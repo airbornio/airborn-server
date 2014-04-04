@@ -1,5 +1,4 @@
 {
 	"name": "scloud",
-	"version": "0.0.1",
-	"main": "server.js"
+	"version": "0.0.1"
 }
