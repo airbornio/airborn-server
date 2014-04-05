@@ -7,7 +7,27 @@ var app = express();
 app.use(express.cookieParser());
 app.use(express.cookieSession({secret: 'secret'})); // TODO: Hide secret
 
-var rValidObjectUrl = /^\/object\/[0-9a-f]{32}$/;
+app.get('/', function(req, res) {
+	res.sendfile('bootstrap.html');
+});
+app.get('/bootstrap.js', function(req, res) {
+	res.sendfile('bootstrap.js');
+});
+app.get('/lang.json', function(req, res) {
+	res.sendfile('lang.json');
+});
+app.get('/bootstrap.css', function(req, res) {
+	res.sendfile('bootstrap.css');
+});
+app.get('/content.html', function(req, res) {
+	res.sendfile('content.html');
+});
+app.get('/content.css', function(req, res) {
+	res.sendfile('content.css');
+});
+app.get('/init.js', function(req, res) {
+	res.sendfile('init.js');
+});
 
 app.get('/object/:id', function(req, res) {
 	if(!userLoggedIn(req)) {
@@ -18,7 +38,6 @@ app.get('/object/:id', function(req, res) {
 	res.attachment(path);
 	res.sendfile(path);
 });
-
 app.put('/object/:id', function(req, res) {
 	if(!userLoggedIn(req)) {
 		res.send(403);
