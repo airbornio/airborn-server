@@ -31,6 +31,25 @@ app.get('/content.css', function(req, res) {
 	res.sendfile('content.css');
 });
 
+app.get('/user/:username/salt', function(req, res) {
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		client.query('SELECT salt FROM users WHERE username = $1', [req.route.params.username], function(err, result) {
+			done();
+			if(err) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			res.send(200, result.rows[0].salt);
+		});
+	});
+});
+
 app.get('/object/:id', function(req, res) {
 	if(!userLoggedIn(req)) {
 		res.send(403);
