@@ -1,0 +1,19 @@
+#container {
+	background-color: #E1E7EA;
+	width: 200px;
+	margin: 10% auto;
+	padding: 30px;
+	border-radius: 10px;
+}
+#container > * {
+	width: 100%;
+	margin: 5px 0;
+}
+iframe {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	z-index: -1;
+}
