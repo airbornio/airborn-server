@@ -7,6 +7,9 @@ var app = express();
 
 var pg = require('pg.js');
 
+var AWS = require('aws-sdk');
+var s3 = new AWS.S3();
+
 app.use(express.cookieParser());
 app.use(express.cookieSession({secret: 'secret'})); // TODO: Hide secret
 
@@ -63,9 +66,7 @@ app.get('/object/:id', function(req, res) {
 		cont();
 	}
 	function cont() {
-		var path = objPath(req);
-		res.attachment(path);
-		res.sendfile(path);
+		s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params.id}).createReadStream().pipe(res);
 	}
 });
 
