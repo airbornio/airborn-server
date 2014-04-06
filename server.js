@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
 
 var express = require('express');
 var app = express();
@@ -67,6 +68,31 @@ app.get('/object/:id', function(req, res) {
 		res.sendfile(path);
 	}
 });
+
+app.get('/sign_s3', function(req, res){
+	var object_name = req.query.s3_object_name;
+	var mime_type = req.query.s3_object_type;
+
+	var now = new Date();
+	var expires = Math.ceil((now.getTime() + 10000)/1000); // 10 seconds from now
+	var amz_headers = "x-amz-acl:public-read";
+
+	var put_request = "PUT\n\n"+mime_type+"\n"+expires+"\n"+amz_headers+"\n/"+process.env.S3_BUCKET_NAME+"/"+object_name;
+
+	var signature = crypto.createHmac('sha1', new Buffer(process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(put_request).digest('base64');
+	signature = encodeURIComponent(signature.trim());
+	signature = signature.replace('%2B','+');
+
+	var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/'+object_name;
+
+	var credentials = {
+		signed_request: url+"?AWSAccessKeyId="+process.env.AWS_ACCESS_KEY_ID+"&Expires="+expires+"&Signature="+signature,
+		url: url
+	};
+	res.write(JSON.stringify(credentials));
+	res.end();
+});
+
 app.put('/object/:id', function(req, res) {
 	if(!userLoggedIn(req)) {
 		res.send(403);
@@ -103,7 +129,7 @@ app.put('/object/:id', function(req, res) {
 });
 
 var server = app.listen(process.env.PORT || 8080, function() {
-    console.log('Listening on port %d', server.address().port);
+	console.log('Listening on port %d', server.address().port);
 });
 
 function objPath(req) {
@@ -125,8 +151,7 @@ function login(req, res, authkey, cont) {
 				return;
 			}
 			if(result.rows[0].authkey === authkey) {
-				console.log(result.rows[0]);
-				req.session.userID = result.rows[0].ID;
+				req.session.userID = result.rows[0].id;
 				delete req.session.username;
 				cont();
 			} else {
