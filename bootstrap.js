@@ -29,6 +29,6 @@ document.getElementById('login').addEventListener('click', function() {
 			eval(sjcl.decrypt(password, req.responseText));
 		}
 	};
-	req.open('GET', 'init.js');
+	req.open('GET', 'object/init.js');
 	req.send(null);
 });
