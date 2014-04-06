@@ -32,6 +32,7 @@ app.get('/content.css', function(req, res) {
 });
 
 app.get('/user/:username/salt', function(req, res) {
+	req.session.username = req.route.params.username;
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 		if(err) {
 			console.error(err);
@@ -51,13 +52,20 @@ app.get('/user/:username/salt', function(req, res) {
 });
 
 app.get('/object/:id', function(req, res) {
-	if(!userLoggedIn(req)) {
+	var authkey = req.get('X-Authentication');
+	if(authkey) {
+		login(req, res, authkey, cont);
+	} else if(!userLoggedIn(req)) {
 		res.send(403);
 		return;
+	} else {
+		cont();
 	}
-	var path = objPath(req);
-	res.attachment(path);
-	res.sendfile(path);
+	function cont() {
+		var path = objPath(req);
+		res.attachment(path);
+		res.sendfile(path);
+	}
 });
 app.put('/object/:id', function(req, res) {
 	if(!userLoggedIn(req)) {
@@ -102,7 +110,32 @@ function objPath(req) {
 	return path.join(__dirname, 'object', req.route.params.id);
 }
 
+function login(req, res, authkey, cont) {
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		client.query('SELECT ID, authkey FROM users WHERE username = $1', [req.session.username], function(err, result) {
+			done();
+			if(err) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			if(result.rows[0].authkey === authkey) {
+				console.log(result.rows[0]);
+				req.session.userID = result.rows[0].ID;
+				delete req.session.username;
+				cont();
+			} else {
+				res.send(401);
+			}
+		});
+	});
+}
+
 function userLoggedIn(req) {
-	return true;
-	return req.session.username !== undefined;
+	return req.session.userID !== undefined;
 }

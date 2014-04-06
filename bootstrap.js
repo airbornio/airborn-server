@@ -1,15 +1,22 @@
+function GET(url, callback, authkey) {
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if(req.readyState === 4 && req.status === 200) {
+			callback(req.responseText);
+		}
+	};
+	req.open('GET', url);
+	if(authkey) req.setRequestHeader('X-Authentication', authkey);
+	req.send(null);
+}
+
 // Language strings
-var req = new XMLHttpRequest();
-req.onreadystatechange = function() {
-	if(req.readyState === 4 && req.status === 200) {
-		var strings = JSON.parse(req.responseText);
-		document.getElementById('username').placeholder = strings.username;
-		document.getElementById('password').placeholder = strings.password;
-		document.getElementById('login').textContent = strings.login;
-	}
-};
-req.open('GET', 'lang.json');
-req.send(null);
+GET('lang.json', function(response) {
+	var strings = JSON.parse(response);
+	document.getElementById('username').placeholder = strings.username;
+	document.getElementById('password').placeholder = strings.password;
+	document.getElementById('login').textContent = strings.login;
+});
 
 // Page content
 var iframe = document.createElement('iframe');
@@ -21,14 +28,11 @@ if('sandbox' in iframe) {
 
 // Login handler
 document.getElementById('login').addEventListener('click', function() {
-	var req = new XMLHttpRequest();
 	var username = document.getElementById('username').value;
 	var password = document.getElementById('password').value;
-	req.onreadystatechange = function() {
-		if(req.readyState === 4 && req.status === 200) {
-			eval(sjcl.decrypt(password, req.responseText));
-		}
-	};
-	req.open('GET', 'object/init.js');
-	req.send(null);
+	GET('user/' + username + '/salt', function(salt) {
+		GET('object/init.js', function(response) {
+			eval(sjcl.decrypt(password, response));
+		}, sjcl.codec.hex.fromBits(sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000, 128)).toUpperCase());
+	});
 });
