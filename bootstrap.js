@@ -27,7 +27,11 @@ if('sandbox' in iframe) {
 }
 
 // Login handler
-document.getElementById('login').addEventListener('click', function() {
+document.getElementById('login').addEventListener('click', login);
+document.getElementById('password').addEventListener('keypress', function(evt) {
+	if(evt.keyCode === 13) login();
+});
+function login() {
 	var username = document.getElementById('username').value;
 	var password = document.getElementById('password').value;
 	GET('user/' + username + '/salt', function(salt) {
@@ -37,4 +41,4 @@ document.getElementById('login').addEventListener('click', function() {
 			eval(sjcl.decrypt(password, response));
 		}, sjcl.codec.hex.fromBits(key.slice(0, 128/32)).toUpperCase());
 	});
-});
+}
