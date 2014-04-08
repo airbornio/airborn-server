@@ -9,7 +9,7 @@
 	width: 100%;
 	margin: 5px 0;
 }
-iframe {
+iframe#content {
 	position: absolute;
 	top: 0;
 	width: 100%;

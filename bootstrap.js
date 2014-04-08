@@ -23,6 +23,7 @@ var iframe = document.createElement('iframe');
 if('sandbox' in iframe) {
 	iframe.sandbox = true;
 	iframe.src = 'content.html';
+	iframe.id = 'content';
 	document.documentElement.appendChild(iframe);
 }
 
