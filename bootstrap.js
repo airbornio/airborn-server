@@ -31,8 +31,10 @@ document.getElementById('login').addEventListener('click', function() {
 	var username = document.getElementById('username').value;
 	var password = document.getElementById('password').value;
 	GET('user/' + username + '/salt', function(salt) {
-		GET('object/init.js', function(response) {
+		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
+		var hmac = new sjcl.misc.hmac(key.slice(128/32));
+		GET('object/' + sjcl.codec.hex.fromBits(hmac.mac('init.js')) + '-c-' + sjcl.codec.hex.fromBits(hmac.mac('daniel-main').slice(0, 2)), function(response) {
 			eval(sjcl.decrypt(password, response));
-		}, sjcl.codec.hex.fromBits(sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000, 128)).toUpperCase());
+		}, sjcl.codec.hex.fromBits(key.slice(0, 128/32)).toUpperCase());
 	});
 });
