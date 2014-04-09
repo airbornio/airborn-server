@@ -17,3 +17,12 @@ iframe#content {
 	border: 0;
 	z-index: -1;
 }
+.window {
+	width: 800px;
+	height: 600px;
+	resize: both;
+}
+.window iframe {
+	width: 100%;
+	height: 100%;
+}
