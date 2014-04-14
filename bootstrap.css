@@ -1,3 +1,6 @@
+body {
+	margin: 0;
+}
 #container {
 	background-color: #E1E7EA;
 	width: 200px;
@@ -18,11 +21,11 @@ iframe#content {
 	z-index: -1;
 }
 .window {
-	width: 800px;
-	height: 600px;
-	resize: both;
+	width: 100%;
+	height: 100%;
 }
 .window iframe {
 	width: 100%;
 	height: 100%;
+	border: 0;
 }
