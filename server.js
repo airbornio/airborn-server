@@ -66,7 +66,12 @@ app.get('/object/:id', function(req, res) {
 		cont();
 	}
 	function cont() {
-		s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params.id}).createReadStream().pipe(res);
+		var stream = s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params.id}).createReadStream();
+		stream.pipe(res);
+		stream.on('error', function(err) {
+			console.error(err);
+			res.send(err.statusCode);
+		});
 	}
 });
 
