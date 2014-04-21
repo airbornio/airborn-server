@@ -1,3 +1,13 @@
 body {
 	background-color: #607B8B;
 }
+#container {
+	width: 260px;
+	height: 177px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -120px 0 0 -130px;
+	background-color: #E1E7EA;
+	border-radius: 10px;
+}

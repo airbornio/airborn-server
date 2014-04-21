@@ -1,5 +1,6 @@
 {
 	"username": "Username",
 	"password": "Password",
-	"login": "Login"
+	"login": "Login",
+	"save": "Remain logged in"
 }

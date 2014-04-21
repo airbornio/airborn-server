@@ -2,15 +2,19 @@ body {
 	margin: 0;
 }
 #container {
-	background-color: #E1E7EA;
 	width: 200px;
-	margin: 10% auto;
-	padding: 30px;
-	border-radius: 10px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -90px 0 0 -100px;
 }
-#container > * {
+#username, #password, #login {
 	width: 100%;
 	margin: 5px 0;
+}
+#label {
+	font-family: sans-serif;
+	font-size: small;
 }
 iframe#content {
 	position: absolute;
