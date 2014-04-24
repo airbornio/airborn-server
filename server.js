@@ -36,16 +36,17 @@ app.get('/content.css', function(req, res) {
 });
 
 app.get('/user/:username/salt', function(req, res) {
-	req.session.username = req.route.params.username;
+	var username = req.param('username');
+	req.session.username = username;
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 		if(err) {
 			console.error(err);
 			res.send(500);
 			return;
 		}
-		client.query('SELECT salt FROM users WHERE username = $1', [req.route.params.username], function(err, result) {
+		client.query('SELECT salt FROM users WHERE username = $1', [username], function(err, result) {
 			done();
-			if(err) {
+			if(err || !result.rows[0]) {
 				console.error(err);
 				res.send(500);
 				return;
@@ -151,7 +152,7 @@ function login(req, res, authkey, cont) {
 		}
 		client.query('SELECT ID, authkey FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
-			if(err) {
+			if(err || !result.rows[0]) {
 				console.error(err);
 				res.send(500);
 				return;
