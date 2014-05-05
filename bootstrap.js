@@ -14,7 +14,7 @@ function login(username, password) {
 	GET('user/' + username + '/salt', function(salt) {
 		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
 		var hmac = new sjcl.misc.hmac(key.slice(128/32));
-		GET('object/' + sjcl.codec.hex.fromBits(hmac.mac('/init.js')) + '-c-' + sjcl.codec.hex.fromBits(hmac.mac(username + '-main').slice(0, 2)), function(response) {
+		GET('object/' + sjcl.codec.hex.fromBits(hmac.mac('/Core/init.js')) + '-c-' + sjcl.codec.hex.fromBits(hmac.mac(username + '-main').slice(0, 2)), function(response) {
 			eval(sjcl.decrypt(password, response));
 		}, sjcl.codec.hex.fromBits(key.slice(0, 128/32)).toUpperCase());
 	});
