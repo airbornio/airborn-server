@@ -76,15 +76,18 @@ app.get('/object/:id', function(req, res) {
 	}
 });
 
-app.get('/sign_s3', function(req, res){
+app.get('/sign_s3_:method', function(req, res) {
+	var method = req.route.params.method;
+	
 	var object_name = req.query.s3_object_name;
 	var mime_type = req.query.s3_object_type;
 
 	var now = new Date();
 	var expires = Math.ceil((now.getTime() + 10000)/1000); // 10 seconds from now
-	var amz_headers = "x-amz-acl:public-read";
+	var amz_headers = 'x-amz-acl:public-read';
+	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + method.split('_')[1];
 
-	var put_request = "PUT\n\n"+mime_type+"\n"+expires+"\n"+amz_headers+"\n/"+process.env.S3_BUCKET_NAME+"/"+object_name;
+	var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 
 	var signature = crypto.createHmac('sha1', new Buffer(process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(put_request).digest('base64');
 	signature = encodeURIComponent(signature.trim());
@@ -93,7 +96,8 @@ app.get('/sign_s3', function(req, res){
 	var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/'+object_name;
 
 	var credentials = {
-		signed_request: url+"?AWSAccessKeyId="+process.env.AWS_ACCESS_KEY_ID+"&Expires="+expires+"&Signature="+signature,
+		req: put_request,
+		signed_request: url+'?AWSAccessKeyId='+process.env.AWS_ACCESS_KEY_ID+'&Expires='+expires+'&Signature='+signature,
 		url: url
 	};
 	res.write(JSON.stringify(credentials));
