@@ -83,7 +83,7 @@ app.get('/sign_s3_:method', function(req, res) {
 	var mime_type = req.query.s3_object_type;
 
 	var now = new Date();
-	var expires = Math.ceil((now.getTime() + 10000)/1000); // 10 seconds from now
+	var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 	var amz_headers = 'x-amz-acl:public-read';
 	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + method.split('_')[1];
 
