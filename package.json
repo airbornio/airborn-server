@@ -4,6 +4,7 @@
 	"dependencies": {
 		"express": "3.4.8",
 		"pg.js": "2.11.1",
-		"aws-sdk": "2.0.x"
+		"aws-sdk": "2.0.x",
+		"newrelic": "1.8.x"
 	}
 }
