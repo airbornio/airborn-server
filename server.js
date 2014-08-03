@@ -58,7 +58,7 @@ app.get('/user/:username/salt', function(req, res) {
 	});
 });
 
-app.get('/object/:id', function(req, res) {
+app.get(/^\/object\/(.+)$/, function(req, res) {
 	var authkey = req.get('X-Authentication');
 	if(authkey) {
 		login(req, res, authkey, cont);
@@ -69,7 +69,7 @@ app.get('/object/:id', function(req, res) {
 		cont();
 	}
 	function cont() {
-		var stream = s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params.id}).createReadStream();
+		var stream = s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params[0]}).createReadStream();
 		stream.pipe(res);
 		stream.on('error', function(err) {
 			console.error(err);
@@ -78,8 +78,8 @@ app.get('/object/:id', function(req, res) {
 	}
 });
 
-app.get('/sign_s3_:method', function(req, res) {
-	var method = req.route.params.method;
+app.get(/^\/sign_s3_(put|copy_(.+))$/, function(req, res) {
+	var method = req.route.params[0];
 	
 	var object_name = req.query.s3_object_name;
 	var mime_type = req.query.s3_object_type;
@@ -87,7 +87,7 @@ app.get('/sign_s3_:method', function(req, res) {
 	var now = new Date();
 	var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 	var amz_headers = 'x-amz-acl:public-read';
-	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + method.split('_')[1];
+	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + req.route.params[1];
 
 	var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 
@@ -177,3 +177,22 @@ function login(req, res, authkey, cont) {
 function userLoggedIn(req) {
 	return req.session.userID !== undefined;
 }
+
+/////////////// Code to get a user's S3 file prefix ///////////////
+//	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+//		if(err) {
+//			console.error(err);
+//			res.send(500);
+//			return;
+//		}
+//		client.query('SELECT username, authkey FROM users WHERE ID = $1', [req.session.userID], function(err, result) {
+//			done();
+//			if(err || !result.rows[0]) {
+//				console.error(err);
+//				res.send(500);
+//				return;
+//			}
+//			console.log(crypto.createHmac('sha256', new Buffer(result.rows[0].authkey, 'hex')).update(result.rows[0].username).digest('hex').substr(0, 16));
+//		});
+//	});
+///////////////////////////////////////////////////////////////////

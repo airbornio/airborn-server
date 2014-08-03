@@ -13,10 +13,13 @@ function GET(url, callback, authkey) {
 function login(username, password) {
 	GET('user/' + username + '/salt', function(salt) {
 		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
-		var hmac = new sjcl.misc.hmac(key.slice(128/32));
-		GET('object/' + sjcl.codec.hex.fromBits(hmac.mac('/Core/init.js')) + '-c-' + sjcl.codec.hex.fromBits(hmac.mac(username + '-main').slice(0, 2)), function(response) {
+		var private_key = key.slice(128/32); // Second half
+		var shared_key = key.slice(0, 128/32); // First half
+		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
+		var shared_hmac = window.shared_hmac = new sjcl.misc.hmac(shared_key);
+		GET('object/' + sjcl.codec.hex.fromBits(shared_hmac.mac(username).slice(0, 2)) + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/Core/init.js')), function(response) {
 			eval(sjcl.decrypt(password, response));
-		}, sjcl.codec.hex.fromBits(key.slice(0, 128/32)).toUpperCase());
+		}, sjcl.codec.hex.fromBits(shared_key).toUpperCase());
 	});
 }
 
