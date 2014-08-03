@@ -79,6 +79,11 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 });
 
 app.get(/^\/sign_s3_(put|copy_(.+))$/, function(req, res) {
+	if(!userLoggedIn(req)) {
+		res.send(403);
+		return;
+	}
+
 	var method = req.route.params[0];
 	
 	var object_name = req.query.s3_object_name;
