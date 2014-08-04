@@ -89,6 +89,11 @@ app.get(/^\/sign_s3_(put|copy_(.+))$/, function(req, res) {
 	var object_name = req.query.s3_object_name;
 	var mime_type = req.query.s3_object_type;
 
+	if(req.query.s3_object_name.substr(0, 17) !== req.session.S3Prefix + '/') {
+		res.send(403);
+		return;
+	}
+
 	var now = new Date();
 	var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 	var amz_headers = 'x-amz-acl:public-read';
@@ -131,6 +136,7 @@ function login(req, res, authkey, cont) {
 			}
 			if(result.rows[0].authkey === authkey) {
 				req.session.userID = result.rows[0].id;
+				req.session.S3Prefix = crypto.createHmac('sha256', new Buffer(result.rows[0].authkey, 'hex')).update(req.session.username).digest('hex').substr(0, 16);
 				delete req.session.username;
 				cont();
 			} else {
@@ -143,22 +149,3 @@ function login(req, res, authkey, cont) {
 function userLoggedIn(req) {
 	return req.session.userID !== undefined;
 }
-
-/////////////// Code to get a user's S3 file prefix ///////////////
-//	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-//		if(err) {
-//			console.error(err);
-//			res.send(500);
-//			return;
-//		}
-//		client.query('SELECT username, authkey FROM users WHERE ID = $1', [req.session.userID], function(err, result) {
-//			done();
-//			if(err || !result.rows[0]) {
-//				console.error(err);
-//				res.send(500);
-//				return;
-//			}
-//			console.log(crypto.createHmac('sha256', new Buffer(result.rows[0].authkey, 'hex')).update(result.rows[0].username).digest('hex').substr(0, 16));
-//		});
-//	});
-///////////////////////////////////////////////////////////////////
