@@ -17,8 +17,11 @@ function login(username, password) {
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
 		var shared_hmac = window.shared_hmac = new sjcl.misc.hmac(shared_key);
-		GET('object/' + sjcl.codec.hex.fromBits(shared_hmac.mac(username).slice(0, 2)) + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/Core/init.js')), function(response) {
-			eval(sjcl.decrypt(password, response));
+		GET('object/' + sjcl.codec.hex.fromBits(shared_hmac.mac(username).slice(0, 2)) + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
+			var files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+			GET('object/' + sjcl.codec.hex.fromBits(shared_hmac.mac(username).slice(0, 2)) + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/Core/init.js')), function(response) {
+				eval(sjcl.decrypt(files_key, response));
+			});
 		}, sjcl.codec.hex.fromBits(shared_key).toUpperCase());
 	});
 }
