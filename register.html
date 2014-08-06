@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="3rdparty/visualcaptcha/visualcaptcha.css">
+	<link rel="stylesheet" href="register.css">
+</head>
+<body>
+	Airborn
+	<form id="container">
+		<table>
+			<tr><td><label id="username-label" for="username"></label></td><td><input type="text" id="username"></td></tr>
+			<tr><td><label id="password-label" for="password"></label></td><td><input type="password" id="password"></td></tr>
+			<tr><td><label id="password-again-label" for="password-again"></label></td><td><input type="password" id="password-again"></td></tr>
+			<tr><td colspan="2" id="captcha-td"><label id="captcha-label" for="captcha"></label><div id="captcha"></div></td></tr>
+			<tr><td colspan="2"><input type="submit" id="register"><br></td></tr>
+		</table>
+	</form>
+	<script src="register.js"></script>
+	<script src="3rdparty/visualcaptcha/visualcaptcha.vanilla.js"></script>
+	<script src="sjcl.js"></script>
+	<script src="3rdparty/jszip/jszip.min.js"></script>
+	<script type="text/javascript" src="3rdparty/jszip/jszip-utils.js"></script>
+	<!--
+	Mandatory in IE 6, 7, 8 and 9.
+	-->
+	<!--[if IE]>
+	<script type="text/javascript" src="3rdparty/jszip/jszip-utils-ie.js"></script>
+	<![endif]-->
+</body>
+</html>

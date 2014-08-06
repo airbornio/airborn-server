@@ -58,10 +58,10 @@ if(username && password && files_key) {
 	// Page content
 	var iframe = document.createElement('iframe');
 	if('sandbox' in iframe) {
-		iframe.sandbox = true;
-		iframe.src = 'content.html';
+		iframe.sandbox = 'allow-scripts allow-popups';
+		iframe.src = 'content';
 		iframe.id = 'content';
-		document.documentElement.appendChild(iframe);
+		document.body.insertBefore(iframe, document.body.firstChild);
 	}
 	
 	// Login handler
@@ -73,6 +73,6 @@ if(username && password && files_key) {
 		var storage = window.storage = document.getElementById('save').checked ? localStorage : sessionStorage;
 		storage.username = username;
 		storage.password = password;
-	}, false);
+	});
 	
 }

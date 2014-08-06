@@ -2,5 +2,14 @@
 	"username": "Username",
 	"password": "Password",
 	"login": "Login",
-	"save": "Remain logged in"
+	"save": "Remain logged in",
+	"register": "Register",
+	"password-again": "Password (again)",
+	"captcha": "Please prove you're human.",
+	"nocaptcha": "Please click the asked image, or click the sound icon for an audial question.",
+	"wrong": "Sorry, that wasn't the right answer. Please click the image that is asked or click the sound icon for an audial question.",
+	"error": "Sorry, there was an error. Please try again.",
+	"validating": "Validating…",
+	"registering": "Registering…",
+	"uploading": "Saving your first files and apps…"
 }
