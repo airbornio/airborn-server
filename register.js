@@ -31,6 +31,8 @@ GET('lang.json', function(response) {
 	document.getElementById('password-label').textContent = strings.password;
 	document.getElementById('password-again-label').textContent = strings['password-again'];
 	document.getElementById('captcha-label').textContent = strings.captcha;
+	document.getElementById('done').textContent = strings.done;
+	document.getElementById('error').textContent = strings.diffpasswords;
 	document.getElementById('register').value = strings.register;
 });
 
@@ -40,23 +42,64 @@ document.addEventListener('DOMContentLoaded', function() {
 		numberOfImages: 5,
 		imgPath: '/3rdparty/visualcaptcha/img/',
 		captcha: {
-			url: '/captcha',
-			callbacks: {
-				loading: function(captcha){
-					console.log('I am loading.', captcha);
-				},
-				loaded: function(captcha){
-					console.log('I am loaded.', captcha);
-				}
-			}
+			url: '/captcha'
 		}
 	});
+	this.addEventListener('click', function(evt) {
+		var elm = evt.target;
+		if(evt.target.tagName === 'IMG') {
+			elm = elm.parentElement;
+		}
+		if(elm.classList.contains('img')) {
+			maybeDone();
+		} else if(elm.classList.contains('visualCaptcha-refresh-button')) {
+			document.getElementById('done').style.display = 'none';
+		}
+	});
+	function debounce(fn, time, obj) {
+		if(obj.timeout) clearTimeout(obj.timeout);
+		obj.timeout = setTimeout(function() {
+			delete obj.timeout;
+			fn();
+		}, time);
+	}
+	var debounceObj = {};
+	this.addEventListener('keyup', function(evt) {
+		debounce(maybeDone, 500, debounceObj);
+	});
+	function maybeDone() {
+		var error = maybeError();
+		document.getElementById('error').style.display = 'none';
+		if(!error) {
+			document.getElementById('done').style.display = 'inline-block';
+		} else if(error === lang.diffpasswords) {
+			document.getElementById('error').style.display = 'inline-block';
+			document.getElementById('done').style.display = 'none';
+		}
+	}
 });
+
+function maybeError() {
+	if(
+		!document.getElementById('username').value ||
+		!document.getElementById('password').value ||
+		!document.getElementById('password-again').value
+	) {
+		return lang.nofield;
+	}
+	if(document.getElementById('password').value !== document.getElementById('password-again').value) {
+		return lang.diffpasswords;
+	}
+	if(!captcha.getCaptchaData().valid) {
+		return lang.nocaptcha;
+	}
+}
 
 document.getElementById('container').addEventListener('submit', function(evt) {
 	evt.preventDefault();
-	if(!captcha.getCaptchaData().valid) {
-		alert(lang.nocaptcha);
+	var error = maybeError();
+	if(error) {
+		alert(error);
 		return;
 	}
 	var register = document.getElementById('register');
@@ -152,6 +195,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		if(req.status === 403) {
 			alert(lang.wrong);
 			captcha.refresh();
+			document.getElementById('done').style.display = 'none';
 		} else {
 			alert(lang.error);
 		}
