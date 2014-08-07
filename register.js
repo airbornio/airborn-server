@@ -81,7 +81,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		var private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
-		var shared_hmac = window.shared_hmac = new sjcl.misc.hmac(shared_key);
+		var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 		
 		POST('/register', {

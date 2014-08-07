@@ -132,15 +132,19 @@ app.post('/register', function(req, res) {
 			return;
 		}
 		var id = guid().replace(/-/g, '').toUpperCase();
-		client.query('INSERT INTO users (id, username, salt, authkey) VALUES ($1, $2, $3, $4)', [id, req.body.username, req.body.salt, req.body.authkey], function(err, result) {
+		var username = req.body.username;
+		var salt = req.body.salt;
+		var authkey = req.body.authkey;
+		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
+		client.query('INSERT INTO users (id, username, salt, authkey, S3Prefix) VALUES ($1, $2, $3, $4)', [id, username, salt, authkey, S3Prefix], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
 				res.send(500);
 				return;
 			}
-			req.session.username = req.body.username;
-			login(req, res, req.body.authkey, function() {
+			req.session.username = username;
+			login(req, res, authkey, function() {
 				res.send(200);
 			});
 		});
@@ -158,7 +162,7 @@ function login(req, res, authkey, cont) {
 			res.send(500);
 			return;
 		}
-		client.query('SELECT id, authkey FROM users WHERE username = $1', [req.session.username], function(err, result) {
+		client.query('SELECT id, authkey, S3Prefix FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
 			if(err || !result.rows[0]) {
 				console.error(err);
@@ -167,7 +171,7 @@ function login(req, res, authkey, cont) {
 			}
 			if(result.rows[0].authkey === authkey) {
 				req.session.userID = result.rows[0].id;
-				req.session.S3Prefix = crypto.createHmac('sha256', new Buffer(result.rows[0].authkey, 'hex')).update(req.session.username).digest('hex').substr(0, 16);
+				req.session.S3Prefix = result.rows[0].S3Prefix;
 				delete req.session.username;
 				cont();
 			} else {
