@@ -40,7 +40,7 @@ label {
 #captcha-td {
 	padding-top: 7px;
 }
-#done, #error {
+#ready, #error {
 	display: none;
 	font-size: small;
 	padding-top: 8px;

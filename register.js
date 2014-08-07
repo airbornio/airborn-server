@@ -31,7 +31,7 @@ GET('lang.json', function(response) {
 	document.getElementById('password-label').textContent = strings.password;
 	document.getElementById('password-again-label').textContent = strings['password-again'];
 	document.getElementById('captcha-label').textContent = strings.captcha;
-	document.getElementById('done').textContent = strings.done;
+	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('error').textContent = strings.diffpasswords;
 	document.getElementById('register').value = strings.register;
 });
@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			elm = elm.parentElement;
 		}
 		if(elm.classList.contains('img')) {
-			maybeDone();
+			maybeReady();
 		} else if(elm.classList.contains('visualCaptcha-refresh-button')) {
-			document.getElementById('done').style.display = 'none';
+			document.getElementById('ready').style.display = 'none';
 		}
 	});
 	function debounce(fn, time, obj) {
@@ -65,16 +65,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	var debounceObj = {};
 	this.addEventListener('keyup', function(evt) {
-		debounce(maybeDone, 500, debounceObj);
+		debounce(maybeReady, 500, debounceObj);
 	});
-	function maybeDone() {
+	function maybeReady() {
 		var error = maybeError();
 		document.getElementById('error').style.display = 'none';
 		if(!error) {
-			document.getElementById('done').style.display = 'inline-block';
+			document.getElementById('ready').style.display = 'inline-block';
 		} else if(error === lang.diffpasswords) {
 			document.getElementById('error').style.display = 'inline-block';
-			document.getElementById('done').style.display = 'none';
+			document.getElementById('ready').style.display = 'none';
 		}
 	}
 });
@@ -102,6 +102,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		alert(error);
 		return;
 	}
+	document.getElementById('ready').style.display = 'none';
 	var register = document.getElementById('register');
 	register.disabled = true;
 	register.value = lang.validating;
@@ -124,7 +125,6 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		var private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
-		var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 		
 		POST('/register', {
@@ -132,6 +132,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
 			authkey: authkey
 		}, function(response) {
+			var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
 			register.value = lang.uploading;
 			JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
 				if(err) {
@@ -181,7 +182,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					if(uploaded === total) cont();
 				});
 				function cont() {
-					
+					document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
 				}
 			});
 		}, function(req) {
@@ -195,7 +196,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		if(req.status === 403) {
 			alert(lang.wrong);
 			captcha.refresh();
-			document.getElementById('done').style.display = 'none';
+			document.getElementById('ready').style.display = 'none';
 		} else {
 			alert(lang.error);
 		}

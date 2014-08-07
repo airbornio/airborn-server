@@ -17,7 +17,12 @@ var visualCaptcha;
 app.use(express.json());
 
 app.use(express.cookieParser());
-app.use(express.cookieSession({secret: process.env.COOKIE_SESSION_SECRET}));
+app.use(express.cookieSession({
+	secret: process.env.COOKIE_SESSION_SECRET,
+	cookie: {
+		httpOnly: false
+	}
+}));
 
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
@@ -139,7 +144,7 @@ app.post('/register', function(req, res) {
 		var salt = req.body.salt;
 		var authkey = req.body.authkey;
 		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
-		client.query('INSERT INTO users (id, username, salt, authkey, S3Prefix) VALUES ($1, $2, $3, $4)', [id, username, salt, authkey, S3Prefix], function(err, result) {
+		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix") VALUES ($1, $2, $3, $4, $5)', [id, username, salt, authkey, S3Prefix], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
@@ -165,7 +170,7 @@ function login(req, res, authkey, cont) {
 			res.send(500);
 			return;
 		}
-		client.query('SELECT id, authkey, S3Prefix FROM users WHERE username = $1', [req.session.username], function(err, result) {
+		client.query('SELECT id, authkey, "S3Prefix" FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
 			if(err || !result.rows[0]) {
 				console.error(err);
@@ -208,6 +213,10 @@ function _getAudio( req, res, next ) {
 	if ( req.params.type !== 'ogg' ) {
 		req.params.type = 'mp3';
 	}
+	
+	if ( ! visualCaptcha ) {
+		visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
+	}
 
 	visualCaptcha.streamAudio( res, req.params.type );
 };
@@ -219,6 +228,10 @@ function _getImage( req, res, next ) {
 	// Default is non-retina
 	if ( req.query.retina ) {
 		isRetina = true;
+	}
+	
+	if ( ! visualCaptcha ) {
+		visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
 	}
 
 	visualCaptcha.streamImage( req.params.index, res, isRetina );
@@ -247,48 +260,44 @@ function _trySubmission( req, res, next ) {
 		audioAnswer,
 		responseStatus,
 		responseObject;
-
+	
+	if ( ! visualCaptcha ) {
+		visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
+	}
+	
 	frontendData = visualCaptcha.getFrontendData();
 
 	// Add namespace to query params, if present
 	if ( namespace && namespace.length !== 0 ) {
 		queryParams.push( 'namespace=' + namespace );
 	}
+	
+	// If an image field name was submitted, try to validate it
+	if ( ( imageAnswer = req.body[ frontendData.imageFieldName ] ) ) {
+		if ( visualCaptcha.validateImage( imageAnswer ) ) {
+			queryParams.push( 'status=validImage' );
 
-	// It's not impossible this method is called before visualCaptcha is initialized, so we have to send a 404
-	if ( typeof frontendData === 'undefined' ) {
-		queryParams.push( 'status=noCaptcha' );
-
-		responseStatus = 404;
-		responseObject = 'Not Found';
-	} else {
-		// If an image field name was submitted, try to validate it
-		if ( ( imageAnswer = req.body[ frontendData.imageFieldName ] ) ) {
-			if ( visualCaptcha.validateImage( imageAnswer ) ) {
-				queryParams.push( 'status=validImage' );
-
-				responseStatus = 200;
-			} else {
-				queryParams.push( 'status=failedImage' );
-
-				responseStatus = 403;
-			}
-		} else if ( ( audioAnswer = req.body[ frontendData.audioFieldName ] ) ) {
-			// We set lowercase to allow case-insensitivity, but it's actually optional
-			if ( visualCaptcha.validateAudio( audioAnswer.toLowerCase() ) ) {
-				queryParams.push( 'status=validAudio' );
-
-				responseStatus = 200;
-			} else {
-				queryParams.push( 'status=failedAudio' );
-
-				responseStatus = 403;
-			}
+			responseStatus = 200;
 		} else {
-			queryParams.push( 'status=failedPost' );
+			queryParams.push( 'status=failedImage' );
 
-			responseStatus = 500;
+			responseStatus = 403;
 		}
+	} else if ( ( audioAnswer = req.body[ frontendData.audioFieldName ] ) ) {
+		// We set lowercase to allow case-insensitivity, but it's actually optional
+		if ( visualCaptcha.validateAudio( audioAnswer.toLowerCase() ) ) {
+			queryParams.push( 'status=validAudio' );
+
+			responseStatus = 200;
+		} else {
+			queryParams.push( 'status=failedAudio' );
+
+			responseStatus = 403;
+		}
+	} else {
+		queryParams.push( 'status=failedPost' );
+
+		responseStatus = 500;
 	}
 
 	if(responseStatus === 403) {
