@@ -41,6 +41,9 @@ app.get(/^\/(?:bootstrap|content|register)\.(?:js|css)$/, function(req, res) {
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
+app.get(/^\/images\/.+\.png$/, function(req, res) {
+	res.sendfile(req.path.substr(1));
+});
 
 app.get('/user/:username/salt', function(req, res) {
 	var username = req.param('username');

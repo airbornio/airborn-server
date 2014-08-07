@@ -5,6 +5,13 @@ body {
 	background-color: #607B8B;
 	font-family: sans-serif;
 }
+#logo {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -141px;
+	margin-top: -200px;
+}
 table {
 	border-collapse: collapse;
 	width: 100%;
@@ -22,7 +29,7 @@ label {
 	top: 50%;
 	left: 50%;
 	margin: -120px 0 0 -205px;
-	padding: 30px;
+	padding: 20px 30px;
 	background-color: #E1E7EA;
 	border-radius: 10px;
 }

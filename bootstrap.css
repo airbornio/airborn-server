@@ -1,3 +1,6 @@
+* {
+	box-sizing: border-box;
+}
 body {
 	margin: 0;
 }
@@ -6,7 +9,7 @@ body {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: -90px 0 0 -100px;
+	margin: -85px 0 0 -100px;
 }
 #username, #password, #login {
 	width: 100%;

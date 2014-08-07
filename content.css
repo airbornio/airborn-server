@@ -1,14 +1,43 @@
+* {
+	box-sizing: border-box;
+}
 body {
 	background-color: #607B8B;
 	font-family: sans-serif;
+	margin: 0;
+}
+#logo {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -94px;
+	margin-top: -160px;
 }
 #container {
 	width: 260px;
-	height: 177px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: -120px 0 0 -130px;
+	margin: -105px 0 0 -130px;
+	padding: 20px 30px;
 	background-color: #E1E7EA;
 	border-radius: 10px;
+}
+#container > * {
+	visibility: hidden;
+}
+#username, #password, #login {
+	width: 100%;
+	margin: 5px 0;
+}
+#register-container {
+	position: absolute;
+	margin-top: 35px;
+	text-align: center;
+	width: 100%;
+	margin-left: -30px;
+	visibility: visible;
+}
+#register {
+	color: #E1E7EA;
 }
