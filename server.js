@@ -97,17 +97,17 @@ app.get('/user/:username/salt', function(req, res) {
 });
 
 app.get(/^\/object\/(.+)$/, function(req, res) {
-	var authkey = req.get('X-Authentication');
-	if(authkey) {
+	var authkey;
+	if(userLoggedIn(req)) {
+		cont();
+	} else if((authkey = req.get('X-Authentication'))) {
 		login(req, res, authkey, cont);
-	} else if(!userLoggedIn(req)) {
+	} else {
 		res.send(403);
 		return;
-	} else {
-		cont();
 	}
 	function cont() {
-		var stream = s3.getObject({Bucket: 'laskya-cloud', Key: req.route.params[0]}).createReadStream();
+		var stream = s3.getObject({Bucket: 'laskya-cloud', Key: req.session.S3Prefix + '/' + req.params[0]}).createReadStream();
 		stream.pipe(res);
 		stream.on('error', function(err) {
 			console.error(err);
@@ -122,7 +122,7 @@ app.get(/^\/sign_s3_(put|copy_(.+))$/, function(req, res) {
 		return;
 	}
 
-	var method = req.route.params[0];
+	var method = req.params[0];
 	
 	var object_name = req.query.s3_object_name;
 	var mime_type = req.query.s3_object_type;
@@ -135,7 +135,7 @@ app.get(/^\/sign_s3_(put|copy_(.+))$/, function(req, res) {
 	var now = new Date();
 	var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 	var amz_headers = 'x-amz-acl:public-read';
-	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + req.route.params[1];
+	if(method !== 'put') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + req.params[1];
 
 	var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 

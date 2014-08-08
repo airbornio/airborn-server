@@ -126,6 +126,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		try {
 			var salt = sjcl.random.randomWords(2);
 			var files_key = window.files_key = sjcl.random.randomWords(8);
+			var hmac_bits = sjcl.random.randomWords(4);
 		} catch(e) {
 			alert(lang.error);
 			throw e;
@@ -134,6 +135,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		var private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
+		var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 		
 		POST('/register', {
@@ -185,8 +187,12 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						});
 					}
 				});
-				total++;
+				total += 2;
 				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase(), function() {
+					uploaded++;
+					if(uploaded === total) cont();
+				});
+				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase(), function() {
 					uploaded++;
 					if(uploaded === total) cont();
 				});

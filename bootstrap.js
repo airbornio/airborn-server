@@ -10,25 +10,34 @@ function GET(url, callback, authkey) {
 	req.send(null);
 }
 
-function login(username, password, files_key) {
+function login(username, password, files_key, hmac_bits) {
 	GET('user/' + username + '/salt', function(salt) {
+		var done = 0;
 		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
 		var private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
-		var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
+		var files_hmac;
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
-		if(files_key) {
+		if(files_key && hmac_bits) {
+			files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			cont(authkey);
 		} else {
-			GET('object/' + S3Prefix + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
+			GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
 				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
 				window.storage.files_key = JSON.stringify(files_key);
-				cont();
+				if(++done === 2) cont();
+			}, authkey);
+			GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
+				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+				window.storage.hmac_bits = JSON.stringify(hmac_bits);
+				files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
+				if(++done === 2) cont();
 			}, authkey);
 		}
 		function cont(authkey) {
-			GET('object/' + S3Prefix + '/' + sjcl.codec.hex.fromBits(private_hmac.mac('/Core/init.js')), function(response) {
+			GET('object/' + sjcl.codec.hex.fromBits(files_hmac.mac('/Core/init.js')), function(response) {
+				var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
 				eval(sjcl.decrypt(files_key, response));
 			}, authkey);
 		}
@@ -39,10 +48,12 @@ var username = sessionStorage.username || localStorage.username;
 var password = sessionStorage.password || localStorage.password;
 var files_key = sessionStorage.files_key || localStorage.files_key;
 if(files_key) files_key = JSON.parse(files_key);
-if(username && password && files_key) {
+var hmac_bits = sessionStorage.hmac_bits || localStorage.hmac_bits;
+if(hmac_bits) hmac_bits = JSON.parse(hmac_bits);
+if(username && password && files_key && hmac_bits) {
 	
 	// Login with previously saved credentials
-	login(username, password, files_key);
+	login(username, password, files_key, hmac_bits);
 	
 } else {
 	
@@ -67,12 +78,10 @@ if(username && password && files_key) {
 	// Login handler
 	document.getElementById('container').addEventListener('submit', function(evt) {
 		evt.preventDefault();
-		var username = document.getElementById('username').value;
-		var password = document.getElementById('password').value;
-		login(username, password);
 		var storage = window.storage = document.getElementById('save').checked ? localStorage : sessionStorage;
-		storage.username = username;
-		storage.password = password;
+		username = storage.username = document.getElementById('username').value;
+		password = storage.password = document.getElementById('password').value;
+		login(username, password);
 	});
 	
 }
