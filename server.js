@@ -50,6 +50,31 @@ app.get(/^\/images\/.+\.png$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 
+app.get('/user/:username/exists', function(req, res) {
+	var username = req.param('username');
+	req.session.username = username;
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		client.query('SELECT salt FROM users WHERE username = $1', [username], function(err, result) {
+			done();
+			if(err) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			if(!result.rows[0]) {
+				res.send(200, 'false');
+				return;
+			}
+			res.send(200, 'true');
+		});
+	});
+});
+
 app.get('/user/:username/salt', function(req, res) {
 	var username = req.param('username');
 	req.session.username = username;
@@ -148,7 +173,11 @@ app.post('/register', function(req, res) {
 			done();
 			if(err) {
 				console.error(err);
-				res.send(500);
+				if(err.detail && err.detail.match(/Key \(username\)=\(.+\) already exists./)) {
+					res.send(409, 'User exists.');
+				} else {
+					res.send(500);
+				}
 				return;
 			}
 			req.session.username = username;

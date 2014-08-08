@@ -32,7 +32,6 @@ GET('lang.json', function(response) {
 	document.getElementById('password-again-label').textContent = strings['password-again'];
 	document.getElementById('captcha-label').textContent = strings.captcha;
 	document.getElementById('ready').textContent = strings.ready;
-	document.getElementById('error').textContent = strings.diffpasswords;
 	document.getElementById('register').value = strings.register;
 });
 
@@ -68,13 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
 		debounce(maybeReady, 500, debounceObj);
 	});
 	function maybeReady() {
-		var error = maybeError();
-		document.getElementById('error').style.display = 'none';
-		if(!error) {
-			document.getElementById('ready').style.display = 'inline-block';
-		} else if(error === lang.diffpasswords) {
-			document.getElementById('error').style.display = 'inline-block';
-			document.getElementById('ready').style.display = 'none';
+		if(document.getElementById('username').value) {
+			document.getElementById('error').style.display = 'none';
+			GET('/user/' + document.getElementById('username').value + '/exists', function(response) {
+				if(response === 'true') {
+					document.getElementById('error').textContent = lang.taken;
+					document.getElementById('error').style.display = 'inline-block';
+					return;
+				}
+				var error = maybeError();
+				if(!error) {
+					document.getElementById('ready').style.display = 'inline-block';
+				} else if(error === lang.diffpasswords) {
+					document.getElementById('error').textContent = lang.diffpasswords;
+					document.getElementById('error').style.display = 'inline-block';
+					document.getElementById('ready').style.display = 'none';
+				}
+			});
 		}
 	}
 });
@@ -188,17 +197,20 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		}, function(req) {
 			register.disabled = false;
 			register.value = lang.register;
-			alert(lang.error);
+			if(req.status === 409) {
+				alert(lang.taken);
+			} else {
+				alert(lang.error);
+			}
 		});
 	}, function(req) {
 		register.disabled = false;
 		register.value = lang.register;
 		if(req.status === 403) {
 			alert(lang.wrong);
-			captcha.refresh();
-			document.getElementById('ready').style.display = 'none';
 		} else {
 			alert(lang.error);
 		}
+		captcha.refresh();
 	});
 });
