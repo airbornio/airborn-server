@@ -30,14 +30,3 @@ body {
 	width: 100%;
 	margin: 5px 0;
 }
-#register-container {
-	position: absolute;
-	margin-top: 35px;
-	text-align: center;
-	width: 100%;
-	margin-left: -30px;
-	visibility: visible;
-}
-#register {
-	color: #E1E7EA;
-}
