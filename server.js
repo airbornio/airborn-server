@@ -86,9 +86,12 @@ app.get('/user/:username/salt', function(req, res) {
 		}
 		client.query('SELECT salt FROM users WHERE username = $1', [username], function(err, result) {
 			done();
-			if(err || !result.rows[0]) {
+			if(err) {
 				console.error(err);
 				res.send(500);
+				return;
+			} else if(!result.rows[0]) {
+				res.send(404);
 				return;
 			}
 			res.send(200, result.rows[0].salt);

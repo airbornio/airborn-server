@@ -3,6 +3,8 @@
 	"password": "Password",
 	"login": "Login",
 	"save": "Remain logged in",
+	"wronguser": "Sorry, that username doesn't exist.",
+	"wrongpass": "Sorry, that password is not correct.",
 	"register": "Register",
 	"password-again": "Password (again)",
 	"captcha": "Please prove you're human.",
