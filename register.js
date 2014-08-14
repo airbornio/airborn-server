@@ -197,7 +197,11 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					if(uploaded === total) cont();
 				});
 				function cont() {
-					document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
+					corsReq('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function() {
+						installPackage(this.response.manifest_url, {categories: this.response.categories}, function() {
+							document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
+						});
+					}, 'json');
 				}
 			});
 		}, function(req) {
