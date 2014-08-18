@@ -171,6 +171,7 @@ app.get(/^\/sign_s3_(put|copy)_(.+)$/, function(req, res) {
 			var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 			var amz_headers = 'x-amz-acl:public-read';
 			if(method === 'copy') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + req.params[1];
+			if(method === 'put') amz_headers += '\nx-amz-content-length-range:' + req.params[1] + ',' + req.params[1];
 
 			var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 
