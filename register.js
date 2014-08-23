@@ -187,6 +187,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				var uploaded = 0;
 				var total = 0;
 				var target = '/Core/';
+				console.time('upload core');
 				keys.forEach(function(path) {
 					var file = zip.files[path];
 					if(!file.options.dir) {
@@ -207,8 +208,11 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					if(uploaded === total) cont();
 				});
 				function cont() {
+					console.timeEnd('upload core');
 					corsReq('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function() {
+						console.time('upload marketplace');
 						installPackage(this.response.manifest_url, {categories: this.response.categories}, function() {
+							console.timeEnd('upload marketplace');
 							document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
 						});
 					}, 'json');
