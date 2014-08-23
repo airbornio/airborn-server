@@ -55,6 +55,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			document.getElementById('ready').style.display = 'none';
 		}
 	});
+	this.addEventListener('keypress', function(evt) {
+		var elm = evt.target;
+		if(evt.target.tagName === 'IMG') {
+			elm = elm.parentElement;
+		}
+		if((elm.classList.contains('img') || elm.classList.contains('visualCaptcha-refresh-button') || elm.classList.contains('visualCaptcha-accessibility-button')) &&
+		   (evt.which === 13 || evt.which === 32)) {
+			elm.click();
+		}
+	});
 	function debounce(fn, time, obj) {
 		if(obj.timeout) clearTimeout(obj.timeout);
 		obj.timeout = setTimeout(function() {
