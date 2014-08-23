@@ -119,16 +119,16 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 	}
 });
 
-app.get(/^\/sign_s3_(put|copy)_(.+)$/, function(req, res) {
+app.get(/^\/sign_s3_copy_(.+)$/, function(req, res) {
 	if(!userLoggedIn(req)) {
 		res.send(403);
 		return;
 	}
-
-	var method = req.params[0];
 	
 	var object_name = req.query.s3_object_name;
 	var mime_type = req.query.s3_object_type;
+	
+	var copy_source = req.params[0];
 
 	if(req.query.s3_object_name.substr(0, 17) !== req.session.S3Prefix + '/') {
 		res.send(403);
@@ -142,24 +142,14 @@ app.get(/^\/sign_s3_(put|copy)_(.+)$/, function(req, res) {
 			return;
 		}
 		var name = object_name.split('/')[1];
-		if(method === 'put') {
-			client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [req.session.userID, name, req.params[1]], function(err, result) {
-				if(err) {
-					client.query('UPDATE objects SET size = $3 WHERE "userId" = $1 AND name = $2', [req.session.userID, name, req.params[1]], cont);
-				} else {
-					cont(err, result);
-				}
-			});
-		} else {
-			var copy_source = req.params[1].split('/')[1];
-			client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, (SELECT size FROM objects WHERE "userId" = $3 AND name = $4))', [req.session.userID, name, req.session.userID, copy_source], function(err, result) {
-				if(err) {
-					client.query('UPDATE objects SET size = (SELECT size FROM objects WHERE "userId" = $1 AND name = $3) WHERE "userId" = $1 AND name = $2', [req.session.userID, name, copy_source], cont);
-				} else {
-					cont(err, result);
-				}
-			});
-		}
+		var copy_source_name = copy_source.split('/')[1];
+		client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, (SELECT size FROM objects WHERE "userId" = $3 AND name = $4))', [req.session.userID, name, req.session.userID, copy_source_name], function(err, result) {
+			if(err) {
+				client.query('UPDATE objects SET size = (SELECT size FROM objects WHERE "userId" = $1 AND name = $3) WHERE "userId" = $1 AND name = $2', [req.session.userID, name, copy_source_name], cont);
+			} else {
+				cont(err, result);
+			}
+		});
 		function cont(err, result) {
 			done();
 			if(err) {
@@ -170,8 +160,7 @@ app.get(/^\/sign_s3_(put|copy)_(.+)$/, function(req, res) {
 			var now = new Date();
 			var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
 			var amz_headers = 'x-amz-acl:public-read';
-			if(method === 'copy') amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + req.params[1];
-			if(method === 'put') amz_headers += '\nx-amz-content-length-range:' + req.params[1] + ',' + req.params[1];
+			amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + copy_source;
 
 			var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 
@@ -185,6 +174,89 @@ app.get(/^\/sign_s3_(put|copy)_(.+)$/, function(req, res) {
 				req: put_request,
 				signed_request: url+'?AWSAccessKeyId='+process.env.AWS_ACCESS_KEY_ID+'&Expires='+expires+'&Signature='+signature,
 				url: url
+			};
+			res.send(JSON.stringify(credentials));
+		}
+	});
+});
+
+app.get(/^\/sign_s3_post_(\d+)$/, function(req, res) {
+	if(!userLoggedIn(req)) {
+		res.send(403);
+		return;
+	}
+	
+	var object_name = req.query.s3_object_name;
+	var mime_type = req.query.s3_object_type;
+	
+	var object_size = req.params[0];
+
+	if(req.query.s3_object_name.substr(0, 17) !== req.session.S3Prefix + '/') {
+		res.send(403);
+		return;
+	}
+	
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		var name = object_name.split('/')[1];
+		client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [req.session.userID, name, object_size], function(err, result) {
+			if(err) {
+				client.query('UPDATE objects SET size = $3 WHERE "userId" = $1 AND name = $2', [req.session.userID, name, object_size], cont);
+			} else {
+				cont(err, result);
+			}
+		});
+		function cont(err, result) {
+			done();
+			if(err) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			var now = new Date();
+			var isoNow = now.toISOString().replace(/-|:|\.\d+/g, '');
+			var date = now.getUTCFullYear() + ('00' + now.getUTCMonth()).substr(-2) + ('00' + now.getUTCDate()).substr(-2);
+			var expires = new Date(now.getTime() + 600000); // 10 minutes from now
+
+			var credential = process.env.AWS_ACCESS_KEY_ID + '/' + date + '/' + process.env.AWS_REGION + '/s3/aws4_request';
+			var policy = new Buffer(JSON.stringify({
+				expiration: expires.toISOString(),
+				conditions: [
+					{bucket: process.env.S3_BUCKET_NAME},
+					{key: object_name},
+					{acl: 'public-read'},
+					['content-length-range', object_size, object_size],
+					{'x-amz-algorithm': 'AWS4-HMAC-SHA256'},
+					{'x-amz-credential': credential},
+					{'x-amz-date': isoNow}
+				]
+			})).toString('base64');
+			
+			var dateKey = crypto.createHmac('sha256', new Buffer('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(date).digest();
+			var dateRegionKey = crypto.createHmac('sha256', dateKey).update(process.env.AWS_REGION).digest();
+			var dateRegionServiceKey = crypto.createHmac('sha256', dateRegionKey).update('s3').digest();
+			var signingKey = crypto.createHmac('sha256', dateRegionServiceKey).update('aws4_request').digest();
+
+			var signature = crypto.createHmac('sha256', signingKey).update(policy).digest('hex');
+
+			var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/';
+
+			var credentials = {
+				fields: {
+					key: object_name,
+					acl: 'public-read',
+					policy: policy,
+					'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+					'x-amz-credential': credential,
+					'x-amz-date': isoNow,
+					'x-amz-signature': signature
+				},
+				signed_request: url,
+				url: url + object_name
 			};
 			res.send(JSON.stringify(credentials));
 		}
