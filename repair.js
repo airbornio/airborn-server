@@ -1,11 +1,16 @@
-function GET(url, callback) {
+function GET(url, callback, err, authkey) {
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
-		if(req.readyState === 4 && req.status === 200) {
-			callback(req.responseText);
+		if(req.readyState === 4) {
+			if(req.status === 200) {
+				callback(req.responseText);
+			} else {
+				if(err) err(req);
+			}
 		}
 	};
 	req.open('GET', url);
+	if(authkey) req.setRequestHeader('X-Authentication', authkey);
 	req.send(null);
 }
 
