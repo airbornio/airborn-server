@@ -18,5 +18,8 @@
 	"validating": "Validating…",
 	"registering": "Registering…",
 	"uploading": "Saving your first files and apps…",
-	"done": "Thanks for registering!"
+	"done": "Thanks for registering!",
+	"repair": "Repair",
+	"repairing": "Repairing…",
+	"repairdone": "Reparation attempt done. If your Airborn is still broken, please contact us at {email}."
 }

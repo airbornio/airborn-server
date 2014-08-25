@@ -33,6 +33,9 @@ app.get('/content', function(req, res) {
 app.get('/register', function(req, res) {
 	res.sendfile('register.html');
 });
+app.get('/repair', function(req, res) {
+	res.sendfile('repair.html');
+});
 app.get('/sjcl.js', function(req, res) {
 	res.sendfile('sjcl.js');
 });
@@ -40,7 +43,7 @@ app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
 	res.sendfile('lang.json');
 });
-app.get(/^\/(?:bootstrap|content|register)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:bootstrap|content|register|repair)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
