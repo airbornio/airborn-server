@@ -53,6 +53,18 @@ label {
 	padding: 1px 20px;
 	margin: 5px 0;
 }
+#links-container {
+	position: absolute;
+	margin-top: 35px;
+	margin-left: -30px;
+	text-align: center;
+	width: 100%;
+	color: #E1E7EA;
+	font-size: small;
+}
+#links-container a {
+	color: #E1E7EA;
+}
 
 .visualCaptcha {
 	margin: 10px 0;

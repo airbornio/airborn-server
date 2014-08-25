@@ -21,5 +21,6 @@
 	"done": "Thanks for registering!",
 	"repair": "Repair",
 	"repairing": "Repairing…",
-	"repairdone": "Reparation attempt done. If your Airborn is still broken, please contact us at {email}."
+	"repairdone": "Reparation attempt done. If your Airborn is still broken, please contact us at {email}.",
+	"contact": "Contact"
 }

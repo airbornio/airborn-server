@@ -50,6 +50,7 @@ GET('lang.json', function(response) {
 	document.getElementById('username').placeholder = strings.username;
 	document.getElementById('password').placeholder = strings.password;
 	document.getElementById('repair').value = strings.repair;
+	document.getElementById('contact').textContent = strings.contact;
 });
 
 document.getElementById('container').addEventListener('submit', function(evt) {

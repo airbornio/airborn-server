@@ -26,3 +26,14 @@ body {
 	width: 100%;
 	margin: 5px 0;
 }
+#links-container {
+	position: absolute;
+	margin-top: 35px;
+	margin-left: -30px;
+	text-align: center;
+	width: 100%;
+	color: #E1E7EA;
+}
+#links-container a {
+	color: #E1E7EA;
+}
