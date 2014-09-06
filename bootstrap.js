@@ -14,11 +14,14 @@ function GET(url, callback, err, authkey) {
 	req.send(null);
 }
 
-function login(username, password, files_key, hmac_bits, errcallback) {
+function login(username, password, key, files_key, hmac_bits, errcallback) {
 	GET('user/' + username + '/salt', function(salt) {
 		var done = 0;
-		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
-		var private_key = key.slice(128/32); // Second half
+		if(!key) {
+			key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
+			(localStorage.username ? localStorage : sessionStorage)._key = JSON.stringify(key); // Storage#key is a function.
+		}
+		var private_key = window.private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
 		var files_hmac;
@@ -28,12 +31,20 @@ function login(username, password, files_key, hmac_bits, errcallback) {
 			cont(authkey);
 		} else {
 			GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
-				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+				try {
+					files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+				} catch(e) {
+					files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+				}
 				window.storage.files_key = JSON.stringify(files_key);
 				if(++done === 2) cont();
 			}, errcallback || err, authkey);
 			GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
-				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+				try {
+					var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+				} catch(e) {
+					var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+				}
 				window.storage.hmac_bits = JSON.stringify(hmac_bits);
 				files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 				if(++done === 2) cont();
@@ -41,7 +52,12 @@ function login(username, password, files_key, hmac_bits, errcallback) {
 		}
 		function cont(authkey) {
 			GET('object/' + sjcl.codec.hex.fromBits(files_hmac.mac('/Core/init.js')), function(response) {
-				var S3Prefix = window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
+				var account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
+				var S3Prefix = window.S3Prefix = account_info.S3Prefix;
+				var account_version = window.account_version = account_info.account_version;
+				if(account_version === 1) {
+					window.password = (window.storage || {}).password = password;
+				}
 				eval(sjcl.decrypt(files_key, response));
 			}, errcallback || err, authkey);
 		}
@@ -63,14 +79,16 @@ function login(username, password, files_key, hmac_bits, errcallback) {
 
 var username = sessionStorage.username || localStorage.username;
 var password = sessionStorage.password || localStorage.password;
+var key = sessionStorage._key || localStorage._key;
+if(key) key = JSON.parse(key);
 var files_key = sessionStorage.files_key || localStorage.files_key;
 if(files_key) files_key = JSON.parse(files_key);
 var hmac_bits = sessionStorage.hmac_bits || localStorage.hmac_bits;
 if(hmac_bits) hmac_bits = JSON.parse(hmac_bits);
-if(username && password && files_key && hmac_bits) {
+if(username && (key || password) && files_key && hmac_bits) {
 	
 	// Login with previously saved credentials
-	login(username, password, files_key, hmac_bits, buildLoginForm);
+	login(username, password, key, files_key, hmac_bits, buildLoginForm);
 	
 } else {
 	
@@ -107,7 +125,7 @@ function buildLoginForm() {
 		evt.preventDefault();
 		var storage = window.storage = document.getElementById('save').checked ? localStorage : sessionStorage;
 		username = storage.username = document.getElementById('username').value;
-		password = storage.password = document.getElementById('password').value;
+		var password = document.getElementById('password').value;
 		login(username, password);
 	});
 	

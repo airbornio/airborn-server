@@ -282,7 +282,7 @@ app.post('/register', function(req, res) {
 		var salt = req.body.salt;
 		var authkey = req.body.authkey;
 		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
-		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix") VALUES ($1, $2, $3, $4, $5)', [id, username, salt, authkey, S3Prefix], function(err, result) {
+		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version) VALUES ($1, $2, $3, $4, $5, 3)', [id, username, salt, authkey, S3Prefix], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
@@ -312,7 +312,7 @@ function login(req, res, authkey, cont) {
 			res.send(500);
 			return;
 		}
-		client.query('SELECT id, authkey, "S3Prefix" FROM users WHERE username = $1', [req.session.username], function(err, result) {
+		client.query('SELECT id, authkey, "S3Prefix", account_version FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
 			if(err || !result.rows[0]) {
 				console.error(err);
@@ -322,6 +322,7 @@ function login(req, res, authkey, cont) {
 			if(result.rows[0].authkey === authkey) {
 				req.session.userID = result.rows[0].id;
 				req.session.S3Prefix = result.rows[0].S3Prefix;
+				req.session.account_version = result.rows[0].account_version;
 				delete req.session.username;
 				cont();
 			} else {

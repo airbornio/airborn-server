@@ -144,7 +144,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			throw e;
 		}
 		var key = sjcl.misc.pbkdf2(password, salt, 1000);
-		var private_key = key.slice(128/32); // Second half
+		var private_key = window.private_key = key.slice(128/32); // Second half
 		var shared_key = key.slice(0, 128/32); // First half
 		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
 		var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
