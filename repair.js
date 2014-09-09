@@ -25,7 +25,6 @@ function login(username, password, callback) {
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
 			files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
-			window.S3Prefix = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]).S3Prefix;
 			if(++done === 2) callback();
 		}, err, authkey);
 		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
