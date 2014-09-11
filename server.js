@@ -27,15 +27,6 @@ app.use(express.cookieSession({
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
 });
-app.get('/content', function(req, res) {
-	res.sendfile('content.html');
-});
-app.get('/register', function(req, res) {
-	res.sendfile('register.html');
-});
-app.get('/repair', function(req, res) {
-	res.sendfile('repair.html');
-});
 app.get('/sjcl.js', function(req, res) {
 	res.sendfile('sjcl.js');
 });
@@ -43,7 +34,10 @@ app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
 	res.sendfile('lang.json');
 });
-app.get(/^\/(?:bootstrap|content|register|repair)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:content|register|repair|try)$/, function(req, res) {
+	res.sendfile(req.path.substr(1) + '.html');
+});
+app.get(/^\/(?:bootstrap|content|register|repair|try)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
