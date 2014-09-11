@@ -106,15 +106,12 @@ function buildLoginForm() {
 		document.getElementById('password').placeholder = strings.password;
 		document.getElementById('login').value = strings.login;
 		document.getElementById('label').textContent = strings.save;
-		document.getElementById('register').textContent = strings.register;
-		document.getElementById('repair').textContent = strings.repair;
-		document.getElementById('contact').textContent = strings.contact;
 	});
 
 	// Page content
 	var iframe = document.createElement('iframe');
 	if('sandbox' in iframe) {
-		iframe.sandbox = '';
+		iframe.sandbox = 'allow-popups allow-same-origin';
 		iframe.src = 'content';
 		iframe.id = 'content';
 		document.body.insertBefore(iframe, document.body.firstChild);

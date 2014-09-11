@@ -21,17 +21,6 @@ html, body {
 	font-family: sans-serif;
 	font-size: small;
 }
-#links-container {
-	position: absolute;
-	margin-top: 35px;
-	text-align: center;
-	width: 100%;
-	color: #E1E7EA;
-	font-size: small;
-}
-#links-container a {
-	color: #E1E7EA;
-}
 iframe#content {
 	position: absolute;
 	top: 0;
