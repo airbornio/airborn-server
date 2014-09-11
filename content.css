@@ -40,6 +40,43 @@ body {
 	color: #E1E7EA;
 	font-size: small;
 }
+#links-container #table-container {
+	display: inline-block;
+	position: relative;
+}
+#links-container table {
+	border-collapse: collapse;
+}
+#links-container td {
+	padding: 10px 0;
+}
+#links-container td:first-child {
+	text-align: right;
+	padding: 5px 8px 5px 10px;
+}
+#links-container td:last-child {
+	text-align: left;
+	padding: 5px 10px 5px 8px;
+}
+#links-container #emphasized td {
+	font-size: medium;
+	color: #374A55;
+}
+#links-container #emphasized a {
+	text-decoration: none;
+	margin: 0 1px;
+	color: #374A55;
+}
 #links-container a {
 	color: #E1E7EA;
+}
+#links-container #emphasized-background {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 37px;
+	background: white;
+	background: repeating-linear-gradient(-55deg, #E1E7EA, #E1E7EA 10px, white 10px, white 20px);
+	border-radius: 7px;
+	z-index: -1;
 }
