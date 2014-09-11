@@ -111,7 +111,7 @@ function buildLoginForm() {
 	// Page content
 	var iframe = document.createElement('iframe');
 	if('sandbox' in iframe) {
-		iframe.sandbox = 'allow-popups allow-same-origin';
+		iframe.sandbox = 'allow-top-navigation';
 		iframe.src = 'content';
 		iframe.id = 'content';
 		document.body.appendChild(iframe);
