@@ -349,6 +349,10 @@ app.post('/register', function(req, res) {
 	});
 });
 
+app.get('/messages', function(req, res) {
+	res.send([]);
+});
+
 var server = app.listen(process.env.PORT || 8080, function() {
 	console.log('Listening on port %d', server.address().port);
 });
