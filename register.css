@@ -37,6 +37,11 @@ label {
 	width: 100%;
 	margin: 5px 0;
 }
+#notify-of-updates {
+	position: relative;
+	top: 3px;
+	margin: 7px 0px 8px;
+}
 #captcha-td {
 	padding-top: 7px;
 }

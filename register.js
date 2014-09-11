@@ -30,6 +30,7 @@ GET('lang.json', function(response) {
 	document.getElementById('username-label').textContent = strings.username;
 	document.getElementById('password-label').textContent = strings.password;
 	document.getElementById('password-again-label').textContent = strings['password-again'];
+	document.getElementById('notify-of-updates-label').textContent = strings['notify-of-updates'];
 	document.getElementById('captcha-label').textContent = strings.captcha;
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('register').value = strings.register;
@@ -133,6 +134,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	});
 	var username = window.username = document.getElementById('username').value;
 	var password = window.password = document.getElementById('password').value;
+	var notifyOfUpdates = document.getElementById('notify-of-updates').checked;
 	POST('/captcha/try', data, function() {
 		register.value = lang.registering;
 		try {
@@ -199,12 +201,16 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						});
 					}
 				});
-				total += 2;
+				total += 3;
 				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase(), function() {
 					uploaded++;
 					if(uploaded === total) cont();
 				});
 				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase(), function() {
+					uploaded++;
+					if(uploaded === total) cont();
+				});
+				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
 					uploaded++;
 					if(uploaded === total) cont();
 				});
