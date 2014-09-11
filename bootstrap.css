@@ -12,6 +12,7 @@ html, body {
 	top: 50%;
 	left: 50%;
 	margin: -85px 0 0 -100px;
+	z-index: 1;
 }
 #username, #password, #login {
 	width: 100%;

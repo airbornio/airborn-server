@@ -114,7 +114,7 @@ function buildLoginForm() {
 		iframe.sandbox = 'allow-popups allow-same-origin';
 		iframe.src = 'content';
 		iframe.id = 'content';
-		document.body.insertBefore(iframe, document.body.firstChild);
+		document.body.appendChild(iframe);
 	}
 	
 	// Login handler
