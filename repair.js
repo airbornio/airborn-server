@@ -24,11 +24,19 @@ function login(username, password, callback) {
 		var files_hmac;
 		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
-			files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+			try {
+				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+			} catch(e) {
+				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+			}
 			if(++done === 2) callback();
 		}, err, authkey);
 		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
-			var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+			try {
+				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+			} catch(e) {
+				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+			}
 			files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			if(++done === 2) callback();
 		}, undefined, authkey);
