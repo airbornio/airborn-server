@@ -52,7 +52,7 @@ function login(username, password, key, files_key, hmac_bits, errcallback) {
 		}
 		function cont(authkey) {
 			GET('object/' + sjcl.codec.hex.fromBits(files_hmac.mac('/Core/init.js')), function(response) {
-				var account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
+				var account_info = window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
 				var S3Prefix = window.S3Prefix = account_info.S3Prefix;
 				var account_version = window.account_version = account_info.account_version;
 				if(account_version === 1) {

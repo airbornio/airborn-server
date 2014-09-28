@@ -29,6 +29,7 @@ function login(username, password, callback) {
 			} catch(e) {
 				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
 			}
+			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
 			if(++done === 2) callback();
 		}, err, authkey);
 		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
