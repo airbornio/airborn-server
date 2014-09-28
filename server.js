@@ -358,7 +358,7 @@ function login(req, res, authkey, cont) {
 			res.send(500);
 			return;
 		}
-		client.query('SELECT id, authkey, "S3Prefix", account_version FROM users WHERE username = $1', [req.session.username], function(err, result) {
+		client.query('SELECT id, authkey, "S3Prefix", account_version, tier FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
 			if(err || !result.rows[0]) {
 				console.error(err);
@@ -369,6 +369,7 @@ function login(req, res, authkey, cont) {
 				req.session.userID = result.rows[0].id;
 				req.session.S3Prefix = result.rows[0].S3Prefix;
 				req.session.account_version = result.rows[0].account_version;
+				req.session.tier = result.rows[0].tier;
 				delete req.session.username;
 				cont();
 			} else {

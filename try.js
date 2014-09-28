@@ -37,6 +37,7 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 	var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
 	var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 	var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
+	var account_info = window.account_info = {tier: 10};
 	
 	var XMLHttpRequest_open = window.XMLHttpRequest.prototype.open;
 	window.XMLHttpRequest.prototype.open = function(method, url) {
