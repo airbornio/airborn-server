@@ -14,6 +14,15 @@ GET('lang.json', function(response) {
 	lang = JSON.parse(response);
 });
 
+var done = -1;
+var total = 0;
+var marketplace;
+GET('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function(response) {
+	marketplace = JSON.parse(response);
+	done++;
+	if(done === total && window.cont) cont();
+}, 'json');
+
 JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
 	if(err) {
 		alert(lang.error);
@@ -81,8 +90,6 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 	};
 	
 	var keys = Object.keys(zip.folder('airborn').files);
-	var uploaded = 0;
-	var total = 0;
 	var target = '/Core/';
 	
 	keys.forEach(function(path) {
@@ -90,19 +97,16 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 		if(!file.options.dir) {
 			total++;
 			putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), function() {
-				uploaded++;
-				if(uploaded === total) cont();
+				done++;
+				if(done === total) cont();
 			});
 		}
 	});
 	
-	function cont() {
-		corsReq('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function() {
-			console.log(this, this.response);
-			installPackage(this.response.manifest_url, {categories: this.response.categories}, function() {
-				document.getElementById('loading').style.display = 'none';
-				eval(zip.files['airborn/startup.js'].asText());
-			});
-		}, 'json');
+	window.cont = function() {
+		installPackage(marketplace.manifest_url, {categories: marketplace.categories}, function() {
+			document.getElementById('loading').style.display = 'none';
+			eval(zip.files['airborn/startup.js'].asText());
+		});
 	}
 });
