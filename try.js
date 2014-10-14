@@ -96,7 +96,7 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 		var file = zip.files[path];
 		if(!file.options.dir) {
 			total++;
-			putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), function() {
+			putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
 				done++;
 				if(done === total) cont();
 			});

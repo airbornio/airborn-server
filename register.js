@@ -196,7 +196,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					var file = zip.files[path];
 					if(!file.options.dir) {
 						total++;
-						putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), function() {
+						putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
 							uploaded++;
 							if(uploaded === total) cont();
 						});

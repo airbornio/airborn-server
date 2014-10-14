@@ -103,10 +103,18 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				var file = zip.files[path];
 				if(!file.options.dir) {
 					total++;
-					putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), function() {
-						uploaded++;
-						if(uploaded === total) cont();
-					});
+					putFile(
+						target + path.replace(/^airborn\//, ''),
+						{codec: 'arrayBuffer'},
+						file.asArrayBuffer(),
+						{from: 'origin'}, // Don't merge because the
+										  // merge might've been the
+										  // problem in the first place.
+						function() {
+							uploaded++;
+							if(uploaded === total) cont();
+						}
+					);
 				}
 			});
 			
