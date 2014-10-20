@@ -21,6 +21,7 @@
 	"uploading": "Saving your first files and apps…",
 	"done": "Thanks for registering!",
 	"repair": "Repair",
+	"repairexplanation": "Repairing resets system files and the Marketplace app, if you have edited them. Repairing can take a couple of minutes.",
 	"repairing": "Repairing…",
 	"repairdone": "Reparation attempt done. If your Airborn is still broken, please contact us at {email}.",
 	"contact": "Contact"

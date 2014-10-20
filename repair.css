@@ -22,6 +22,9 @@ body {
 	background-color: #E1E7EA;
 	border-radius: 10px;
 }
+#explanation {
+	font-size: smaller;
+}
 #username, #password, #repair {
 	width: 100%;
 	margin: 5px 0;

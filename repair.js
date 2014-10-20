@@ -64,18 +64,23 @@ GET('lang.json', function(response) {
 	document.getElementById('password').placeholder = strings.password;
 	document.getElementById('repair').value = strings.repair;
 	document.getElementById('contact').textContent = strings.contact;
+	document.getElementById('explanation').textContent = strings.repairexplanation;
 });
 
 document.getElementById('container').addEventListener('submit', function(evt) {
 	evt.preventDefault();
+	
+	document.getElementById('repair').disabled = true;
+	document.getElementById('repair').value = lang.repairing;
+	
 	login(document.getElementById('username').value, document.getElementById('password').value, function() {
 		JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
 			if(err) {
+				document.getElementById('repair').disabled = false;
+				document.getElementById('repair').value = lang.repair;
 				alert(lang.error);
 				return;
 			}
-			
-			document.getElementById('repair').value = lang.repairing;
 			
 			var zip = new JSZip(data);
 
