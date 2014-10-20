@@ -120,6 +120,15 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 	if(userLoggedIn(req)) {
 		var name = req.params[0];
 		var size = req.get('Content-Length');
+		if(!+size) {
+			// Reject Content-Length: 0 as a weak effort to prevent data
+			// loss. Chrome 38 Linux sends that for PUT requests with a
+			// blob under particularly strange network stack conditions.
+			// TODO: (additionally) never truncate the body below and
+			// reject instead.
+			res.send(400);
+			return;
+		}
 		s3.putObject({
 			Bucket: 'laskya-cloud',
 			Key: req.session.S3Prefix + '/' + name,
