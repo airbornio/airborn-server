@@ -14,6 +14,18 @@ var s3 = new AWS.S3();
 
 var visualCaptcha;
 
+var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1');
+function queueTask(type, metadata, buffer, callback) {
+	channel.then(function(conn) {
+		return conn.createChannel().then(function(channel) {
+			channel.assertQueue('tasks');
+			channel.sendToQueue('tasks', buffer, {type: type, headers: metadata});
+		});
+	}).then(callback, function(err) {
+		callback(null, err);
+	});
+}
+
 app.use(express.json());
 
 app.use(express.cookieParser());
@@ -129,40 +141,33 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 			res.send(400);
 			return;
 		}
-		s3.putObject({
-			Bucket: 'laskya-cloud',
-			Key: req.session.S3Prefix + '/' + name,
-			ACL: 'public-read',
-			ContentLength: size,
-			Body: req
-		}, function(err, data) {
-			if(err) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		var body = [];
+		req.on('data', function(data) {
+			body.push(data);
+		});
+		req.on('end', function() {
+			queueTask('putObject', {
+				S3Prefix: req.session.S3Prefix,
+				name: name,
+				size: size
+			}, Buffer.concat(body), function(err) {
 				if(err) {
 					console.error(err);
 					res.send(500);
 					return;
 				}
-				client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [req.session.userID, name, size], function(err, result) {
-					if(err) {
-						client.query('UPDATE objects SET size = $3 WHERE "userId" = $1 AND name = $2', [req.session.userID, name, size], cont);
-					} else {
-						cont(err, result);
-					}
-				});
-				function cont(err, result) {
-					done();
+				queueTask('setObjectSize', {
+					userID: req.session.userID,
+					name: name,
+					size: size
+				}, new Buffer(0), function(err) {
 					if(err) {
 						console.error(err);
 						res.send(500);
 						return;
 					}
 					res.send(200);
-				}
+				});
 			});
 		});
 	} else {
