@@ -10,6 +10,8 @@
 		"amqplib": "0.3.0",
 		"express-session": "1.9.1",
 		"connect-redis": "2.1.0",
-		"body-parser": "1.9.1"
+		"body-parser": "1.9.1",
+		"redis": "0.12.1",
+		"parse-redis-url": "0.0.1"
 	}
 }

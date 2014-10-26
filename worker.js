@@ -5,8 +5,8 @@ var s3 = new AWS.S3();
 
 require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1').then(function(conn) {
 	return conn.createChannel().then(function(channel) {
-		channel.assertQueue('tasks');
-		channel.consume('tasks', function(message) {
+		channel.assertQueue('transactions');
+		channel.consume('transactions', function(message) {
 			if(message === null) {
 				console.error('Consumer was canceled');
 				process.exit(1);
@@ -14,29 +14,59 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1').then(func
 			}
 			var action = message.properties.type;
 			var metadata = message.properties.headers;
-			var buffer = message.content;
 			switch(action) {
-				case 'putObject':
-					s3.putObject({
-						Bucket: 'laskya-cloud',
-						Key: metadata.S3Prefix + '/' + metadata.name,
-						ACL: 'public-read',
-						ContentLength: metadata.size,
-						Body: buffer
-					}, function(err, data) {
-						if(err) {
-							console.error(err);
-							channel.nackAll(false);
-							return;
-						}
-						channel.ack(message);
-					});
+				case 'commit':
+					channel.assertQueue(metadata.queue);
+					(function _getMessage() {
+						getMessage(channel, metadata.queue, function(done) {
+							if(done) {
+								channel.ack(message);
+								return;
+							}
+							_getMessage();
+						});
+					})();
 					break;
-				case 'setObjectSize':
+				default:
+					console.error('Unknown message type: ' + action);
+					channel.nack(message, false, false);
+					break;
+			}
+		});
+	});
+}).then(null, function(err) {
+	throw err;
+});
+
+function getMessage(channel, queue, callback) {
+	channel.get(queue).then(function(message) {
+		if(message === false) {
+			callback(true);
+			return;
+		}
+		var action = message.properties.type;
+		var metadata = message.properties.headers;
+		var buffer = message.content;
+		switch(action) {
+			case 'putObject':
+				s3.putObject({
+					Bucket: 'laskya-cloud',
+					Key: metadata.S3Prefix + '/' + metadata.name,
+					ACL: 'public-read',
+					ContentLength: metadata.size,
+					Body: buffer
+				}, function(err, data) {
+					if(err) {
+						console.error(err);
+						channel.nackAll(false);
+						callback();
+						return;
+					}
 					pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 						if(err) {
 							console.error(err);
 							channel.nackAll(false);
+							callback();
 							return;
 						}
 						client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [metadata.userID, metadata.name, metadata.size], function(err, result) {
@@ -51,19 +81,20 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1').then(func
 							if(err) {
 								console.error(err);
 								channel.nackAll(false);
+								callback();
 								return;
 							}
 							channel.ack(message);
+							callback();
 						}
 					});
-					break;
-				default:
-					console.error('Unknown message type: ' + action);
-					channel.nackAll(false);
-					break;
-			}
-		});
+				});
+				break;
+			default:
+				console.error('Unknown message type: ' + action);
+				channel.nackAll(false);
+				callback();
+				break;
+		}
 	});
-}).then(null, function(err) {
-	throw err;
-});
+}

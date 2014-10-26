@@ -17,14 +17,18 @@ var RedisStore = require('connect-redis')(session);
 
 var bodyParser = require('body-parser');
 
+var redisParams = require('parse-redis-url')().parse(process.env.REDISCLOUD_URL);
+var redis = require('redis').createClient(redisParams.port, redisParams.host);
+redis.auth(redisParams.password);
+
 var visualCaptcha;
 
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1');
-function queueTask(type, metadata, buffer, callback) {
+function queueTask(queue, type, metadata, buffer, callback) {
 	channel.then(function(conn) {
 		return conn.createChannel().then(function(channel) {
-			channel.assertQueue('tasks');
-			channel.sendToQueue('tasks', buffer, {type: type, headers: metadata});
+			channel.assertQueue(queue);
+			channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
 		});
 	}).then(callback, function(err) {
 		callback(null, err);
@@ -35,7 +39,7 @@ app.use(bodyParser.json());
 
 app.use(session({
 	secret: process.env.COOKIE_SESSION_SECRET,
-	store: new RedisStore({url: process.env.REDISCLOUD_URL}),
+	store: new RedisStore({client: redis}),
 	resave: true,
 	saveUninitialized: true
 }));
@@ -132,10 +136,52 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 	}
 });
 
+app.post('/transaction/add', function(req, res) {
+	if(userLoggedIn(req)) {
+		var transactionId = req.body.transactionId;
+		var queue = req.session.userID + ':' + transactionId;
+		redis.incrby('transactions:' + queue, req.body.messageCount, function(err, result) {
+			if(err) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			if(result === 0) {
+				queueTask('transactions', 'commit', {
+					queue: queue
+				}, new Buffer(0), function(err) {
+					if(err) {
+						console.error(err);
+						res.send(500);
+						return;
+					}
+					res.send(200);
+				});
+			} else {
+				res.send(200);
+			}
+		});
+	} else {
+		res.send(403);
+		return;
+	}
+});
+
 app.put(/^\/object\/(.+)$/, function(req, res) {
 	if(userLoggedIn(req)) {
 		var name = req.params[0];
 		var size = req.get('Content-Length');
+		var transactionId = req.get('X-Transaction-Id');
+		var queue = req.session.userID + ':' + (transactionId || '');
+		if(!transactionId) {
+			redis.incr('transactions:' + queue, function(err) {
+				if(err) {
+					console.error(err);
+					res.send(500);
+					return;
+				}
+			});
+		}
 		if(!+size) {
 			// Reject Content-Length: 0 as a weak effort to prevent data
 			// loss. Chrome 38 Linux sends that for PUT requests with a
@@ -150,7 +196,8 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 			body.push(data);
 		});
 		req.on('end', function() {
-			queueTask('putObject', {
+			queueTask(queue, 'putObject', {
+				userID: req.session.userID,
 				S3Prefix: req.session.S3Prefix,
 				name: name,
 				size: size
@@ -160,17 +207,26 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 					res.send(500);
 					return;
 				}
-				queueTask('setObjectSize', {
-					userID: req.session.userID,
-					name: name,
-					size: size
-				}, new Buffer(0), function(err) {
+				redis.decr('transactions:' + queue, function(err, result) {
 					if(err) {
 						console.error(err);
 						res.send(500);
 						return;
 					}
-					res.send(200);
+					if(result === 0) {
+						queueTask('transactions', 'commit', {
+							queue: queue
+						}, new Buffer(0), function(err) {
+							if(err) {
+								console.error(err);
+								res.send(500);
+								return;
+							}
+							res.send(200);
+						});
+					} else {
+						res.send(200);
+					}
 				});
 			});
 		});
