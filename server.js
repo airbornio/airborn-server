@@ -15,6 +15,8 @@ var s3 = new AWS.S3();
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
+var bodyParser = require('body-parser');
+
 var visualCaptcha;
 
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1');
@@ -29,7 +31,7 @@ function queueTask(type, metadata, buffer, callback) {
 	});
 }
 
-app.use(express.json());
+app.use(bodyParser.json());
 
 app.use(session({
 	secret: process.env.COOKIE_SESSION_SECRET,
