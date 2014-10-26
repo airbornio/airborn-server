@@ -7,6 +7,8 @@
 		"aws-sdk": "~2.0.6",
 		"newrelic": "1.8.x",
 		"visualcaptcha": "0.0.2",
-		"amqplib": "0.3.0"
+		"amqplib": "0.3.0",
+		"express-session": "1.9.1",
+		"connect-redis": "2.1.0"
 	}
 }

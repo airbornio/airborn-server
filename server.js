@@ -12,6 +12,9 @@ var pg = require('pg.js');
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
 
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
 var visualCaptcha;
 
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1');
@@ -28,12 +31,11 @@ function queueTask(type, metadata, buffer, callback) {
 
 app.use(express.json());
 
-app.use(express.cookieParser());
-app.use(express.cookieSession({
+app.use(session({
 	secret: process.env.COOKIE_SESSION_SECRET,
-	cookie: {
-		httpOnly: false
-	}
+	store: new RedisStore({url: process.env.REDISCLOUD_URL}),
+	resave: true,
+	saveUninitialized: true
 }));
 
 app.get('/', function(req, res) {
@@ -382,8 +384,11 @@ function login(req, res, authkey, cont) {
 			if(result.rows[0].authkey === authkey) {
 				req.session.userID = result.rows[0].id;
 				req.session.S3Prefix = result.rows[0].S3Prefix;
-				req.session.account_version = result.rows[0].account_version;
-				req.session.tier = result.rows[0].tier;
+				res.cookie('account_info', {
+					S3Prefix: result.rows[0].S3Prefix,
+					account_version: result.rows[0].account_version,
+					tier: result.rows[0].tier
+				});
 				delete req.session.username;
 				cont();
 			} else {
