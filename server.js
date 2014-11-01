@@ -23,13 +23,13 @@ redis.auth(redisParams.password);
 
 var visualCaptcha;
 
-var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1');
+var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
+	return conn.createChannel();
+});
 function queueTask(queue, type, metadata, buffer, callback) {
-	channel.then(function(conn) {
-		return conn.createChannel().then(function(channel) {
-			channel.assertQueue(queue);
-			channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
-		});
+	channel.then(function(channel) {
+		channel.assertQueue(queue);
+		channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
 	}).then(callback, function(err) {
 		callback(null, err);
 	});

@@ -3,7 +3,7 @@ var pg = require('pg.js');
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
 
-require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1').then(function(conn) {
+require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
 	return conn.createChannel().then(function(channel) {
 		channel.assertQueue('transactions');
 		channel.consume('transactions', function(message) {
@@ -29,7 +29,7 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=1').then(func
 					break;
 				default:
 					console.error('Unknown message type: ' + action);
-					channel.nack(message, false, false);
+					channel.nack(message);
 					break;
 			}
 		});
@@ -58,14 +58,14 @@ function getMessage(channel, queue, callback) {
 				}, function(err, data) {
 					if(err) {
 						console.error(err);
-						channel.nackAll(false);
+						channel.nackAll();
 						callback();
 						return;
 					}
 					pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 						if(err) {
 							console.error(err);
-							channel.nackAll(false);
+							channel.nackAll();
 							callback();
 							return;
 						}
@@ -80,7 +80,7 @@ function getMessage(channel, queue, callback) {
 							done();
 							if(err) {
 								console.error(err);
-								channel.nackAll(false);
+								channel.nackAll();
 								callback();
 								return;
 							}
@@ -92,7 +92,7 @@ function getMessage(channel, queue, callback) {
 				break;
 			default:
 				console.error('Unknown message type: ' + action);
-				channel.nackAll(false);
+				channel.nackAll();
 				callback();
 				break;
 		}
