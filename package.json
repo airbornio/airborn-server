@@ -12,6 +12,7 @@
 		"connect-redis": "2.1.0",
 		"body-parser": "1.9.1",
 		"redis": "0.12.1",
-		"parse-redis-url": "0.0.1"
+		"parse-redis-url": "0.0.1",
+		"socket.io": "1.2.0"
 	}
 }

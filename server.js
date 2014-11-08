@@ -425,6 +425,23 @@ var server = app.listen(process.env.PORT || 8080, function() {
 	console.log('Listening on port %d', server.address().port);
 });
 
+var io = require('socket.io')(server);
+
+io.on('connection', function(socket) {
+	socket.emit('hello', '/push/' + socket.id + '/');
+});
+
+app.use('/push/', bodyParser.urlencoded({type: [], extended: false, limit: 100, parameterLimit: 1}));
+
+app.put('/push/:id/', function(req, res) {
+	console.log(req.body);
+	io.to(req.params.id).emit('push', {
+		registrationId: req.query.registrationId,
+		version: parseInt(req.body.version, 10)
+	});
+	res.send(200);
+});
+
 function login(req, res, authkey, cont) {
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 		if(err) {
