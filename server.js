@@ -117,11 +117,11 @@ app.get('/user/:username/salt', function(req, res) {
 });
 
 app.get(/^\/object\/(.+)$/, function(req, res) {
-	var authkey;
-	if(userLoggedIn(req)) {
-		cont();
-	} else if((authkey = req.get('X-Authentication'))) {
+	var authkey = req.get('X-Authentication');
+	if(authkey) {
 		login(req, res, authkey, cont);
+	} else if(userLoggedIn(req)) {
+		cont();
 	} else {
 		res.send(403);
 		return;
@@ -464,7 +464,6 @@ function login(req, res, authkey, cont) {
 					account_version: result.rows[0].account_version,
 					tier: result.rows[0].tier
 				});
-				delete req.session.username;
 				cont();
 			} else {
 				res.send(401);
