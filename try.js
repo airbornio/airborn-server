@@ -14,16 +14,7 @@ GET('lang.json', function(response) {
 	lang = JSON.parse(response);
 });
 
-var done = -1;
-var total = 0;
-var marketplace;
-GET('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function(response) {
-	marketplace = JSON.parse(response);
-	done++;
-	if(done === total && window.cont) cont();
-}, 'json');
-
-JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
+JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
 	if(err) {
 		alert(lang.error);
 		return;
@@ -67,12 +58,12 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 		XMLHttpRequest_open.apply(this, arguments);
 	};
 	var getFile = function(file, options, callback) {
-		if(!window.getFileCache[file] && file.substr(0, 6) === '/Core/' && file.substr(-1) !== '/' && zip.files['airborn/' + file.substr(6)]) {
+		if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
 			if(typeof options === 'function' || options === undefined) {
 				callback = options;
 				options = {};
 			}
-			var zipfile = zip.files['airborn/' + file.substr(6)];
+			var zipfile = zip.files[file.substr(1)];
 			if(options.codec) {
 				if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(zipfile.asArrayBuffer())));
 				return;
@@ -82,31 +73,31 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current',
 		}
 		return _getFile(file, options, callback);
 	};
-	eval(zip.files['airborn/core.js'].asText());
+	eval(zip.files['Core/core.js'].asText());
 	var _getFile = window.getFile;
 	window.getFile = getFile;
 	window.logout = function() {
 		window.location = '/';
 	};
 	
-	var keys = Object.keys(zip.folder('airborn').files);
-	var target = '/Core/';
+	var keys = Object.keys(zip.files);
+	var uploaded = 0;
+	var total = 0;
+	var target = '/';
 	
 	keys.forEach(function(path) {
 		var file = zip.files[path];
 		if(!file.options.dir) {
 			total++;
-			putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
-				done++;
-				if(done === total) cont();
+			putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
+				uploaded++;
+				if(uploaded === total) cont();
 			});
 		}
 	});
 	
-	window.cont = function() {
-		installPackage(marketplace.manifest_url, {categories: marketplace.categories}, function() {
-			document.getElementById('loading').style.display = 'none';
-			eval(zip.files['airborn/startup.js'].asText());
-		});
+	function cont() {
+		document.getElementById('loading').style.display = 'none';
+		eval(zip.files['Core/startup.js'].asText());
 	}
 });

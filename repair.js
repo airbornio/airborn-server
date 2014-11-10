@@ -74,7 +74,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	document.getElementById('repair').value = lang.repairing;
 	
 	login(document.getElementById('username').value, document.getElementById('password').value, function() {
-		JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
+		JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
 			if(err) {
 				document.getElementById('repair').disabled = false;
 				document.getElementById('repair').value = lang.repair;
@@ -86,30 +86,30 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 
 			var getFile = function(file, options, callback) {
 				console.log([].slice.call(arguments));
-				if(file.substr(0, 6) === '/Core/' && file.substr(-1) !== '/' && zip.files['airborn/' + file.substr(6)]) {
+				if(file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
 					if(typeof options === 'function') {
 						callback = options;
 						options = {};
 					}
-					callback(zip.files['airborn/' + file.substr(6)].asText());
+					callback(zip.files[file.substr(1)].asText());
 					return;
 				}
 				return window.getFile(file, options, callback);
 			};
 			var openWindow = function() {};
-			eval(zip.files['airborn/core.js'].asText());
+			eval(zip.files['Core/core.js'].asText());
 
-			var keys = Object.keys(zip.folder('airborn').files);
+			var keys = Object.keys(zip.files);
 			var uploaded = 0;
 			var total = 0;
-			var target = '/Core/';
+			var target = '/';
 			
 			keys.forEach(function(path) {
 				var file = zip.files[path];
 				if(!file.options.dir) {
 					total++;
 					putFile(
-						target + path.replace(/^airborn\//, ''),
+						target + path,
 						{codec: 'arrayBuffer'},
 						file.asArrayBuffer(),
 						{from: 'origin'}, // Don't merge because the
@@ -124,11 +124,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			});
 			
 			function cont() {
-				corsReq('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function() {
-					installPackage(this.response.manifest_url, {categories: this.response.categories}, function() {
-						document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airborn.io">support@airborn.io</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
-					});
-				}, 'json');
+				document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airborn.io">support@airborn.io</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
 			}
 		});
 	});

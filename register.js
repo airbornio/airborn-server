@@ -159,7 +159,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		}, function(response) {
 			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
 			register.value = lang.uploading;
-			JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/current', function(err, data) {
+			JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
 				if(err) {
 					register.disabled = false;
 					register.value = lang.register;
@@ -178,25 +178,25 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						callback = options;
 						options = {};
 					}
-					if(file.substr(0, 6) === '/Core/' && file.substr(-1) !== '/' && zip.files['airborn/' + file.substr(6)]) {
-						callback(zip.files['airborn/' + file.substr(6)].asText());
+					if(file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
+						callback(zip.files[file.substr(1)].asText());
 					} else {
 						callback(null);
 					}
 				};
 				var openWindow = function() {};
-				eval(zip.files['airborn/core.js'].asText());
+				eval(zip.files['Core/core.js'].asText());
 
-				var keys = Object.keys(zip.folder('airborn').files);
+				var keys = Object.keys(zip.files);
 				var uploaded = 0;
 				var total = 0;
-				var target = '/Core/';
+				var target = '/';
 				console.time('upload core');
 				keys.forEach(function(path) {
 					var file = zip.files[path];
 					if(!file.options.dir) {
 						total++;
-						putFile(target + path.replace(/^airborn\//, ''), {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
+						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
 							uploaded++;
 							if(uploaded === total) cont();
 						});
@@ -217,13 +217,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				});
 				function cont() {
 					console.timeEnd('upload core');
-					corsReq('http://marketplace-dev.airborn.io/api/v1/apps/app/marketplace/', function() {
-						console.time('upload marketplace');
-						installPackage(this.response.manifest_url, {categories: this.response.categories}, function() {
-							console.timeEnd('upload marketplace');
-							document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
-						});
-					}, 'json');
+					document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
 				}
 			});
 		}, function(req) {
