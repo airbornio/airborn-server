@@ -21,6 +21,7 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(fun
 						getMessage(channel, metadata.queue, function(done) {
 							if(done) {
 								channel.ack(message);
+								channel.deleteQueue(metadata.queue, {ifEmpty: true}); // To be safe, but it should always be empty.
 								return;
 							}
 							_getMessage();
