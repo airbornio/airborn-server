@@ -24,6 +24,8 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(fun
 								return;
 							}
 							_getMessage();
+						}, function getanother() {
+							getMessage(channel, metadata.queue, function() {}, getanother);
 						});
 					})();
 					break;
@@ -38,7 +40,7 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(fun
 	throw err;
 });
 
-function getMessage(channel, queue, callback) {
+function getMessage(channel, queue, callback, getanother) {
 	channel.get(queue).then(function(message) {
 		if(message === false) {
 			callback(true);
@@ -58,14 +60,14 @@ function getMessage(channel, queue, callback) {
 				}, function(err, data) {
 					if(err) {
 						console.error(err);
-						channel.nackAll();
+						channel.nack(message);
 						callback();
 						return;
 					}
 					pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 						if(err) {
 							console.error(err);
-							channel.nackAll();
+							channel.nack(message);
 							callback();
 							return;
 						}
@@ -80,7 +82,7 @@ function getMessage(channel, queue, callback) {
 							done();
 							if(err) {
 								console.error(err);
-								channel.nackAll();
+								channel.nack(message);
 								callback();
 								return;
 							}
@@ -92,9 +94,10 @@ function getMessage(channel, queue, callback) {
 				break;
 			default:
 				console.error('Unknown message type: ' + action);
-				channel.nackAll();
+				channel.nack(message);
 				callback();
 				break;
 		}
+		getanother();
 	});
 }
