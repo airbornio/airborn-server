@@ -41,7 +41,7 @@ JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/curren
 	
 	var XMLHttpRequest_open = window.XMLHttpRequest.prototype.open;
 	window.XMLHttpRequest.prototype.open = function(method, url) {
-		if(url.substr(0, 8) === '/object/' || url.substr(0, 7) === 'object/') {
+		if(url.substr(0, 8) === '/object/' || url.substr(0, 7) === 'object/' || url.substr(0, 13) === '/transaction/') {
 			Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
 			Object.defineProperty(this, 'send', {value: function() {
 				Object.defineProperty(this, 'readyState', {get: function() { return 4; }});
