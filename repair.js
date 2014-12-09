@@ -42,6 +42,8 @@ function login(username, password, callback) {
 			if(++done === 2) callback();
 		}, undefined, authkey);
 		function err(req) {
+			document.getElementById('repair').disabled = false;
+			document.getElementById('repair').value = lang.repair;
 			if(req.status === 401) {
 				alert(lang.wrongpass);
 			} else {
@@ -49,6 +51,8 @@ function login(username, password, callback) {
 			}
 		}
 	}, function(req) {
+		document.getElementById('repair').disabled = false;
+		document.getElementById('repair').value = lang.repair;
 		if(req.status === 404) {
 			alert(lang.wronguser);
 		} else {
