@@ -1,66 +1,3 @@
-function GET(url, callback, err, authkey) {
-	var req = new XMLHttpRequest();
-	req.onreadystatechange = function() {
-		if(req.readyState === 4) {
-			if(req.status === 200) {
-				callback(req.responseText);
-			} else {
-				if(err) err(req);
-			}
-		}
-	};
-	req.open('GET', url);
-	if(authkey) req.setRequestHeader('X-Authentication', authkey);
-	req.send(null);
-}
-
-function login(username, password, callback) {
-	GET('user/' + username + '/salt', function(salt) {
-		var done = 0;
-		var key = sjcl.misc.pbkdf2(password, sjcl.codec.hex.toBits(salt), 1000);
-		var private_key = key.slice(128/32); // Second half
-		var shared_key = key.slice(0, 128/32); // First half
-		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
-		var files_hmac;
-		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
-		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
-			try {
-				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
-			} catch(e) {
-				files_key = window.files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
-			}
-			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
-			if(++done === 2) callback();
-		}, err, authkey);
-		GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
-			try {
-				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
-			} catch(e) {
-				var hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
-			}
-			files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
-			if(++done === 2) callback();
-		}, undefined, authkey);
-		function err(req) {
-			document.getElementById('repair').disabled = false;
-			document.getElementById('repair').value = lang.repair;
-			if(req.status === 401) {
-				alert(lang.wrongpass);
-			} else {
-				alert(lang.error);
-			}
-		}
-	}, function(req) {
-		document.getElementById('repair').disabled = false;
-		document.getElementById('repair').value = lang.repair;
-		if(req.status === 404) {
-			alert(lang.wronguser);
-		} else {
-			alert(lang.error);
-		}
-	});
-}
-
 var lang = {};
 GET('lang.json', function(response) {
 	var strings = lang = JSON.parse(response);
@@ -77,7 +14,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	document.getElementById('repair').disabled = true;
 	document.getElementById('repair').value = lang.repairing;
 	
-	login(document.getElementById('username').value, document.getElementById('password').value, function() {
+	login({username: document.getElementById('username').value, password: document.getElementById('password').value}, null, function() {}, function() {
 		JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
 			if(err) {
 				document.getElementById('repair').disabled = false;
@@ -131,5 +68,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airborn.io">support@airborn.io</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
 			}
 		});
+	}, function(err) {
+		document.getElementById('repair').disabled = false;
+		document.getElementById('repair').value = lang.repair;
+		alert(lang[err.id]);
 	});
 });

@@ -47,8 +47,8 @@ app.use(session({
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
 });
-app.get('/sjcl.js', function(req, res) {
-	res.sendfile('sjcl.js');
+app.get(/^\/(?:sjcl|login)\.js$/, function(req, res) {
+	res.sendfile(req.path.substr(1));
 });
 app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
