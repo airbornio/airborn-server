@@ -398,7 +398,7 @@ app.post('/register', function(req, res) {
 		var salt = req.body.salt;
 		var authkey = req.body.authkey;
 		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
-		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version) VALUES ($1, $2, $3, $4, $5, 3)', [id, username, salt, authkey, S3Prefix], function(err, result) {
+		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier) VALUES ($1, $2, $3, $4, $5, 3, 10)', [id, username, salt, authkey, S3Prefix], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
