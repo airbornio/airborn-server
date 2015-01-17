@@ -19,6 +19,7 @@ function buildLoginForm() {
 		iframe.sandbox = 'allow-top-navigation';
 		iframe.src = 'content';
 		iframe.id = 'content';
+		iframe.scrolling = 'no';
 		document.body.appendChild(iframe);
 	}
 	

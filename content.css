@@ -1,6 +1,9 @@
 * {
 	box-sizing: border-box;
 }
+html {
+	overflow: hidden;
+}
 body {
 	background-color: #607B8B;
 	font-family: sans-serif;
@@ -11,14 +14,14 @@ body {
 	left: 50%;
 	top: 50%;
 	margin-left: -94px;
-	margin-top: -160px;
+	margin-top: -260px;
 }
 #container {
 	width: 260px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: -105px 0 0 -130px;
+	margin: -205px 0 0 -130px;
 	padding: 20px 30px;
 	background-color: #E1E7EA;
 	border-radius: 10px;
@@ -30,10 +33,51 @@ body {
 	width: 100%;
 	margin: 5px 0;
 }
+#tricolon {
+	color: #E1E7EA;
+	visibility: visible;
+	position: fixed;
+	margin-top: 45px;
+	left: 10%;
+	right: calc(10% - 30px);
+	overflow: auto;
+	white-space: nowrap;
+	text-align: center;
+}
+#tricolon .colon {
+	max-width: 275px;
+	display: inline-block;
+	margin-right: 30px;
+	text-align: left;
+}
+#tricolon .colon .header {
+	display: inline-block;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+#tricolon .colon img {
+	height: 160px;
+	width: 90px;
+	float: left;
+	margin: 3px;
+	margin-bottom: 5px;
+}
+#tricolon .colon img.screenshot {
+	border-radius: 10px;
+	box-shadow: 0 0 5px 2px #374A55;
+}
+#tricolon .colon .body {
+	float: right;
+	width: calc(100% - 105px);
+	white-space: normal;
+}
+#tricolon .colon .body a {
+	color: #E1E7EA;
+}
 #links-container {
 	visibility: visible;
 	position: absolute;
-	margin-top: 35px;
+	margin-top: 255px;
 	margin-left: -30px;
 	text-align: center;
 	width: 100%;
@@ -66,6 +110,7 @@ body {
 	text-decoration: none;
 	margin: 0 1px;
 	color: #374A55;
+	font-weight: bold;
 }
 #links-container a {
 	color: #E1E7EA;
@@ -79,4 +124,9 @@ body {
 	background: repeating-linear-gradient(-55deg, #E1E7EA, #E1E7EA 10px, white 10px, white 20px);
 	border-radius: 7px;
 	z-index: -1;
+}
+@media (max-height: 580px) {
+	#logo, #container {
+		top: 290px;
+	}
 }
