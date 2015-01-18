@@ -3,9 +3,11 @@ var newrelic = require('newrelic');
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
+var http = require('http');
 
 var express = require('express');
 var app = express();
+var Mustache = require('mustache');
 
 var pg = require('pg.js');
 
@@ -16,6 +18,7 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
 var redisParams = require('parse-redis-url')().parse(process.env.REDISCLOUD_URL);
 var redis = require('redis').createClient(redisParams.port, redisParams.host);
@@ -36,6 +39,7 @@ function queueTask(queue, type, metadata, buffer, callback) {
 }
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use(session({
 	secret: process.env.COOKIE_SESSION_SECRET,
@@ -57,7 +61,7 @@ app.get('/lang.json', function(req, res) {
 app.get(/^\/(?:content|register|repair|try)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:bootstrap|content|register|repair|try)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:bootstrap|content|register|repair|try|plans)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
@@ -398,7 +402,7 @@ app.post('/register', function(req, res) {
 		var salt = req.body.salt;
 		var authkey = req.body.authkey;
 		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
-		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier) VALUES ($1, $2, $3, $4, $5, 3, 10)', [id, username, salt, authkey, S3Prefix], function(err, result) {
+		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota) VALUES ($1, $2, $3, $4, $5, 3, $6, $7)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
@@ -442,6 +446,78 @@ app.put('/push/:id/', function(req, res) {
 	res.send(200);
 });
 
+app.get('/plans', function(req, res) {
+	return http.get('http://sites.fastspring.com/airbornos/api/price?product_1_path=/knowledgeworker&product_2_path=/medialover&product_3_path=/mediaworker&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For')) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
+		var body = '';
+		response.on('data', function(data) {
+			body += data;
+		});
+		response.on('end', function() {
+			var prices = {};
+			body.split('\n').forEach(function(line) {
+				var pair = line.split('=');
+				prices[pair[0]] = pair[1];
+			});
+			fs.readFile('plans.html', 'utf8', function(err, contents) {
+				res.send(200, Mustache.render(contents, {
+					FASTSPRING_URL: process.env.FASTSPRING_URL,
+					userId: req.session.userID,
+					username: req.session.username,
+					subscription: req.session.subscription,
+					knowledgeWorkerPrice: prices.product_1_unit_display,
+					mediaLoverPrice: prices.product_2_unit_display,
+					mediaWorkerPrice: prices.product_3_unit_display
+				}));
+			});
+		});
+	});
+});
+app.post(/^\/notify\/(activated|changed)\/$/, function(req, res) {
+	if(crypto.createHash('md5').update(req.get('X-Security-Data') + process.env.FASTSPRING_PRIVATE_KEY, 'ascii').digest('hex') !== req.get('X-Security-Hash')) {
+		res.send(403);
+		return;
+	}
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, req.body.tier, req.body.quota, req.body.subscription], function(err, result) {
+			done();
+			if(err || !result.rowCount) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			res.send(200);
+		});
+	});
+});
+app.post('/notify/deactivated/', function(req, res) {
+	if(crypto.createHash('md5').update(req.get('X-Security-Data') + process.env.FASTSPRING_PRIVATE_KEY, 'ascii').digest('hex') !== req.get('X-Security-Hash')) {
+		res.send(403);
+		return;
+	}
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, ''], function(err, result) {
+			done();
+			if(err || !result.rowCount) {
+				console.error(err);
+				res.send(500);
+				return;
+			}
+			res.send(200);
+		});
+	});
+});
+
+
 function login(req, res, authkey, cont) {
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 		if(err) {
@@ -449,7 +525,7 @@ function login(req, res, authkey, cont) {
 			res.send(500);
 			return;
 		}
-		client.query('SELECT id, authkey, "S3Prefix", account_version, tier FROM users WHERE username = $1', [req.session.username], function(err, result) {
+		client.query('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username], function(err, result) {
 			done();
 			if(err || !result.rows[0]) {
 				console.error(err);
@@ -459,6 +535,7 @@ function login(req, res, authkey, cont) {
 			if(result.rows[0].authkey === authkey) {
 				req.session.userID = result.rows[0].id;
 				req.session.S3Prefix = result.rows[0].S3Prefix;
+				req.session.subscription = result.rows[0].subscription;
 				res.cookie('account_info', {
 					S3Prefix: result.rows[0].S3Prefix,
 					account_version: result.rows[0].account_version,

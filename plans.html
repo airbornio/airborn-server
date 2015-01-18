@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+	<link rel="stylesheet" href="plans.css">
+</head>
+<body>
+	<a href="/"><img id="logo" src="images/logo.png"></a>
+	<div id="plans">
+		<div class="plan">
+			<div class="header">Starter</div>
+			<div class="features">
+				<ul>
+					<li>2GB</li>
+				</ul>
+			</div>
+			<div class="price">Free</div>
+			<div class="purchase">
+				{{#userId}}
+					{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Starter plan. My subscription id is {{subscription}}.">Email us to switch</a>{{/subscription}}
+					{{^subscription}}&nbsp;{{/subscription}}
+				{{/userId}}
+				{{^userId}}<a href="/">Login or Register</a>{{/userId}}
+			</div>
+		</div>
+		{{#FASTSPRING_URL}}
+		<div class="plan">
+			<div class="header">Media Lover</div>
+			<div class="features">
+				<ul>
+					<li>100GB</li>
+				</ul>
+			</div>
+			<div class="price">{{mediaLoverPrice}} / month</div>
+			<div class="purchase">
+				{{#userId}}
+					{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Media Lover plan. My subscription id is {{subscription}}.">Email us to switch</a>{{/subscription}}
+					{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/medialover?referrer={{userId}}">Purchase</a> (you're logged in as {{username}}){{/subscription}}
+				{{/userId}}
+				{{^userId}}<a href="/">Login or Register to Purchase</a>{{/userId}}
+			</div>
+		</div>
+		<div class="plan">
+			<div class="header">Knowledge Worker</div>
+			<div class="features">
+				<ul>
+					<li>File history*</li>
+					<li>2GB + 10GB Free</li>
+				</ul>
+			</div>
+			<div class="price">{{knowledgeWorkerPrice}} / month</div>
+			<div class="purchase">
+				{{#userId}}
+					{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Knowledge Worker plan. My subscription id is {{subscription}}.">Email us to switch</a>{{/subscription}}
+					{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}">Purchase</a> (you're logged in as {{username}}){{/subscription}}
+				{{/userId}}
+				{{^userId}}<a href="/">Login or Register to Purchase</a>{{/userId}}
+			</div>
+			<div class="footnote">* Old versions of your files take up space, which is why you get 10GB free.</div>
+		</div>
+		<div class="plan">
+			<div class="header">Media Worker</div>
+			<div class="features">
+				<ul>
+					<li>File history*</li>
+					<li>100GB + 200GB Free</li>
+				</ul>
+			</div>
+			<div class="price">{{mediaWorkerPrice}} / month</div>
+			<div class="purchase">
+				{{#userId}}
+					{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Media Worker plan. My subscription id is {{subscription}}.">Email us to switch</a>{{/subscription}}
+					{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/mediaworker?referrer={{userId}}">Purchase</a> (you're logged in as {{username}}){{/subscription}}
+				{{/userId}}
+				{{^userId}}<a href="/">Login or Register to Purchase</a>{{/userId}}
+			</div>
+			<div class="footnote">* Old versions of your files take up space, which is why you get 200GB free.</div>
+		</div>
+		{{/FASTSPRING_URL}}
+	</div>
+</body>
+</html>

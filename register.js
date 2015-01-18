@@ -34,7 +34,7 @@ GET('lang.json', function(response) {
 	document.getElementById('captcha-label').textContent = strings.captcha;
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('register').value = strings.register;
-	document.getElementById('repair').textContent = strings.repair;
+	document.getElementById('plans').textContent = strings.plans;
 	document.getElementById('contact').textContent = strings.contact;
 });
 
