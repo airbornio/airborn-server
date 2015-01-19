@@ -65,7 +65,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			});
 			
 			function cont() {
-				document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airborn.io">support@airborn.io</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
+				document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
 			}
 		});
 	}, function(err) {

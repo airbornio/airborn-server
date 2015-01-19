@@ -7,7 +7,7 @@
 	"wrongpass": "Sorry, that password is not correct.",
 	"register": "Register",
 	"password-again": "Password (again)",
-	"notify-of-updates": "Notify me before updating Airborn.",
+	"notify-of-updates": "Notify me before updating Airborn OS.",
 	"captcha": "Please prove you're human.",
 	"nofield": "Please fill out all the fields.",
 	"taken": "Sorry, that username is taken.",
@@ -23,6 +23,6 @@
 	"repair": "Repair",
 	"repairexplanation": "Repairing resets system files and the Marketplace app, if you have edited them. Repairing can take a couple of minutes.",
 	"repairing": "Repairing…",
-	"repairdone": "Reparation attempt done. If your Airborn is still broken, please contact us at {email}.",
+	"repairdone": "Reparation attempt done. If your Airborn OS is still broken, please contact us at {email}.",
 	"contact": "Contact"
 }
