@@ -25,5 +25,6 @@
 	"repairing": "Repairing…",
 	"repairdone": "Reparation attempt done. If your Airborn OS is still broken, please contact us at {email}.",
 	"contact": "Contact",
-	"plans": "Plans"
+	"plans": "Plans",
+	"sitename": "Airborn OS"
 }

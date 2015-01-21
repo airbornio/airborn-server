@@ -11,6 +11,7 @@ function buildLoginForm() {
 		document.getElementById('password').placeholder = strings.password;
 		document.getElementById('login').value = strings.login;
 		document.getElementById('label').textContent = strings.save;
+		document.title = strings.sitename;
 	});
 
 	// Page content
