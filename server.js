@@ -70,6 +70,9 @@ app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
 app.get(/^\/images\/.+\.png$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
+app.get('/favicon.ico', function(req, res) {
+	res.sendfile('favicon.ico');
+});
 
 app.get('/user/:username/exists', function(req, res) {
 	var username = req.param('username');
