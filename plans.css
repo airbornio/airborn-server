@@ -14,15 +14,15 @@ body {
 	margin-top: -179px;
 }
 #plans {
-	width: 850px;
+	width: 100%;
 	position: absolute;
 	top: 50%;
-	left: 50%;
-	margin: -120px 0 0 -425px;
+	margin-top: -120px;
 	text-align: center;
+	padding: 0 calc((100% - 730px) / 2);
 }
 .plan {
-	width: 400px;
+	width: 340px;
 	padding: 20px 30px;
 	background-color: #E1E7EA;
 	border-radius: 10px;
