@@ -33,11 +33,22 @@ body {
 	width: 100%;
 	margin: 5px 0;
 }
+#whatisit {
+	visibility: visible;
+	position: fixed;
+	margin-top: 40px;
+	left: 0;
+	text-align: center;
+	width: 100%;
+	color: #E1E7EA;
+	font-weight: bold;
+	font-size: large;
+}
 #tricolon {
 	color: #E1E7EA;
 	visibility: visible;
 	position: fixed;
-	margin-top: 45px;
+	margin-top: 70px;
 	left: 10%;
 	right: calc(10% - 30px);
 	overflow: auto;
@@ -50,11 +61,6 @@ body {
 	margin-right: 30px;
 	text-align: left;
 }
-#tricolon .colon .header {
-	display: inline-block;
-	margin-bottom: 5px;
-	font-weight: bold;
-}
 #tricolon .colon img {
 	height: 160px;
 	width: 90px;
@@ -65,6 +71,13 @@ body {
 #tricolon .colon img.screenshot {
 	border-radius: 10px;
 	box-shadow: 0 0 5px 2px #374A55;
+}
+#tricolon .colon .header {
+	margin-bottom: 5px;
+	font-weight: bold;
+	float: right;
+	width: calc(100% - 105px);
+	white-space: normal;
 }
 #tricolon .colon .body {
 	float: right;
