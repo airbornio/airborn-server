@@ -18,7 +18,6 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
 var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
 
 var redisParams = require('parse-redis-url')().parse(process.env.REDISCLOUD_URL);
 var redis = require('redis').createClient(redisParams.port, redisParams.host);
@@ -39,7 +38,6 @@ function queueTask(queue, type, metadata, buffer, callback) {
 }
 
 app.use(bodyParser.json());
-app.use(cookieParser());
 
 app.use(session({
 	secret: process.env.COOKIE_SESSION_SECRET,
