@@ -37,6 +37,18 @@ function queueTask(queue, type, metadata, buffer, callback) {
 	});
 }
 
+if(process.env.TRUST_PROXY) {
+	app.enable('trust proxy');
+}
+
+app.use(function(req, res, next) {
+	if(!process.env.DEVELOPMENT && !req.secure) {
+		res.redirect('https://' + process.env.HOSTNAME + req.url);
+		return;
+	}
+	next();
+});
+
 app.use(bodyParser.json());
 
 app.use(session({
