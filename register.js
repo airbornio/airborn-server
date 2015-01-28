@@ -170,55 +170,42 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				var zip = new JSZip(data);
 
 				var getFile = function(file, options, callback) {
-					console.log([].slice.call(arguments));
-					if(window.getFileCache[file]) {
-						return window.getFile(file, options, callback);
+					if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
+						if(typeof options === 'function' || options === undefined) {
+							callback = options;
+							options = {};
+						}
+						var zipfile = zip.files[file.substr(1)];
+						if(options.codec) {
+							if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(zipfile.asArrayBuffer())));
+							return;
+						}
+						if(callback) callback(zipfile.asText());
+						return;
 					}
-					if(typeof options === 'function') {
-						callback = options;
-						options = {};
-					}
-					if(file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
-						callback(zip.files[file.substr(1)].asText());
-					} else {
-						callback(null);
-					}
+					return _getFile(file, options, callback);
 				};
-				var openWindow = function() {};
 				eval(zip.files['Core/core.js'].asText());
+				var _getFile = window.getFile;
+				window.getFile = getFile;
 
 				var keys = Object.keys(zip.files);
-				var uploaded = 0;
-				var total = 0;
 				var target = '/';
-				console.time('upload core');
 				keys.forEach(function(path) {
 					var file = zip.files[path];
 					if(!file.options.dir) {
-						total++;
-						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
-							uploaded++;
-							if(uploaded === total) cont();
-						});
+						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'});
 					}
 				});
-				total += 3;
-				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase(), function() {
-					uploaded++;
-					if(uploaded === total) cont();
+				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
+				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
+				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}});
+				
+				history.pushState({}, '', '/');
+				getFile('/Core/startup.js', function(contents) {
+					eval(contents);
+					//alert(lang.done);
 				});
-				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase(), function() {
-					uploaded++;
-					if(uploaded === total) cont();
-				});
-				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
-					uploaded++;
-					if(uploaded === total) cont();
-				});
-				function cont() {
-					console.timeEnd('upload core');
-					document.getElementById('container').innerHTML = lang.done + ' ' + '<a href="/">' + lang.login + '</a>';
-				}
 			});
 		}, function(req) {
 			register.disabled = false;

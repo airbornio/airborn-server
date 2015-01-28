@@ -26,47 +26,47 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			var zip = new JSZip(data);
 
 			var getFile = function(file, options, callback) {
-				console.log([].slice.call(arguments));
-				if(file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
-					if(typeof options === 'function') {
+				if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
+					if(typeof options === 'function' || options === undefined) {
 						callback = options;
 						options = {};
 					}
-					callback(zip.files[file.substr(1)].asText());
+					var zipfile = zip.files[file.substr(1)];
+					if(options.codec) {
+						if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(zipfile.asArrayBuffer())));
+						return;
+					}
+					if(callback) callback(zipfile.asText());
 					return;
 				}
-				return window.getFile(file, options, callback);
+				return _getFile(file, options, callback);
 			};
-			var openWindow = function() {};
 			eval(zip.files['Core/core.js'].asText());
+			var _getFile = window.getFile;
+			window.getFile = getFile;
 
 			var keys = Object.keys(zip.files);
-			var uploaded = 0;
-			var total = 0;
 			var target = '/';
 			
 			keys.forEach(function(path) {
 				var file = zip.files[path];
 				if(!file.options.dir) {
-					total++;
 					putFile(
 						target + path,
 						{codec: 'arrayBuffer'},
 						file.asArrayBuffer(),
-						{from: 'origin'}, // Don't merge because the
+						{from: 'origin'}  // Don't merge because the
 										  // merge might've been the
 										  // problem in the first place.
-						function() {
-							uploaded++;
-							if(uploaded === total) cont();
-						}
 					);
 				}
 			});
 			
-			function cont() {
-				document.getElementById('container').innerHTML = lang.repairdone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>') + ' ' + '<a href="/">' + lang.login + '</a>';
-			}
+			history.pushState({}, '', '/');
+			getFile('/Core/startup.js', function(contents) {
+				eval(contents);
+				//alert(lang.repairdone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>'));
+			});
 		});
 	}, function(err) {
 		document.getElementById('repair').disabled = false;
