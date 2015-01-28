@@ -15,7 +15,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	document.getElementById('repair').value = lang.repairing;
 	
 	login({username: document.getElementById('username').value, password: document.getElementById('password').value}, null, function() {}, function() {
-		JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
+		JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 			if(err) {
 				document.getElementById('repair').disabled = false;
 				document.getElementById('repair').value = lang.repair;

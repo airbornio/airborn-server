@@ -14,7 +14,7 @@ GET('lang.json', function(response) {
 	lang = JSON.parse(response);
 });
 
-JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
+JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 	if(err) {
 		alert(lang.error);
 		return;

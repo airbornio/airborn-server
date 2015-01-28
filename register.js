@@ -159,7 +159,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		}, function(response) {
 			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
 			register.value = lang.uploading;
-			JSZipUtils.getBinaryContent('http://airborn-update-stage.herokuapp.com/v2/current', function(err, data) {
+			JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 				if(err) {
 					register.disabled = false;
 					register.value = lang.register;

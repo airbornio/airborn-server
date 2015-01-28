@@ -530,6 +530,16 @@ app.post('/notify/deactivated/', function(req, res) {
 	});
 });
 
+app.get(/^\/(?:v2\/)?current(?:-id)?$/, function(req, res) {
+	console.log(process.env.UPDATE_URL + req.path);
+	http.get(process.env.UPDATE_URL + req.path, function(update) {
+		update.pipe(res);
+	}).on('error', function(err) {
+		console.error(err);
+		res.send(500);
+	});
+});
+
 
 function login(req, res, authkey, cont) {
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
