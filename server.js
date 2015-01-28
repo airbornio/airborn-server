@@ -23,6 +23,9 @@ var redisParams = require('parse-redis-url')().parse(process.env.REDISCLOUD_URL)
 var redis = require('redis').createClient(redisParams.port, redisParams.host);
 redis.auth(redisParams.password);
 
+var bruteStore = new (require('express-brute-redis'))({client: redis});
+var brute = new (require('express-brute'))(bruteStore);
+
 var visualCaptcha;
 
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
@@ -136,7 +139,9 @@ app.get('/user/:username/salt', function(req, res) {
 app.get(/^\/object\/(.+)$/, function(req, res) {
 	var authkey = req.get('X-Authentication');
 	if(authkey) {
-		login(req, res, authkey, cont);
+		brute.prevent(req, res, function() {
+			login(req, res, authkey, cont);
+		});
 	} else if(userLoggedIn(req)) {
 		cont();
 	} else {
