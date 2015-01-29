@@ -30,9 +30,13 @@ GET('lang.json', function(response) {
 	document.getElementById('username-label').textContent = strings.username;
 	document.getElementById('password-label').textContent = strings.password;
 	document.getElementById('password-again-label').textContent = strings['password-again'];
+	document.getElementById('download-creds-explanation').innerHTML = strings['download-creds-explanation'].replace('\n', '<br>');
+	document.getElementById('download-creds').value = strings['download-creds'];
+	document.getElementById('email-label').textContent = strings.email;
+	document.getElementById('double-check-email').innerHTML = strings['double-check-email'].replace('\n', '<br>');
 	document.getElementById('notify-of-updates-label').textContent = strings['notify-of-updates'];
-	document.getElementById('captcha-label').textContent = strings.captcha;
 	document.getElementById('ready').textContent = strings.ready;
+	document.getElementById('current-step').textContent = strings['current-step'];
 	document.getElementById('register').value = strings.register;
 	document.getElementById('plans').textContent = strings.plans;
 	document.getElementById('contact').textContent = strings.contact;
@@ -53,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			elm = elm.parentElement;
 		}
 		if(elm.classList.contains('img')) {
-			maybeReady();
+			updateCurrentStep();
 		} else if(elm.classList.contains('visualCaptcha-refresh-button')) {
 			document.getElementById('ready').style.display = 'none';
 		}
@@ -77,49 +81,84 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	var debounceObj = {};
 	this.addEventListener('keyup', function(evt) {
-		debounce(maybeReady, 500, debounceObj);
+		debounce(updateCurrentStep, 500, debounceObj);
 	});
-	function maybeReady() {
+	document.getElementById('download-creds').addEventListener('click', function() {
+		var username = document.getElementById('username').value;
+		var password = document.getElementById('password').value;
+		var password_backup_key = window.password_backup_key = sjcl.random.randomWords(8);
+		var password_backup = sjcl.encrypt(password_backup_key, password);
+		saveAs(new Blob([username, '\n', password_backup], {type: 'text/plain'}), 'airbornos.txt');
+		window.creds_backupped = JSON.stringify([username, password]);
+		updateCurrentStep();
+	});
+	function updateCurrentStep() {
+		document.getElementById('ready').style.display = 'none';
+		document.getElementById('error').style.display = 'none';
+		document.getElementById('current-step').style.display = 'none';
+		document.getElementById('download-creds').disabled = true;
+		document.getElementById('register').disabled = true;
 		if(document.getElementById('username').value) {
-			document.getElementById('error').style.display = 'none';
 			GET('/user/' + document.getElementById('username').value + '/exists', function(response) {
+				var step, error;
 				if(response === 'true') {
-					document.getElementById('error').textContent = lang.taken;
-					document.getElementById('error').style.display = 'inline-block';
-					return;
+					step = 0;
+					error = lang.taken;
+				} else {
+					var current = currentStep();
+					step = current[0];
+					error = current[1];
 				}
-				var error = maybeError();
-				if(!error) {
+				if(step === 'done') {
 					document.getElementById('ready').style.display = 'inline-block';
-				} else if(error === lang.diffpasswords) {
-					document.getElementById('error').textContent = lang.diffpasswords;
+				} else {
+					var td = document.getElementById('container').getElementsByTagName('tr')[step].firstChild
+					td.insertBefore(document.getElementById('current-step'), td.firstChild);
+					document.getElementById('current-step').style.display = 'block';
+				}
+				if(step === 3) {
+					document.getElementById('download-creds').disabled = false;
+				}
+				if(step === 'done') {
+					document.getElementById('register').disabled = false;
+				}
+				if(error === lang.taken || error === lang.diffpasswords) {
+					document.getElementById('error').textContent = error;
 					document.getElementById('error').style.display = 'inline-block';
-					document.getElementById('ready').style.display = 'none';
 				}
 			});
 		}
 	}
 });
 
-function maybeError() {
-	if(
-		!document.getElementById('username').value ||
-		!document.getElementById('password').value ||
-		!document.getElementById('password-again').value
-	) {
-		return lang.nofield;
+function currentStep() {
+	if(!document.getElementById('username').value) {
+		return [0, lang.nofield];
+	}
+	if(!document.getElementById('password').value) {
+		return [1, lang.nofield];
+	}
+	if(!document.getElementById('password-again').value) {
+		return [2, lang.nofield];
 	}
 	if(document.getElementById('password').value !== document.getElementById('password-again').value) {
-		return lang.diffpasswords;
+		return [2, lang.diffpasswords];
+	}
+	if(window.creds_backupped !== JSON.stringify([document.getElementById('username').value, document.getElementById('password').value])) {
+		return [3, lang.nodownloadcreds];
+	}
+	if(!document.getElementById('email').value) {
+		return [4, lang.nofield];
 	}
 	if(!captcha.getCaptchaData().valid) {
-		return lang.nocaptcha;
+		return [7, lang.nocaptcha];
 	}
+	return ['done'];
 }
 
 document.getElementById('container').addEventListener('submit', function(evt) {
 	evt.preventDefault();
-	var error = maybeError();
+	var error = currentStep()[1];
 	if(error) {
 		alert(error);
 		return;
@@ -134,6 +173,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	});
 	var username = window.username = document.getElementById('username').value;
 	var password = window.password = document.getElementById('password').value;
+	var email = document.getElementById('email').value;
 	var notifyOfUpdates = document.getElementById('notify-of-updates').checked;
 	POST('/captcha/try', data, function() {
 		register.value = lang.registering;
@@ -155,7 +195,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		POST('/register', {
 			username: username,
 			salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
-			authkey: authkey
+			authkey: authkey,
+			password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
+			email: email
 		}, function(response) {
 			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
 			register.value = lang.uploading;

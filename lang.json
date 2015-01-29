@@ -8,7 +8,6 @@
 	"register": "Register",
 	"password-again": "Password (again)",
 	"notify-of-updates": "Notify me before updating Airborn OS.",
-	"captcha": "Please prove you're human.",
 	"nofield": "Please fill out all the fields.",
 	"taken": "Sorry, that username is taken.",
 	"diffpasswords": "The two passwords are not the same.",
@@ -26,5 +25,11 @@
 	"repairdone": "Reparation attempt done. If your Airborn OS is still broken, please contact us at {email}.",
 	"contact": "Contact",
 	"plans": "Plans",
-	"sitename": "Airborn OS"
+	"sitename": "Airborn OS",
+	"download-creds-explanation": "We can't recover your password if you lose it.\nInstead:",
+	"download-creds": "Download Username and Key",
+	"nodownloadcreds": "Please download your username and password in case you ever lose it.",
+	"current-step": "→",
+	"email": "Email address",
+	"double-check-email": "Please double check your email address.\nYou need it to use your key (above)"
 }

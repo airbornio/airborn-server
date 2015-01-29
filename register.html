@@ -13,19 +13,24 @@
 			<tr><td><label id="username-label" for="username"></label></td><td><input type="text" id="username"></td></tr>
 			<tr><td><label id="password-label" for="password"></label></td><td><input type="password" id="password"></td></tr>
 			<tr><td><label id="password-again-label" for="password-again"></label></td><td><input type="password" id="password-again"></td></tr>
+			<tr><td colspan="2"><span id="download-creds-explanation"></span> <input type="button" id="download-creds" disabled><br></td></tr>
+			<tr><td><label id="email-label" for="email"></label></td><td><input type="text" id="email"></td></tr>
+			<tr><td colspan="2"><span id="double-check-email"></span></td></tr>
 			<tr><td colspan="2"><input type="checkbox" id="notify-of-updates"> <label id="notify-of-updates-label" for="notify-of-updates"></label></td></tr>
-			<tr><td colspan="2" id="captcha-td"><label id="captcha-label" for="captcha"></label><div id="captcha"></div></td></tr>
-			<tr><td colspan="2"><span id="ready"></span><span id="error"></span><input type="submit" id="register"><br></td></tr>
+			<tr><td colspan="2" id="captcha-td"><div id="captcha"></div></td></tr>
+			<tr><td colspan="2"><span id="ready"></span><span id="error"></span><input type="submit" id="register" disabled><br></td></tr>
 		</table>
 		<div id="links-container">
 			<a href="plans" id="plans"></a> |
 			<a href="mailto:info@airbornos.com" id="contact"></a>
 		</div>
 	</form>
+	<span id="current-step"></span>
 	<script src="register.js"></script>
 	<script src="3rdparty/visualcaptcha/visualcaptcha.vanilla.js"></script>
 	<script src="sjcl.js"></script>
 	<script src="3rdparty/jszip/jszip.min.js"></script>
+	<script src="3rdparty/FileSaver.min.js"></script>
 	<script type="text/javascript" src="3rdparty/jszip/jszip-utils.js"></script>
 	<!--
 	Mandatory in IE 6, 7, 8 and 9.

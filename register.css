@@ -21,7 +21,7 @@ table {
 	width: 100%;
 }
 td {
-	padding: 0;
+	padding: 5px 0;
 }
 label {
 	font-size: small;
@@ -37,14 +37,19 @@ label {
 	background-color: #E1E7EA;
 	border-radius: 10px;
 }
-#username, #password, #password-again {
+#username, #password, #password-again, #email {
 	width: 100%;
-	margin: 5px 0;
+}
+#download-creds-explanation, #double-check-email {
+	font-size: small;
+}
+#download-creds {
+	padding: 1px 20px;
 }
 #notify-of-updates {
 	position: relative;
 	top: 3px;
-	margin: 7px 0px 8px;
+	margin: 0;
 }
 #captcha-td {
 	padding-top: 7px;
@@ -60,7 +65,11 @@ label {
 #register {
 	float: right;
 	padding: 1px 20px;
-	margin: 5px 0;
+}
+#current-step {
+	display: none;
+	position: absolute;
+	margin-left: -22px;
 }
 #links-container {
 	position: absolute;
@@ -76,14 +85,14 @@ label {
 }
 
 .visualCaptcha {
-	margin: 10px 0;
+	margin: 0;
 	min-height: 0;
 }
 .accessibility-description, .visualCaptcha-explanation, .status.valid {
 	background-color: transparent;
 	color: black;
 	padding: 0;
-	margin: 10px;
+	margin: 0 0 10px;
 }
 .visualCaptcha-possibilities .img {
 	padding: 4px;
