@@ -8,6 +8,7 @@ var http = require('http');
 var express = require('express');
 var app = express();
 var Mustache = require('mustache');
+var markdown = require('markdown').markdown;
 
 var pg = require('pg.js');
 
@@ -74,7 +75,7 @@ app.get('/lang.json', function(req, res) {
 app.get(/^\/(?:content|register|repair|try)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:bootstrap|content|register|repair|try|plans)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:bootstrap|content|register|repair|try|plans|docs\/docs)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
@@ -545,6 +546,25 @@ app.get(/^\/(?:v2\/)?current(?:-id)?$/, function(req, res) {
 		console.error(err);
 		res.send(500);
 	});
+});
+
+app.get('/docs/:id', function(req, res) {
+	fs.readFile(req.path.substr(1) + '.md', 'utf8', function(err, contents) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		fs.readFile('docs/docs.html', 'utf8', function(err, docs) {
+			res.send(200, Mustache.render(docs, {
+				title: contents.split('\n')[0].replace('# ', ''),
+				contents: markdown.toHTML(contents)
+			}));
+		});
+	});
+});
+app.get('/docs/images/:image', function(req, res) {
+	res.sendfile(req.path.substr(1));
 });
 
 
