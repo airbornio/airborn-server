@@ -75,7 +75,7 @@ app.get('/lang.json', function(req, res) {
 app.get(/^\/(?:content|register|repair|try)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:bootstrap|content|register|repair|try|plans|docs\/docs)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:bootstrap|content|register|repair|try|plans|docs\/docs|terms)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
@@ -423,7 +423,7 @@ app.post('/register', function(req, res) {
 		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
 		var password_backup_key = req.body.password_backup_key;
 		var email = req.body.email;
-		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email], function(err, result) {
+		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email, created) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9, $10)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email, Math.floor(Date.now() / 1000)], function(err, result) {
 			done();
 			if(err) {
 				console.error(err);
@@ -565,6 +565,16 @@ app.get('/docs/:id', function(req, res) {
 });
 app.get('/docs/images/:image', function(req, res) {
 	res.sendfile(req.path.substr(1));
+});
+
+app.get('/terms', function(req, res) {
+	fs.readFile('terms.md', 'utf8', function(err, contents) {
+		fs.readFile('terms.html', 'utf8', function(err, terms) {
+			res.send(200, Mustache.render(terms, {
+				contents: markdown.toHTML(contents)
+			}));
+		});
+	});
 });
 
 

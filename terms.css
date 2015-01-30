@@ -1,0 +1,24 @@
+* {
+	box-sizing: border-box;
+}
+html, body {
+	height: 100%;
+	margin: 0;
+}
+body {
+	background-color: #607B8B;
+	font-family: sans-serif;
+	padding: 100px calc((100% - 800px) / 2) 100px;
+}
+#logo {
+	margin: 0 auto;
+	display: block;
+}
+#container {
+	width: calc(100% - 20px);
+	padding: 1px 30px 10px;
+	background-color: #E1E7EA;
+	border-radius: 10px;
+	margin: 10px;
+	margin-bottom: 100px;
+}

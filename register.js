@@ -35,6 +35,7 @@ GET('lang.json', function(response) {
 	document.getElementById('email-label').textContent = strings.email;
 	document.getElementById('double-check-email').innerHTML = strings['double-check-email'].replace('\n', '<br>');
 	document.getElementById('notify-of-updates-label').textContent = strings['notify-of-updates'];
+	document.getElementById('agree-terms-label').innerHTML = strings['agree-terms'].replace('{terms}', '<a target="_blank" href="terms">' + strings.terms + '</a>');
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('current-step').textContent = strings['current-step'];
 	document.getElementById('register').value = strings.register;
@@ -60,6 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			updateCurrentStep();
 		} else if(elm.classList.contains('visualCaptcha-refresh-button')) {
 			document.getElementById('ready').style.display = 'none';
+		} else if(elm.tagName === 'INPUT' && elm.type === 'checkbox') {
+			updateCurrentStep();
 		}
 	});
 	this.addEventListener('keypress', function(evt) {
@@ -111,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 				if(step === 'done') {
 					document.getElementById('ready').style.display = 'inline-block';
-				} else {
+				} else if(step !== 7) {
 					var td = document.getElementById('container').getElementsByTagName('tr')[step].firstChild
 					td.insertBefore(document.getElementById('current-step'), td.firstChild);
 					document.getElementById('current-step').style.display = 'block';
@@ -150,8 +153,11 @@ function currentStep() {
 	if(!document.getElementById('email').value) {
 		return [4, lang.nofield];
 	}
+	if(!document.getElementById('agree-terms').checked) {
+		return [7, lang.noterms];
+	}
 	if(!captcha.getCaptchaData().valid) {
-		return [7, lang.nocaptcha];
+		return [8, lang.nocaptcha];
 	}
 	return ['done'];
 }

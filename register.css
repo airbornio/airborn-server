@@ -46,7 +46,7 @@ label {
 #download-creds {
 	padding: 1px 20px;
 }
-#notify-of-updates {
+#notify-of-updates, #agree-terms {
 	position: relative;
 	top: 3px;
 	margin: 0;
