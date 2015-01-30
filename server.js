@@ -538,9 +538,10 @@ app.post('/notify/deactivated/', function(req, res) {
 	});
 });
 
-app.get(/^\/(?:v2\/)?current(?:-id)?$/, function(req, res) {
+app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
 	console.log(process.env.UPDATE_URL + req.path);
 	http.get(process.env.UPDATE_URL + req.path, function(update) {
+		res.statusCode = update.statusCode;
 		update.pipe(res);
 	}).on('error', function(err) {
 		console.error(err);

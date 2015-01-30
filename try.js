@@ -1,27 +1,25 @@
-function GET(url, callback) {
+function GET(url, responseType, callback, error) {
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
-		if(req.readyState === 4 && req.status === 200) {
-			callback(req.responseText);
+		if(req.readyState === 4) {
+			if(req.status === 200) {
+				callback(req.response);
+			} else if(error) {
+				error({status: req.status, statusText: req.statusText});
+			}
 		}
 	};
 	req.open('GET', url);
+	req.responseType = responseType;
 	req.send(null);
 }
 
 var lang = {};
-GET('lang.json', function(response) {
+GET('lang.json', 'text', function(response) {
 	lang = JSON.parse(response);
 });
 
-JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
-	if(err) {
-		alert(lang.error);
-		return;
-	}
-	
-	var zip = new JSZip(data);
-	
+(function() {
 	try {
 		var password = sjcl.codec.hex.fromBits(sjcl.random.randomWords(8));
 		var salt = sjcl.random.randomWords(2);
@@ -38,7 +36,7 @@ JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 	var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 	var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 	var account_info = window.account_info = {tier: 1};
-	
+
 	var XMLHttpRequest_open = window.XMLHttpRequest.prototype.open;
 	window.XMLHttpRequest.prototype.open = function(method, url) {
 		if(url.substr(0, 8) === '/object/' || url.substr(0, 7) === 'object/' || url.substr(0, 13) === '/transaction/') {
@@ -59,46 +57,39 @@ JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 		XMLHttpRequest_open.apply(this, arguments);
 	};
 	var getFile = function(file, options, callback) {
-		if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
+		if(!window.getFileCache || !window.getFileCache[file]) {
 			if(typeof options === 'function' || options === undefined) {
 				callback = options;
 				options = {};
 			}
-			var zipfile = zip.files[file.substr(1)];
 			if(options.codec) {
-				if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(zipfile.asArrayBuffer())));
-				return;
+				GET('/v2/live' + file, 'arraybuffer', function(contents) {
+					if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(contents)));
+				}, function(err) {
+					if(callback) callback(null, err)
+				});
+			} else {
+				GET('/v2/live' + file, 'text', function(contents) {
+					if(callback) callback(contents);
+				}, function(err) {
+					if(callback) callback(null, err)
+				});
 			}
-			if(callback) callback(zipfile.asText());
 			return;
 		}
 		return _getFile(file, options, callback);
 	};
-	eval(zip.files['Core/core.js'].asText());
-	var _getFile = window.getFile;
-	window.getFile = getFile;
-	window.logout = function() {
-		window.location = '/';
-	};
-	
-	var keys = Object.keys(zip.files);
-	var uploaded = 0;
-	var total = 0;
-	var target = '/';
-	
-	keys.forEach(function(path) {
-		var file = zip.files[path];
-		if(!file.options.dir) {
-			total++;
-			putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'}, function() {
-				uploaded++;
-				if(uploaded === total) cont();
-			});
-		}
+	var _getFile;
+	getFile('/Core/core.js', function(contents) {
+		eval(contents);
+		getFile('/Core/startup.js', function(contents) {
+			document.getElementById('loading').style.display = 'none';
+			eval(contents);
+		});
+		_getFile = window.getFile;
+		window.getFile = getFile;
+		window.logout = function() {
+			window.location = '/';
+		};
 	});
-	
-	function cont() {
-		document.getElementById('loading').style.display = 'none';
-		eval(zip.files['Core/startup.js'].asText());
-	}
-});
+})();
