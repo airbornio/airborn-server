@@ -746,3 +746,11 @@ app.get( '/captcha/image/:index', _getImage );
 
 // @param howmany is required, the number of images to generate
 app.get( '/captcha/start/:howmany', _startRoute );
+
+
+/********* Error handling *********/
+
+app.use(function(err, req, res, next) {
+	console.error(err);
+	res.send(500);
+});
