@@ -36,4 +36,4 @@ We don't protect your anonymity. Unless you protect it yourself, we can
 see where in the world you're accessing Airborn OS from.
 
 
-[this addon]: 
+[this addon]: https://addons.mozilla.org/firefox/addon/hcs-checker/
