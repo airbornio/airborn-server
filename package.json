@@ -2,7 +2,7 @@
 	"name": "airborn-server",
 	"version": "0.0.1",
 	"dependencies": {
-		"express": "4.10.0",
+		"express": "4.12.3",
 		"pg.js": "2.11.1",
 		"aws-sdk": "~2.0.6",
 		"newrelic": "1.8.x",
@@ -17,6 +17,7 @@
 		"mustache": "1.0.0",
 		"express-brute": "0.5.2",
 		"express-brute-redis": "0.0.1",
-		"markdown": "0.5.0"
+		"markdown": "0.5.0",
+		"compression": "1.4.3"
 	}
 }

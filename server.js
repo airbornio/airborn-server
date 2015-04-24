@@ -9,6 +9,7 @@ var express = require('express');
 var app = express();
 var Mustache = require('mustache');
 var markdown = require('markdown').markdown;
+var compression = require('compression');
 
 var pg = require('pg.js');
 
@@ -40,6 +41,8 @@ function queueTask(queue, type, metadata, buffer, callback) {
 		callback(null, err);
 	});
 }
+
+app.use(compression());
 
 app.use(bodyParser.json());
 
@@ -530,6 +533,8 @@ app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
 	console.log(process.env.UPDATE_URL + req.path);
 	http.get(process.env.UPDATE_URL + req.path, function(update) {
 		res.statusCode = update.statusCode;
+		res.set('Content-Type', update.headers['content-type']);
+		res.set('Content-Length', update.headers['content-length']);
 		update.pipe(res);
 	}).on('error', function(err) {
 		console.error(err);
