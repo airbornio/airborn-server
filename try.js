@@ -14,22 +14,16 @@ function GET(url, responseType, callback, error) {
 	req.send(null);
 }
 
-var lang = {};
-GET('lang.json', 'text', function(response) {
-	lang = JSON.parse(response);
-});
-
 (function() {
-	try {
-		var password = sjcl.codec.hex.fromBits(sjcl.random.randomWords(8));
-		var salt = sjcl.random.randomWords(2);
-		var files_key = window.files_key = sjcl.random.randomWords(8);
-		var hmac_bits = sjcl.random.randomWords(4);
-	} catch(e) {
-		alert(lang.error);
-		throw e;
+	function randomWords(n) {
+		return Array.apply(null, new Array(n)).map(function() { return Math.floor(Math.random() * 0xFFFFFFFF); });
 	}
-	var key = sjcl.misc.pbkdf2(password, salt, 1000);
+	
+	var password = sjcl.codec.hex.fromBits(randomWords(8));
+	var salt = randomWords(2);
+	var files_key = window.files_key = randomWords(8);
+	var hmac_bits = randomWords(4);
+	var key = sjcl.misc.pbkdf2(password, salt, 10);
 	var private_key = window.private_key = key.slice(128/32); // Second half
 	var shared_key = key.slice(0, 128/32); // First half
 	var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
