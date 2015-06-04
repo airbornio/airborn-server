@@ -1,19 +1,3 @@
-function GET(url, responseType, callback, error) {
-	var req = new XMLHttpRequest();
-	req.onreadystatechange = function() {
-		if(req.readyState === 4) {
-			if(req.status === 200) {
-				callback(req.response);
-			} else if(error) {
-				error({status: req.status, statusText: req.statusText});
-			}
-		}
-	};
-	req.open('GET', url);
-	req.responseType = responseType;
-	req.send(null);
-}
-
 (function() {
 	function randomWords(n) {
 		return Array.apply(null, new Array(n)).map(function() { return Math.floor(Math.random() * 0xFFFFFFFF); });
@@ -33,15 +17,22 @@ function GET(url, responseType, callback, error) {
 
 	var XMLHttpRequest_open = window.XMLHttpRequest.prototype.open;
 	window.XMLHttpRequest.prototype.open = function(method, url) {
-		if(url.substr(0, 8) === '/object/' || url.substr(0, 7) === 'object/' || url.substr(0, 13) === '/transaction/') {
+		if(url.substr(0, 8) === '/object/' && method === 'GET') {
+			var hash = url.split('#')[1]
+			var codec = hash.substr(0, hash.indexOf('.'));
+			url = '/v2/live' + hash.substr(hash.indexOf('.') + 1);
+			if(codec) {
+				Object.defineProperty(this, 'responseText', {get: function() {
+					return sjcl.codec.utf8String.fromBits(sjcl.codec.arrayBuffer.toBits(this.response));
+				}});
+				this.responseType = 'arraybuffer';
+			}
+		} else if(url.substr(0, 8) === '/object/' || url.substr(0, 13) === '/transaction/') {
 			Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
 			Object.defineProperty(this, 'send', {value: function() {
 				Object.defineProperty(this, 'readyState', {get: function() { return 4; }});
 				Object.defineProperty(this, 'status', {get: function() {
-					if(method === 'PUT') {
-						return 200;
-					}
-					return 404;
+					return 200;
 				}});
 				this.dispatchEvent(new Event('readystatechange'));
 				this.dispatchEvent(new Event('load'));
@@ -50,40 +41,22 @@ function GET(url, responseType, callback, error) {
 		}
 		XMLHttpRequest_open.apply(this, arguments);
 	};
-	var getFile = function(file, options, callback) {
-		if(!window.getFileCache || !window.getFileCache[file]) {
-			if(typeof options === 'function' || options === undefined) {
-				callback = options;
-				options = {};
-			}
-			if(options.codec) {
-				GET('/v2/live' + file, 'arraybuffer', function(contents) {
-					if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(contents)));
-				}, function(err) {
-					if(callback) callback(null, err)
-				});
-			} else {
-				GET('/v2/live' + file, 'text', function(contents) {
-					if(callback) callback(contents);
-				}, function(err) {
-					if(callback) callback(null, err)
-				});
-			}
-			return;
-		}
-		return _getFile(file, options, callback);
+	sjcl.encrypt = sjcl.decrypt = function(key, content) {
+		return content;
 	};
-	var _getFile;
-	getFile('/Core/core.js', function(contents) {
-		eval(contents);
-		getFile('/Core/startup.js', function(contents) {
-			document.getElementById('loading').style.display = 'none';
-			eval(contents);
-		});
-		_getFile = window.getFile;
-		window.getFile = getFile;
-		window.logout = function() {
-			window.location = '/';
-		};
+	var req = new XMLHttpRequest();
+	req.open('GET', '/v2/live/Core/core.js');
+	req.addEventListener('readystatechange', function() {
+		if(this.readyState === 4 && this.status === 200) {
+			eval(this.responseText);
+			getFile('/Core/startup.js', function(contents) {
+				document.getElementById('loading').style.display = 'none';
+				eval(contents);
+			});
+			window.logout = function() {
+				window.location = '/';
+			};
+		}
 	});
+	req.send(null);
 })();
