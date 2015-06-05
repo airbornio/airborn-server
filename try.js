@@ -59,4 +59,16 @@
 		}
 	});
 	req.send(null);
+	[
+		'/settings',
+		'/Core/laskyawm.html',
+		'/Core/laskyawm.css',
+		'/Core/laskyawm-bar.css',
+		'/Core/laskyawm-mobile.css'
+	].forEach(function(url) {
+		var link = document.createElement('link');
+		link.rel = 'prefetch';
+		link.href= '/v2/live' + url;
+		document.body.appendChild(link);
+	});
 })();
