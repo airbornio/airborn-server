@@ -53,7 +53,7 @@ function getMessage(channel, queue, callback, getanother) {
 		switch(action) {
 			case 'putObject':
 				s3.putObject({
-					Bucket: 'laskya-cloud',
+					Bucket: process.env.S3_BUCKET_NAME,
 					Key: metadata.S3Prefix + '/' + metadata.name,
 					ACL: 'public-read',
 					ContentLength: metadata.size,
