@@ -10,6 +10,15 @@ body {
 	font-family: sans-serif;
 	padding: 100px calc((100% - 800px) / 2) 100px;
 }
+body:before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+}
 #logo {
 	margin: 0 auto;
 	display: block;
@@ -17,8 +26,9 @@ body {
 #container {
 	width: calc(100% - 20px);
 	padding: 1px 30px 10px;
-	background-color: #E1E7EA;
+	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	margin: 10px;
 	margin-bottom: 100px;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
 }

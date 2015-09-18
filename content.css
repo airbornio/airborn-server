@@ -6,8 +6,10 @@ html {
 }
 body {
 	background-color: #607B8B;
+	background-image: url(images/background.png);
 	font-family: sans-serif;
 	margin: 0;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
 }
 #logo {
 	position: absolute;
@@ -23,8 +25,9 @@ body {
 	left: 50%;
 	margin: -205px 0 0 -130px;
 	padding: 20px 30px;
-	background-color: #E1E7EA;
+	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
 }
 #container > * {
 	visibility: hidden;
@@ -70,7 +73,7 @@ body {
 }
 #tricolon .colon img.screenshot {
 	border-radius: 10px;
-	box-shadow: 0 0 5px 2px #374A55;
+	box-shadow: 0 0 5px 2px rgba(0, 0, 0, .5);
 }
 #tricolon .colon .header {
 	margin-bottom: 5px;
@@ -118,6 +121,7 @@ body {
 #links-container #emphasized td {
 	font-size: medium;
 	color: #374A55;
+	text-shadow: none;
 }
 #links-container #emphasized a {
 	text-decoration: none;
@@ -134,9 +138,15 @@ body {
 	width: 100%;
 	height: 37px;
 	background: white;
-	background: repeating-linear-gradient(-55deg, #E1E7EA, #E1E7EA 10px, white 10px, white 20px);
+	background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .6) 10px, rgba(255, 255, 255, .8) 10px, rgba(255, 255, 255, .8) 20px);
 	border-radius: 7px;
 	z-index: -1;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, .6);
+}
+@media (max-device-width: 640px) and (max-device-height: 640px) {
+	body {
+		background-image: url(images/background-small.png)
+	}
 }
 @media (max-height: 580px) {
 	#logo, #container {

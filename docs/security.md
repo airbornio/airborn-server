@@ -11,6 +11,7 @@
 
 
 ![Client-Side Encryption](images/client-side-encryption.png)
+{: .img-container .security #sidebar}
 
 ## What we did, or What we can't see
 

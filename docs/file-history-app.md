@@ -1,6 +1,7 @@
 # File History App FAQ
 
 ![Every file has a little history icon next to it](images/history-app-1.png)
+{: .img-container .file-hist #sidebar}
 
 ## Why are those little history icons missing for all files?
 

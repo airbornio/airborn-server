@@ -552,7 +552,7 @@ app.get('/docs/:id', function(req, res) {
 		fs.readFile('docs/docs.html', 'utf8', function(err, docs) {
 			res.send(200, Mustache.render(docs, {
 				title: contents.split('\n')[0].replace('# ', ''),
-				contents: markdown.toHTML(contents)
+				contents: markdown.toHTML(contents, 'Maruku')
 			}));
 		});
 	});
@@ -565,7 +565,7 @@ app.get('/terms', function(req, res) {
 	fs.readFile('terms.md', 'utf8', function(err, contents) {
 		fs.readFile('terms.html', 'utf8', function(err, terms) {
 			res.send(200, Mustache.render(terms, {
-				contents: markdown.toHTML(contents)
+				contents: markdown.toHTML(contents, 'Maruku')
 			}));
 		});
 	});
