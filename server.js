@@ -54,6 +54,9 @@ app.use(session({
 }));
 
 app.get('/', function(req, res) {
+	if(req.session.username) {
+		res.set('Link', '</user/' + req.session.username + '/salt>; rel=prefetch');
+	}
 	res.sendfile('bootstrap.html');
 });
 app.get(/^\/(?:sjcl|login)\.js$/, function(req, res) {
