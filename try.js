@@ -19,14 +19,11 @@
 	window.XMLHttpRequest.prototype.open = function(method, url) {
 		if(url.substr(0, 8) === '/object/' && method === 'GET') {
 			var hash = url.split('#')[1]
-			var codec = hash.substr(0, hash.indexOf('.'));
 			url = '/v2/live' + hash.substr(hash.indexOf('.') + 1);
-			if(codec) {
-				Object.defineProperty(this, 'responseText', {get: function() {
-					return sjcl.codec.utf8String.fromBits(sjcl.codec.arrayBuffer.toBits(this.response));
-				}});
-				this.responseType = 'arraybuffer';
-			}
+			Object.defineProperty(this, 'responseText', {get: function() {
+				return this.response;
+			}});
+			this.responseType = 'arraybuffer';
 		} else if(url.substr(0, 8) === '/object/' || url.substr(0, 13) === '/transaction/') {
 			Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
 			Object.defineProperty(this, 'send', {value: function() {
@@ -41,14 +38,14 @@
 		}
 		XMLHttpRequest_open.apply(this, arguments);
 	};
-	sjcl.encrypt = sjcl.decrypt = function(key, content) {
-		return content;
-	};
 	var req = new XMLHttpRequest();
 	req.open('GET', '/v2/live/Core/core.js');
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
 			eval(this.responseText);
+			encrypt = decrypt = function(key, content, callback) {
+				callback(content);
+			};
 			getFile('/Core/startup.js', function(contents) {
 				document.getElementById('loading').style.display = 'none';
 				eval(contents);

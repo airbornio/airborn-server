@@ -225,7 +225,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						}
 						var zipfile = zip.files[file.substr(1)];
 						if(options.codec) {
-							if(callback) callback(sjcl.codec[options.codec].fromBits(sjcl.codec.arrayBuffer.toBits(zipfile.asArrayBuffer())));
+							if(callback) callback(codec[options.codec].fromAB(zipfile.asArrayBuffer()));
 							return;
 						}
 						if(callback) callback(zipfile.asText());
