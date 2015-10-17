@@ -57,11 +57,8 @@
 	});
 	req.send(null);
 	[
-		'/settings',
-		'/Core/laskyawm.html',
-		'/Core/laskyawm.css',
-		'/Core/laskyawm-bar.css',
-		'/Core/laskyawm-mobile.css'
+		'/Apps/firetext/index.html',
+		'/Apps/firetext/styles.css',
 	].forEach(function(url) {
 		var link = document.createElement('link');
 		link.rel = 'prefetch';
