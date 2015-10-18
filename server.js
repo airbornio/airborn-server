@@ -144,10 +144,12 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 		return;
 	}
 	function cont() {
+		res.set('Content-Type', 'application/json');
 		var stream = s3.getObject({Bucket: process.env.S3_BUCKET_NAME, Key: req.session.S3Prefix + '/' + req.params[0]}).createReadStream();
 		stream.pipe(res);
 		stream.on('error', function(err) {
 			console.error(err);
+			res.removeHeader('Content-Type');
 			res.send(err.statusCode);
 		});
 	}
