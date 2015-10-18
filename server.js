@@ -556,7 +556,7 @@ app.get('/docs/:id', function(req, res) {
 		}
 		fs.readFile('docs/docs.html', 'utf8', function(err, docs) {
 			res.send(200, Mustache.render(docs, {
-				title: contents.split('\n')[0].replace('# ', ''),
+				title: contents.match(/^# (.*)$/m)[1],
 				contents: markdown.toHTML(contents, 'Maruku')
 			}));
 		});

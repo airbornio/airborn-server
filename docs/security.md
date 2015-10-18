@@ -1,17 +1,7 @@
-# Security
-
-## What you can do
-
-1. Don't use Airborn OS on computers you don't trust
-2. Always log out of Airborn OS when you leave your computer, even if for a
-   little while
-3. Choose a long password, or choose a short sentence as your password,
-   or use a password manager
-4. Use Airborn OS with Firefox with [this addon][] installed
-
-
 ![Client-Side Encryption](images/client-side-encryption.png)
 {: .img-container .security #sidebar}
+
+# Security
 
 ## What we did, or What we can't see
 
@@ -35,6 +25,16 @@ see it.
 
 We don't protect your anonymity. Unless you protect it yourself, we can
 see where in the world you're accessing Airborn OS from.
+
+
+## What you can do
+
+1. Don't use Airborn OS on computers you don't trust
+2. Always log out of Airborn OS when you leave your computer, even if for a
+   little while
+3. Choose a long password, or choose a short sentence as your password,
+   or use a password manager
+4. Use Airborn OS with Firefox with [this addon][] installed
 
 
 [this addon]: https://addons.mozilla.org/firefox/addon/hcs-checker/

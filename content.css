@@ -64,16 +64,51 @@ body {
 	margin-right: 30px;
 	text-align: left;
 }
-#tricolon .colon img {
+#tricolon .colon .image {
 	height: 160px;
 	width: 90px;
 	float: left;
 	margin: 3px;
 	margin-bottom: 5px;
 }
-#tricolon .colon img.screenshot {
+#tricolon .colon .phone {
+	border: 2px solid black;
+	border-radius: 14px;
+	padding: 5px;
+	padding-bottom: 20px;
+}
+#tricolon .colon .phone img {
 	border-radius: 10px;
-	box-shadow: 0 0 5px 2px rgba(0, 0, 0, .5);
+	opacity: .8;
+}
+#tricolon .colon .laptop {
+	overflow: hidden;
+	position: relative;
+	perspective: 100px;
+	perspective-origin: 90%;
+	padding-left: 50px;
+	margin-left: -50px;
+	box-sizing: content-box;
+}
+#tricolon .colon .laptop:before, #tricolon .colon .laptop:after {
+	content: '';
+	display: block;
+	width: 177px;
+	height: 125px;
+	border: 2px solid black;
+	border-radius: 14px;
+}
+#tricolon .colon .laptop:after {
+	transform: rotateX(90deg) scaleY(.30);
+	transform-origin: top;
+	border-width: 2px;
+}
+#tricolon .colon .laptop img {
+	border-radius: 10px 0 0 10px;
+	opacity: .8;
+	position: absolute;
+	top: 7px;
+	left: 57px;
 }
 #tricolon .colon .header {
 	margin-bottom: 5px;
@@ -128,6 +163,9 @@ body {
 	margin: 0 1px;
 	color: #374A55;
 	font-weight: bold;
+}
+#links-container #emphasized #try {
+	font-size: larger;
 }
 #links-container a {
 	color: #E1E7EA;
