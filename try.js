@@ -20,17 +20,17 @@
 		if(url.substr(0, 8) === '/object/' && method === 'GET') {
 			var hash = url.split('#')[1]
 			url = '/v2/live' + hash.substr(hash.indexOf('.') + 1);
-			Object.defineProperty(this, 'responseText', {get: function() {
-				return this.response;
-			}});
+			Object.defineProperty(this, 'airborn_readyState', {get: function() { return this.readyState; }});
+			Object.defineProperty(this, 'airborn_status', {get: function() { return this.status; }});
+			Object.defineProperty(this, 'airborn_statusText', {get: function() { return this.statusText; }});
+			Object.defineProperty(this, 'airborn_response', {get: function() { return this.response; }});
+			Object.defineProperty(this, 'airborn_responseText', {get: function() { return this.response; }}); // Not responseText
 			this.responseType = 'arraybuffer';
 		} else if(url.substr(0, 8) === '/object/' || url.substr(0, 13) === '/transaction/') {
 			Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
 			Object.defineProperty(this, 'send', {value: function() {
-				Object.defineProperty(this, 'readyState', {get: function() { return 4; }});
-				Object.defineProperty(this, 'status', {get: function() {
-					return 200;
-				}});
+				Object.defineProperty(this, 'airborn_readyState', {get: function() { return 4; }});
+				Object.defineProperty(this, 'airborn_status', {get: function() { return 200; }});
 				this.dispatchEvent(new Event('readystatechange'));
 				this.dispatchEvent(new Event('load'));
 			}});
@@ -42,7 +42,7 @@
 	req.open('GET', '/v2/live/Core/core.js');
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
-			eval(this.responseText);
+			eval(this.responseText.replace(/((?:this|req)\.)((?:readyState|status|response)(?:Text)?)/g, '$1airborn_$2')); // renameGlobalVariables light
 			encrypt = decrypt = function(key, content, callback) {
 				callback(content);
 			};
