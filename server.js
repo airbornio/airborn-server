@@ -502,6 +502,19 @@ app.post('/notify/deactivated/', function(req, res) {
 	});
 });
 
+app.get('/v2/live/Documents/', function(req, res) {
+	res.send('Documents/: {}');
+});
+app.get('/v2/live/Documents/Documents/', function(req, res) {
+	res.send('Welcome.html: {type: text/html}');
+});
+app.get('/v2/live/Documents/Documents/Welcome.html', function(req, res) {
+	res.sendFile('Welcome.html', {root: __dirname});
+});
+app.get('/v2/live/AppData/firetext/localStorage', function(req, res) {
+	res.send('{"firetext.recents":"[[\\"/sdcard/Documents/\\",\\"Welcome\\",\\".html\\",\\"\\",\\"internal\\"]]"}');
+});
+
 app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
 	console.log(process.env.UPDATE_URL + req.path);
 	http.get(process.env.UPDATE_URL + req.path, function(update) {
