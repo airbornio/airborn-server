@@ -144,6 +144,7 @@ body {
 }
 #links-container td {
 	padding: 10px 0;
+	vertical-align: baseline;
 }
 #links-container td:first-child {
 	text-align: right;
@@ -164,8 +165,8 @@ body {
 	color: #374A55;
 	font-weight: bold;
 }
-#links-container #emphasized #try {
-	font-size: larger;
+#links-container #emphasized #demo {
+	font-size: 1.3em;
 }
 #links-container a {
 	color: #E1E7EA;
