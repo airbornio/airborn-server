@@ -547,6 +547,22 @@ app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
 	});
 });
 
+app.use('/firetext', function(req, res) {
+	req.pipe(http.request({
+		method: req.method,
+		hostname: process.env.FIRETEXT_SERVER_HOSTNAME,
+		path: req.url,
+	}, function(firetext) {
+		res.statusCode = firetext.statusCode;
+		res.set('Content-Type', firetext.headers['content-type']);
+		res.set('Access-Control-Allow-Origin', firetext.headers['access-control-allow-origin']);
+		firetext.pipe(res);
+	}).on('error', function(err) {
+		console.error(err);
+		res.send(500);
+	}));
+});
+
 app.get('/docs/:id', function(req, res) {
 	fs.readFile(req.path.substr(1) + '.md', 'utf8', function(err, contents) {
 		if(err) {
