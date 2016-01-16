@@ -25,6 +25,7 @@ body:before {
 }
 #container {
 	width: calc(100% - 200px);
+	position: relative;
 	padding: 1px 30px 10px;
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
@@ -46,6 +47,19 @@ body:before {
 }
 .img-container.security img {
 	margin: 10px;
+}
+#links-container {
+	position: absolute;
+	margin-top: 35px;
+	margin-left: -30px;
+	text-align: center;
+	width: 100%;
+	color: #E1E7EA;
+	font-size: small;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+}
+#links-container a {
+	color: #E1E7EA;
 }
 @media (min-width: 769px) {
 	.img-container {

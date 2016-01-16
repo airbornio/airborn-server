@@ -47,3 +47,16 @@ body:before {
 	margin-top: 10px;
 	font-size: small;
 }
+#links-container {
+	position: absolute;
+	margin-top: 10px;
+	left: 0;
+	text-align: center;
+	width: 100%;
+	color: #E1E7EA;
+	font-size: small;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+}
+#links-container a {
+	color: #E1E7EA;
+}
