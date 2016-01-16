@@ -53,6 +53,10 @@ app.use(session({
 	saveUninitialized: true
 }));
 
+fs.writeFileSync('content.html', Mustache.render(fs.readFileSync('content.html', 'utf8'), {
+	FORKME_URL: process.env.FORKME_URL
+}));
+
 app.get('/', function(req, res) {
 	if(req.session.username) {
 		res.set('Link', '</user/' + req.session.username + '/salt>; rel=prefetch');

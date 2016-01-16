@@ -187,6 +187,10 @@ body {
 		background-image: url(images/background-small.png)
 	}
 }
+#forkme {
+	position: absolute;
+	right: 0;
+}
 @media (max-height: 580px) {
 	#logo, #container {
 		top: 290px;
