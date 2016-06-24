@@ -28,6 +28,9 @@ redis.auth(redisParams.password);
 var bruteStore = new (require('express-brute-redis'))({client: redis});
 var brute = new (require('express-brute'))(bruteStore);
 
+var geoip2 = require('geoip2');
+geoip2.init();
+
 var visualCaptcha;
 
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
@@ -548,6 +551,20 @@ app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
 	}).on('error', function(err) {
 		console.error(err);
 		res.send(500);
+	});
+});
+
+app.get('/firetext/location', function(req, res) {
+	geoip2.lookupSimple(req.get('X-Forwarded-For').split(',')[0], function(err, result) {
+		if(err) {
+			console.error(err);
+			res.send(500);
+			return;
+		}
+		res.set('Access-Control-Allow-Origin', '*');
+		res.send(200, {
+			country: result.country,
+		});
 	});
 });
 
