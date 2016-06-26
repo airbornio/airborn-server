@@ -11,13 +11,14 @@ var Mustache = require('mustache');
 var markdown = require('markdown').markdown;
 var compression = require('compression');
 
-var pg = require('pg.js');
+var pg = require('pg-promise')();
+var client = pg(process.env.DATABASE_URL);
 
-var AWS = require('aws-sdk');
+var AWS = require('aws-sdk-promise');
 var s3 = new AWS.S3();
 
-var session = require('express-session');
-var RedisStore = require('connect-redis')(session);
+var Session = require('express-session');
+var RedisStore = require('connect-redis')(Session);
 
 var bodyParser = require('body-parser');
 
@@ -49,12 +50,13 @@ app.use(compression());
 
 app.use(bodyParser.json());
 
-app.use(session({
+var session = Session({
 	secret: process.env.COOKIE_SESSION_SECRET,
 	store: new RedisStore({client: redis}),
 	resave: true,
 	saveUninitialized: true
-}));
+});
+app.use(session);
 
 fs.writeFileSync('content.html', Mustache.render(fs.readFileSync('content.html', 'utf8'), {
 	FORKME_URL: process.env.FORKME_URL
@@ -92,49 +94,32 @@ app.get('/favicon.ico', function(req, res) {
 app.get('/user/:username/exists', function(req, res) {
 	var username = req.param('username');
 	req.session.username = username;
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
+	client.query('SELECT salt FROM users WHERE username = $1', [username]).then(function(rows) {
+		if(!rows[0]) {
+			res.send(200, 'false');
 			return;
 		}
-		client.query('SELECT salt FROM users WHERE username = $1', [username], function(err, result) {
-			done();
-			if(err) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			if(!result.rows[0]) {
-				res.send(200, 'false');
-				return;
-			}
-			res.send(200, 'true');
-		});
+		res.send(200, 'true');
+	}, function(err) {
+		console.error(err);
+		res.send(500);
+		return;
 	});
 });
 
 app.get('/user/:username/salt', function(req, res) {
 	var username = req.param('username');
 	req.session.username = username;
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
+	client.query('SELECT salt FROM users WHERE username = $1', [username]).then(function(rows) {
+		if(!rows[0]) {
+			res.send(404);
 			return;
 		}
-		client.query('SELECT salt FROM users WHERE username = $1', [username], function(err, result) {
-			done();
-			if(err) {
-				console.error(err);
-				res.send(500);
-				return;
-			} else if(!result.rows[0]) {
-				res.send(404);
-				return;
-			}
-			res.send(200, result.rows[0].salt);
-		});
+		res.send(200, rows[0].salt);
+	}, function(err) {
+		console.error(err);
+		res.send(500);
+		return;
 	});
 });
 
@@ -144,7 +129,7 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 		brute.prevent(req, res, function() {
 			login(req, res, authkey, cont);
 		});
-	} else if(userLoggedIn(req)) {
+	} else if(req.get('X-S3Prefix') || userLoggedIn(req)) {
 		cont();
 	} else {
 		res.send(403);
@@ -152,7 +137,12 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 	}
 	function cont() {
 		res.set('Content-Type', 'application/json');
-		var stream = s3.getObject({Bucket: process.env.S3_BUCKET_NAME, Key: req.session.S3Prefix + '/' + req.params[0]}).createReadStream();
+		var S3Prefix = req.get('X-S3Prefix') || req.session.S3Prefix;
+		var authenticated = S3Prefix === req.session.S3Prefix;
+		var stream = s3[authenticated ? 'makeRequest' : 'makeUnauthenticatedRequest']('getObject', {
+			Bucket: process.env.S3_BUCKET_NAME,
+			Key: S3Prefix + '/' + req.params[0]
+		}).createReadStream();
 		stream.pipe(res);
 		stream.on('error', function(err) {
 			console.error(err);
@@ -194,11 +184,15 @@ app.post('/transaction/add', function(req, res) {
 });
 
 app.put(/^\/object\/(.+)$/, function(req, res) {
-	if(userLoggedIn(req)) {
+	if(req.get('X-S3Prefix') || userLoggedIn(req)) {
+		var S3Prefix = req.get('X-S3Prefix') || req.session.S3Prefix;
+		var authenticated = S3Prefix === req.session.S3Prefix;
 		var name = req.params[0];
 		var size = req.get('Content-Length');
 		var transactionId = req.get('X-Transaction-Id');
 		var queue = req.session.userID + ':' + (transactionId || '');
+		var ACL = req.get('X-ACL');
+		var objectAuthkey = req.get('X-Object-Authentication');
 		if(!transactionId) {
 			redis.incr('transactions:' + queue, function(err) {
 				if(err) {
@@ -217,44 +211,59 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 			res.send(400);
 			return;
 		}
-		var body = [];
-		req.on('data', function(data) {
-			body.push(data);
-		});
-		req.on('end', function() {
-			queueTask(queue, 'putObject', {
-				userID: req.session.userID,
-				S3Prefix: req.session.S3Prefix,
-				name: name,
-				size: size
-			}, Buffer.concat(body), function(err) {
-				if(err) {
-					console.error(err);
-					res.send(500);
-					return;
-				}
-				redis.decr('transactions:' + queue, function(err, result) {
+		Promise.resolve().then(function() {
+			if(!authenticated) {
+				return client.one(`
+					SELECT 1 FROM objects WHERE "userId" = (SELECT id FROM users WHERE "S3Prefix" = $1) AND name = $2 AND "ACL" = 'public-read-write' AND authkey = $3
+				`, [S3Prefix, name, objectAuthkey]);
+			}
+		}).then(function() {
+			var body = [];
+			req.on('data', function(data) {
+				body.push(data);
+			});
+			req.on('end', function() {
+				queueTask(queue, 'putObject', {
+					userID: req.session.userID,
+					S3Prefix: S3Prefix,
+					authenticated: authenticated,
+					name: name,
+					size: size,
+					ACL: ACL,
+					objectAuthkey: objectAuthkey,
+				}, Buffer.concat(body), function(err) {
 					if(err) {
 						console.error(err);
 						res.send(500);
 						return;
 					}
-					if(result === 0) {
-						queueTask('transactions', 'commit', {
-							queue: queue
-						}, new Buffer(0), function(err) {
-							if(err) {
-								console.error(err);
-								res.send(500);
-								return;
-							}
+					redis.decr('transactions:' + queue, function(err, result) {
+						if(err) {
+							console.error(err);
+							res.send(500);
+							return;
+						}
+						if(result === 0) {
+							queueTask('transactions', 'commit', {
+								queue: queue
+							}, new Buffer(0), function(err) {
+								if(err) {
+									console.error(err);
+									res.send(500);
+									return;
+								}
+								res.send(200);
+							});
+						} else {
 							res.send(200);
-						});
-					} else {
-						res.send(200);
-					}
+						}
+					});
 				});
 			});
+		}, function() {
+			res.statusMessage = 'Not allowed. Ask for a new share link?';
+			res.send(403);
+			return;
 		});
 	} else {
 		res.send(403);
@@ -279,48 +288,35 @@ if(process.env.MIN_CORE_VERSION <= 1) {
 			return;
 		}
 		
-		pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-			if(err) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			var name = object_name.split('/')[1];
-			var copy_source_name = copy_source.split('/')[1];
-			client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, (SELECT size FROM objects WHERE "userId" = $3 AND name = $4))', [req.session.userID, name, req.session.userID, copy_source_name], function(err, result) {
-				if(err) {
-					client.query('UPDATE objects SET size = (SELECT size FROM objects WHERE "userId" = $1 AND name = $3) WHERE "userId" = $1 AND name = $2', [req.session.userID, name, copy_source_name], cont);
-				} else {
-					cont(err, result);
-				}
-			});
-			function cont(err, result) {
-				done();
-				if(err) {
-					console.error(err);
-					res.send(500);
-					return;
-				}
-				var now = new Date();
-				var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
-				var amz_headers = 'x-amz-acl:public-read';
-				amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + copy_source;
+		var name = object_name.split('/')[1];
+		var copy_source_name = copy_source.split('/')[1];
+		client.query(`
+			INSERT INTO objects ("userId", name, size) VALUES ($1, $2, (SELECT size FROM objects WHERE "userId" = $3 AND name = $4))
+			ON CONFLICT ("userId", name) DO UPDATE
+			SET size = excluded.size
+		`, [req.session.userID, name, req.session.userID, copy_source_name]).then(function() {
+			var now = new Date();
+			var expires = Math.ceil((now.getTime() + 600000)/1000); // 10 minutes from now
+			var amz_headers = 'x-amz-acl:public-read';
+			amz_headers += '\nx-amz-copy-source:/' + process.env.S3_BUCKET_NAME + '/' + copy_source;
 
-				var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
+			var put_request = 'PUT\n\n'+mime_type+'\n'+expires+'\n'+amz_headers+'\n/'+process.env.S3_BUCKET_NAME+'/'+object_name;
 
-				var signature = crypto.createHmac('sha1', new Buffer(process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(put_request).digest('base64');
-				signature = encodeURIComponent(signature.trim());
-				signature = signature.replace('%2B','+');
+			var signature = crypto.createHmac('sha1', new Buffer(process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(put_request).digest('base64');
+			signature = encodeURIComponent(signature.trim());
+			signature = signature.replace('%2B','+');
 
-				var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/'+object_name;
+			var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/'+object_name;
 
-				var credentials = {
-					req: put_request,
-					signed_request: url+'?AWSAccessKeyId='+process.env.AWS_ACCESS_KEY_ID+'&Expires='+expires+'&Signature='+signature,
-					url: url
-				};
-				res.send(JSON.stringify(credentials));
-			}
+			var credentials = {
+				req: put_request,
+				signed_request: url+'?AWSAccessKeyId='+process.env.AWS_ACCESS_KEY_ID+'&Expires='+expires+'&Signature='+signature,
+				url: url
+			};
+			res.send(JSON.stringify(credentials));
+		}, function() {
+			console.error(err);
+			res.send(500);
 		});
 	});
 	
@@ -340,70 +336,57 @@ if(process.env.MIN_CORE_VERSION <= 1) {
 			return;
 		}
 		
-		pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-			if(err) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			var name = object_name.split('/')[1];
-			client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [req.session.userID, name, object_size], function(err, result) {
-				if(err) {
-					client.query('UPDATE objects SET size = $3 WHERE "userId" = $1 AND name = $2', [req.session.userID, name, object_size], cont);
-				} else {
-					cont(err, result);
-				}
-			});
-			function cont(err, result) {
-				done();
-				if(err) {
-					console.error(err);
-					res.send(500);
-					return;
-				}
-				var now = new Date();
-				var isoNow = now.toISOString().replace(/-|:|\.\d+/g, '');
-				var date = now.getUTCFullYear() + ('00' + now.getUTCMonth()).substr(-2) + ('00' + now.getUTCDate()).substr(-2);
-				var expires = new Date(now.getTime() + 600000); // 10 minutes from now
+		var name = object_name.split('/')[1];
+		client.query(`
+			INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)
+			ON CONFLICT ("userId", name) DO UPDATE
+			SET size = excluded.size
+		`, [req.session.userID, name, object_size]).then(function() {
+			var now = new Date();
+			var isoNow = now.toISOString().replace(/-|:|\.\d+/g, '');
+			var date = now.getUTCFullYear() + ('00' + now.getUTCMonth()).substr(-2) + ('00' + now.getUTCDate()).substr(-2);
+			var expires = new Date(now.getTime() + 600000); // 10 minutes from now
 
-				var credential = process.env.AWS_ACCESS_KEY_ID + '/' + date + '/' + process.env.AWS_REGION + '/s3/aws4_request';
-				var policy = new Buffer(JSON.stringify({
-					expiration: expires.toISOString(),
-					conditions: [
-						{bucket: process.env.S3_BUCKET_NAME},
-						{key: object_name},
-						{acl: 'public-read'},
-						['content-length-range', object_size, object_size],
-						{'x-amz-algorithm': 'AWS4-HMAC-SHA256'},
-						{'x-amz-credential': credential},
-						{'x-amz-date': isoNow}
-					]
-				})).toString('base64');
-				
-				var dateKey = crypto.createHmac('sha256', new Buffer('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(date).digest();
-				var dateRegionKey = crypto.createHmac('sha256', dateKey).update(process.env.AWS_REGION).digest();
-				var dateRegionServiceKey = crypto.createHmac('sha256', dateRegionKey).update('s3').digest();
-				var signingKey = crypto.createHmac('sha256', dateRegionServiceKey).update('aws4_request').digest();
+			var credential = process.env.AWS_ACCESS_KEY_ID + '/' + date + '/' + process.env.AWS_REGION + '/s3/aws4_request';
+			var policy = new Buffer(JSON.stringify({
+				expiration: expires.toISOString(),
+				conditions: [
+					{bucket: process.env.S3_BUCKET_NAME},
+					{key: object_name},
+					{acl: 'public-read'},
+					['content-length-range', object_size, object_size],
+					{'x-amz-algorithm': 'AWS4-HMAC-SHA256'},
+					{'x-amz-credential': credential},
+					{'x-amz-date': isoNow}
+				]
+			})).toString('base64');
+			
+			var dateKey = crypto.createHmac('sha256', new Buffer('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, 'ascii')).update(date).digest();
+			var dateRegionKey = crypto.createHmac('sha256', dateKey).update(process.env.AWS_REGION).digest();
+			var dateRegionServiceKey = crypto.createHmac('sha256', dateRegionKey).update('s3').digest();
+			var signingKey = crypto.createHmac('sha256', dateRegionServiceKey).update('aws4_request').digest();
 
-				var signature = crypto.createHmac('sha256', signingKey).update(policy).digest('hex');
+			var signature = crypto.createHmac('sha256', signingKey).update(policy).digest('hex');
 
-				var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/';
+			var url = 'https://'+process.env.S3_BUCKET_NAME+'.s3.amazonaws.com/';
 
-				var credentials = {
-					fields: {
-						key: object_name,
-						acl: 'public-read',
-						policy: policy,
-						'x-amz-algorithm': 'AWS4-HMAC-SHA256',
-						'x-amz-credential': credential,
-						'x-amz-date': isoNow,
-						'x-amz-signature': signature
-					},
-					signed_request: url,
-					url: url + object_name
-				};
-				res.send(JSON.stringify(credentials));
-			}
+			var credentials = {
+				fields: {
+					key: object_name,
+					acl: 'public-read',
+					policy: policy,
+					'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+					'x-amz-credential': credential,
+					'x-amz-date': isoNow,
+					'x-amz-signature': signature
+				},
+				signed_request: url,
+				url: url + object_name
+			};
+			res.send(JSON.stringify(credentials));
+		}, function() {
+			console.error(err);
+			res.send(500);
 		});
 	});
 }
@@ -413,35 +396,25 @@ app.post('/register', function(req, res) {
 		res.send(403);
 		return;
 	}
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
-			return;
-		}
-		var id = guid().replace(/-/g, '').toUpperCase();
-		var username = req.body.username;
-		var salt = req.body.salt;
-		var authkey = req.body.authkey;
-		var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
-		var password_backup_key = req.body.password_backup_key;
-		var email = req.body.email;
-		client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email, created) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9, $10)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email, Math.floor(Date.now() / 1000)], function(err, result) {
-			done();
-			if(err) {
-				console.error(err);
-				if(err.detail && err.detail.match(/Key \(username\)=\(.+\) already exists./)) {
-					res.send(409, 'User exists.');
-				} else {
-					res.send(500);
-				}
-				return;
-			}
-			req.session.username = username;
-			login(req, res, authkey, function() {
-				res.send(200);
-			});
+	var id = guid().replace(/-/g, '').toUpperCase();
+	var username = req.body.username;
+	var salt = req.body.salt;
+	var authkey = req.body.authkey;
+	var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
+	var password_backup_key = req.body.password_backup_key;
+	var email = req.body.email;
+	client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email, created) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9, $10)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email, Math.floor(Date.now() / 1000)]).then(function() {
+		req.session.username = username;
+		login(req, res, authkey, function() {
+			res.send(200);
 		});
+	}, function(err) {
+		console.error(err);
+		if(err.detail && err.detail.match(/Key \(username\)=\(.+\) already exists./)) {
+			res.send(409, 'User exists.');
+		} else {
+			res.send(500);
+		}
 	});
 });
 
@@ -501,21 +474,11 @@ app.post(/^\/notify\/(activated|changed)\/$/, function(req, res) {
 		res.send(403);
 		return;
 	}
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
-			return;
-		}
-		client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, req.body.tier, req.body.quota, req.body.subscription], function(err, result) {
-			done();
-			if(err || !result.rowCount) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			res.send(200);
-		});
+	client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, req.body.tier, req.body.quota, req.body.subscription]).then(function() {
+		res.send(200);
+	}).then(null, function(err) {
+		console.error(err);
+		res.send(500);
 	});
 });
 app.post('/notify/deactivated/', function(req, res) {
@@ -523,21 +486,11 @@ app.post('/notify/deactivated/', function(req, res) {
 		res.send(403);
 		return;
 	}
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
-			return;
-		}
-		client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, ''], function(err, result) {
-			done();
-			if(err || !result.rowCount) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			res.send(200);
-		});
+	client.query('UPDATE users SET tier = $2, quota = $3, subscription = $4 WHERE id = $1', [req.body.userId, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, '']).then(function() {
+		res.send(200);
+	}).then(null, function(err) {
+		console.error(err);
+		res.send(500);
 	});
 });
 
@@ -613,35 +566,33 @@ app.get('/terms', function(req, res) {
 	});
 });
 
+app.get('/run', function(req, res) {
+	if(userLoggedIn(req)) {
+		res.redirect('/');
+	} else {
+		res.redirect('/demo');
+	}
+});
+
 
 function login(req, res, authkey, cont) {
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-		if(err) {
-			console.error(err);
-			res.send(500);
-			return;
+	client.one('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username]).then(function(user) {
+		if(user.authkey === authkey) {
+			req.session.userID = user.id;
+			req.session.S3Prefix = user.S3Prefix;
+			req.session.subscription = user.subscription;
+			res.cookie('account_info', {
+				S3Prefix: user.S3Prefix,
+				account_version: user.account_version,
+				tier: user.tier
+			});
+			cont();
+		} else {
+			res.send(401);
 		}
-		client.query('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username], function(err, result) {
-			done();
-			if(err || !result.rows[0]) {
-				console.error(err);
-				res.send(500);
-				return;
-			}
-			if(result.rows[0].authkey === authkey) {
-				req.session.userID = result.rows[0].id;
-				req.session.S3Prefix = result.rows[0].S3Prefix;
-				req.session.subscription = result.rows[0].subscription;
-				res.cookie('account_info', {
-					S3Prefix: result.rows[0].S3Prefix,
-					account_version: result.rows[0].account_version,
-					tier: result.rows[0].tier
-				});
-				cont();
-			} else {
-				res.send(401);
-			}
-		});
+	}, function(err) {
+		console.error(err);
+		res.send(500);
 	});
 }
 
@@ -658,6 +609,44 @@ function guid() {
 	});
 	return uuid;
 }
+
+
+/********* Collaboration *********/
+
+process.on('SIGTERM', server.close.bind(server)); // Give `setTimeout`s time to execute
+
+var ftio = require('socket.io')(server, {
+	path: '/ft-socket.io'
+});
+
+ftio.use(function(socket, next) {
+	session(socket.request, {}, next);
+});
+
+function updateRooms(socket, data) {
+	if(socket.path !== data.path) {
+		if(socket.path) { socket.leave(socket.path); }
+		socket.join(data.path);
+		socket.path = data.path;
+	}
+}
+
+ftio.on('connection', function(socket) {
+	socket.on('open', function(data) {
+		updateRooms(socket, data);
+		socket.to(data.path).emit('open');
+	});
+	socket.on('edit', function(data) {
+		updateRooms(socket, data)
+		ftio.to(data.path).emit('edit', data);
+		setTimeout(function() {
+			ftio.to(data.path).emit('lock-end', {
+				id: data.id
+			});
+		}, data.len);
+	});
+});
+
 
 
 /********* visualCaptcha *********/

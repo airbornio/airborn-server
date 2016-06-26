@@ -13,29 +13,32 @@
 	var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
 	var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 	var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
-	var account_info = window.account_info = {tier: 1};
+	var account_info = window.account_info = {tier: 10, S3Prefix: sjcl.codec.hex.fromBits(sjcl.random.randomWords(2,0)).toUpperCase()};
+	var S3Prefix = window.S3Prefix = account_info.S3Prefix;
 
 	var XMLHttpRequest_open = window.XMLHttpRequest.prototype.open;
 	window.XMLHttpRequest.prototype.open = function(method, url) {
-		if(url.substr(0, 8) === '/object/' && method === 'GET') {
-			var hash = url.split('#')[1]
-			url = '/v2/live' + hash.substr(hash.indexOf('.') + 1);
-			Object.defineProperty(this, 'airborn_readyState', {get: function() { return this.readyState; }});
-			Object.defineProperty(this, 'airborn_status', {get: function() { return this.status; }});
-			Object.defineProperty(this, 'airborn_statusText', {get: function() { return this.statusText; }});
-			Object.defineProperty(this, 'airborn_response', {get: function() { return this.response; }});
-			Object.defineProperty(this, 'airborn_responseText', {get: function() { return this.response; }}); // Not responseText
-			this.responseType = 'arraybuffer';
-		} else if(url.substr(0, 8) === '/object/' || url.substr(0, 13) === '/transaction/') {
-			Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
-			Object.defineProperty(this, 'send', {value: function() {
-				Object.defineProperty(this, 'airborn_readyState', {get: function() { return 4; }});
-				Object.defineProperty(this, 'airborn_status', {get: function() { return 200; }});
-				this.dispatchEvent(new Event('readystatechange'));
-				this.dispatchEvent(new Event('load'));
-			}});
-			return;
+		var hash = url.substr(url.indexOf('#') + 1);
+		if(hash.substr(0, hash.indexOf('.')) !== '1') { // Not a request to a real shared document
+			if(url.substr(0, 8) === '/object/' && method === 'GET') {
+				url = '/v2/live' + hash.substr(hash.indexOf('.') + 1);
+				this.responseType = 'arraybuffer';
+			} else if(url.substr(0, 8) === '/object/' || url.substr(0, 13) === '/transaction/') {
+				Object.defineProperty(this, 'setRequestHeader', {value: function() {}});
+				Object.defineProperty(this, 'send', {value: function() {
+					Object.defineProperty(this, 'airborn_readyState', {get: function() { return 4; }});
+					Object.defineProperty(this, 'airborn_status', {get: function() { return 200; }});
+					this.dispatchEvent(new Event('readystatechange'));
+					this.dispatchEvent(new Event('load'));
+				}});
+				return;
+			}
 		}
+		Object.defineProperty(this, 'airborn_readyState', {get: function() { return this.readyState; }});
+		Object.defineProperty(this, 'airborn_status', {get: function() { return this.status; }});
+		Object.defineProperty(this, 'airborn_statusText', {get: function() { return this.statusText; }});
+		Object.defineProperty(this, 'airborn_response', {get: function() { return this.response; }});
+		Object.defineProperty(this, 'airborn_responseText', {get: function() { return this.response; }}); // Not responseText
 		XMLHttpRequest_open.apply(this, arguments);
 	};
 	var req = new XMLHttpRequest();
@@ -43,8 +46,15 @@
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
 			eval(this.responseText.replace(/((?:this|req)\.)((?:readyState|status|response)(?:Text)?)/g, '$1airborn_$2')); // renameGlobalVariables light
-			encrypt = decrypt = function(key, content, callback) {
-				callback(content);
+			var _decrypt = decrypt;
+			decrypt = function(key, contents, callback) {
+				_decrypt(key, contents, function(decrypted, err) {
+					if(err) {
+						callback(contents);
+					} else {
+						callback(decrypted);
+					}
+				});
 			};
 			getFile('/Core/startup.js', function(contents) {
 				document.getElementById('loading').style.display = 'none';

@@ -1,6 +1,7 @@
-var pg = require('pg.js');
+var pg = require('pg-promise')();
+var client = pg(process.env.DATABASE_URL);
 
-var AWS = require('aws-sdk');
+var AWS = require('aws-sdk-promise');
 var s3 = new AWS.S3();
 
 require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
@@ -55,42 +56,33 @@ function getMessage(channel, queue, callback, getanother) {
 				s3.putObject({
 					Bucket: process.env.S3_BUCKET_NAME,
 					Key: metadata.S3Prefix + '/' + metadata.name,
-					ACL: 'public-read',
 					ContentLength: metadata.size,
+					ACL: metadata.ACL,
 					Body: buffer
-				}, function(err, data) {
-					if(err) {
-						console.error(err);
-						channel.nack(message);
-						callback();
-						return;
+				}).promise().then(function() {
+					if(metadata.authenticated) {
+						return client.query(`
+							INSERT INTO objects ("userId", name, size, "ACL", authkey) VALUES ((SELECT id FROM users WHERE "S3Prefix" = $1), $2, $3, $4, $5)
+							ON CONFLICT ("userId", name) DO UPDATE
+							SET (size, "ACL", authkey) = ($3, $4, $5)
+						`, [metadata.S3Prefix, metadata.name, metadata.size, metadata.ACL, metadata.objectAuthkey]);
+					} else {
+						return client.query(`
+							INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)
+							ON CONFLICT ("userId", name) DO UPDATE
+							SET size = $3
+						`, [metadata.userID, metadata.name, metadata.size]);
 					}
-					pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-						if(err) {
-							console.error(err);
-							channel.nack(message);
-							callback();
-							return;
-						}
-						client.query('INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)', [metadata.userID, metadata.name, metadata.size], function(err, result) {
-							if(err) {
-								client.query('UPDATE objects SET size = $3 WHERE "userId" = $1 AND name = $2', [metadata.userID, metadata.name, metadata.size], cont);
-							} else {
-								cont(err, result);
-							}
-						});
-						function cont(err, result) {
-							done();
-							if(err) {
-								console.error(err);
-								channel.nack(message);
-								callback();
-								return;
-							}
-							channel.ack(message);
-							callback();
-						}
-					});
+				}).then(function() {
+					channel.ack(message);
+					callback();
+				}, function(err) {
+					console.log(metadata);
+					console.error(err);
+					setTimeout(function() {
+						channel.nack(message);
+					}, (err.retryDelay || 1) * 1000);
+					callback();
 				});
 				break;
 			default:
