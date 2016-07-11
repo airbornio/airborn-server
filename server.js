@@ -136,6 +136,8 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 		return;
 	}
 	function cont() {
+		res.set('Access-Control-Allow-Origin', process.env.USERCONTENT_URL);
+		res.set('Access-Control-Allow-Headers', 'X-S3Prefix');
 		res.set('Content-Type', 'application/json');
 		var S3Prefix = req.get('X-S3Prefix') || req.session.S3Prefix;
 		var authenticated = S3Prefix === req.session.S3Prefix;
@@ -150,6 +152,12 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 			res.send(err.statusCode);
 		});
 	}
+});
+
+app.options(/^\/object\/(.+)$/, function(req, res) {
+	res.set('Access-Control-Allow-Origin', process.env.USERCONTENT_URL);
+	res.set('Access-Control-Allow-Headers', 'X-S3Prefix');
+	res.send(200);
 });
 
 app.post('/transaction/add', function(req, res) {
@@ -572,6 +580,10 @@ app.get('/run', function(req, res) {
 	} else {
 		res.redirect('/demo');
 	}
+});
+
+app.get('/pub', function(req, res) {
+	res.redirect(process.env.USERCONTENT_URL + req.path);
 });
 
 
