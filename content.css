@@ -193,9 +193,19 @@ body {
 		background-image: url(images/background-small.png)
 	}
 }
-#forkme {
+#forkme, #forkmelink {
 	position: absolute;
 	right: 0;
+}
+#forkme {
+	pointer-events: none;
+}
+#forkmelink {
+	bottom: 100%;
+	width: 194px;
+	height: 34px;
+	transform: translateX(57px) rotate(45deg);
+	transform-origin: bottom left;
 }
 @media (max-height: 580px) {
 	#logo, #container {
