@@ -168,6 +168,12 @@ body {
 #links-container #emphasized #demo {
 	font-size: 1.3em;
 }
+#links-container #emphasized #demo #live {
+	font-size: small;
+	vertical-align: super;
+	text-transform: capitalize;
+	font-variant: small-caps;
+}
 #links-container a {
 	color: #E1E7EA;
 }
