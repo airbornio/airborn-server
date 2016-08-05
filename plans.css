@@ -29,7 +29,6 @@ body:before {
 }
 .plan {
 	width: 340px;
-	padding: 20px 30px;
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	display: inline-block;
@@ -38,14 +37,37 @@ body:before {
 	text-align: left;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
 }
+.plan div {
+	padding: 0 30px;
+}
 .plan .header {
 	font-size: large;
 	font-weight: bold;
-	margin-bottom: 10px;
+	margin-top: 20px;
 }
 .plan .footnote {
-	margin-bottom: 10px;
+	margin-bottom: 1rem;
 	font-size: small;
+}
+.plan a {
+	color: black;
+	text-decoration: none;
+	border-radius: inherit;
+}
+.plan .purchase {
+	background: white;
+	background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .6) 10px, rgba(255, 255, 255, .8) 10px, rgba(255, 255, 255, .8) 20px);
+	padding-top: 8px;
+	padding-bottom: 8px;
+	position: relative;
+	border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+}
+.plan a .purchase:after {
+	content: '⇨';
+	font-weight: bold;
+	position: absolute;
+	right: 12px;
 }
 #links-container {
 	position: absolute;
