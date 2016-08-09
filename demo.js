@@ -45,7 +45,7 @@
 	req.open('GET', '/v2/live/Core/core.js');
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
-			eval(this.responseText.replace(/((?:this|req)\.)((?:readyState|status|response)(?:Text)?)/g, '$1airborn_$2')); // renameGlobalVariables light
+			eval(this.responseText.replace(/\b((?:this|req)\.)((?:readyState|status|response)(?:Text)?)\b/g, '$1airborn_$2')); // renameGlobalVariables light
 			var _decrypt = decrypt;
 			decrypt = function(key, contents, callback) {
 				_decrypt(key, contents, function(decrypted, err) {
