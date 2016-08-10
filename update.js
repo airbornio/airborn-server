@@ -3,22 +3,22 @@ GET('lang.json', function(response) {
 	var strings = lang = JSON.parse(response);
 	document.getElementById('username').placeholder = strings.username;
 	document.getElementById('password').placeholder = strings.password;
-	document.getElementById('repair').value = strings.repair;
+	document.getElementById('update').value = strings.update;
 	document.getElementById('contact').textContent = strings.contact;
-	document.getElementById('explanation').textContent = strings.repairexplanation;
+	document.getElementById('explanation').textContent = strings.updateexplanation;
 });
 
 document.getElementById('container').addEventListener('submit', function(evt) {
 	evt.preventDefault();
 	
-	document.getElementById('repair').disabled = true;
-	document.getElementById('repair').value = lang.repairing;
+	document.getElementById('update').disabled = true;
+	document.getElementById('update').value = lang.updating;
 	
 	login({username: document.getElementById('username').value, password: document.getElementById('password').value}, null, function() {}, function() {
 		JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 			if(err) {
-				document.getElementById('repair').disabled = false;
-				document.getElementById('repair').value = lang.repair;
+				document.getElementById('update').disabled = false;
+				document.getElementById('update').value = lang.update;
 				alert(lang.error);
 				return;
 			}
@@ -65,12 +65,12 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			history.pushState({}, '', '/');
 			getFile('/Core/startup.js', function(contents) {
 				eval(contents);
-				//alert(lang.repairdone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>'));
+				//alert(lang.updatedone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>'));
 			});
 		});
 	}, function(err) {
-		document.getElementById('repair').disabled = false;
-		document.getElementById('repair').value = lang.repair;
+		document.getElementById('update').disabled = false;
+		document.getElementById('update').value = lang.update;
 		alert(lang[err.id]);
 	});
 });

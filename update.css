@@ -36,7 +36,7 @@ body:before {
 #explanation {
 	font-size: smaller;
 }
-#username, #password, #repair {
+#username, #password, #update {
 	width: 100%;
 	margin: 5px 0;
 }
