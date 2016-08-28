@@ -254,6 +254,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					eval(contents);
 					//alert(lang.done);
 				});
+				getFile('/Core/loader.js', function(contents) {
+					eval(contents);
+				});
 			});
 		}, function(req) {
 			register.disabled = false;

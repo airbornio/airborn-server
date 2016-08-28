@@ -2,6 +2,7 @@
 	"username": "Username",
 	"password": "Password",
 	"login": "Login",
+	"loggingIn": "Logging in…",
 	"save": "Remain logged in",
 	"wronguser": "Sorry, that username doesn't exist.",
 	"wrongpass": "Sorry, that password is not correct.",

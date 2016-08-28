@@ -67,6 +67,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				eval(contents);
 				//alert(lang.updatedone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>'));
 			});
+			getFile('/Core/loader.js', function(contents) {
+				eval(contents);
+			});
 		});
 	}, function(err) {
 		document.getElementById('update').disabled = false;
