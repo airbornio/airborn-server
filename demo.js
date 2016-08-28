@@ -57,7 +57,6 @@
 				});
 			};
 			getFile('/Core/startup.js', function(contents) {
-				document.getElementById('loading').style.display = 'none';
 				eval(contents);
 			});
 			window.logout = function() {
