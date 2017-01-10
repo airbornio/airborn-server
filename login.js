@@ -14,6 +14,18 @@ function GET(url, callback, err, authkey) {
 	req.send(null);
 }
 
+function decryptAndMaybeUngzip(key, contents) {
+	var outparams = {};
+	var decrypted = sjcl.decrypt(key, contents, {raw: 1}, outparams);
+	if(outparams.adata.length) {
+		decrypted = pako.ungzip(new Uint8Array(sjcl.codec.arrayBuffer.fromBits(decrypted)), {to: 'string'});
+		/* arrayBuffer.fromBits adds padding by default, but that's allowed for gzip files. */
+	} else {
+		decrypted = sjcl.codec.utf8String.fromBits(decrypted);
+	}
+	return decrypted;
+}
+
 function login(creds, firstfile, requestmorecreds, success, error) {
 	var username = creds.username;
 	var password = creds.password;
@@ -41,20 +53,20 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 			} else {
 				GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/key')), function(response) {
 					try {
-						files_key = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+						files_key = decryptAndMaybeUngzip(private_key, response);
 					} catch(e) {
-						files_key = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+						files_key = decryptAndMaybeUngzip(password, response);
 					}
-					storage.files_key = window.files_key = files_key;
+					storage.files_key = window.files_key = files_key = sjcl.codec.hex.toBits(files_key);
 					if(++done === 2) cont();
 				}, err, authkey);
 				GET('object/' + sjcl.codec.hex.fromBits(private_hmac.mac('/hmac')), function(response) {
 					try {
-						hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(private_key, response));
+						hmac_bits = decryptAndMaybeUngzip(private_key, response);
 					} catch(e) {
-						hmac_bits = sjcl.codec.hex.toBits(sjcl.decrypt(password, response));
+						hmac_bits = decryptAndMaybeUngzip(password, response);
 					}
-					storage.hmac_bits = hmac_bits;
+					storage.hmac_bits = hmac_bits = sjcl.codec.hex.toBits(hmac_bits);
 					files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 					if(++done === 2) cont();
 				}, undefined, authkey);
@@ -71,7 +83,7 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 				if(firstfile) {
 					GET('object/' + sjcl.codec.hex.fromBits(files_hmac.mac(firstfile)), function(response) {
 						cont2();
-						eval(sjcl.decrypt(files_key, response));
+						eval(decryptAndMaybeUngzip(files_key, response));
 						success(storage);
 					}, err, authkey);
 				} else {

@@ -41,14 +41,22 @@
 		Object.defineProperty(this, 'airborn_responseText', {get: function() { return this.response; }}); // Not responseText
 		XMLHttpRequest_open.apply(this, arguments);
 	};
+	
+	window.pako = {};
+	window.pako.deflate =
+	window.pako.inflate =
+	window.pako.gzip =
+	window.pako.ungzip =
+		function(contents) { return contents; };
+	
 	var req = new XMLHttpRequest();
 	req.open('GET', '/v2/live/Core/core.js');
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
 			eval(this.responseText.replace(/\b((?:this|req)\.)((?:readyState|status|response)(?:Text)?)\b/g, '$1airborn_$2')); // renameGlobalVariables light
 			var _decrypt = decrypt;
-			decrypt = function(key, contents, callback) {
-				_decrypt(key, contents, function(decrypted, err) {
+			decrypt = function(key, contents, outparams, callback) {
+				_decrypt(key, contents, outparams, function(decrypted, err) {
 					if(err) {
 						callback(contents);
 					} else {

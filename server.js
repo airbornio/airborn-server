@@ -68,7 +68,7 @@ app.get('/', function(req, res) {
 	}
 	res.sendfile('bootstrap.html');
 });
-app.get(/^\/(?:sjcl|login)\.js$/, function(req, res) {
+app.get(/^\/(?:pako\.min|sjcl|login)\.js$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get('/lang.json', function(req, res) {
