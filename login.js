@@ -95,7 +95,7 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 				});
 			}
 		}).then(function(firstfilecontents) {
-			window.account_info = JSON.parse(decodeURIComponent(document.cookie.split('=')[1]).match(/\{.*\}/)[0]);
+			window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
 			window.S3Prefix = window.account_info.S3Prefix;
 			window.account_version = window.account_info.account_version;
 			if(window.account_version === 1) {
