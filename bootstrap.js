@@ -1,5 +1,7 @@
 // First try to login with previously saved credentials
-login(JSON.parse(localStorage.creds || sessionStorage.creds || '{}'), '/Core/init.js', function() {}, function() {}, buildLoginForm);
+login(JSON.parse(localStorage.creds || sessionStorage.creds || '{}'), '/Core/init.js', function() {}, function(storecreds) {
+	(localStorage.creds ? localStorage : sessionStorage).creds = JSON.stringify(storecreds);
+}, buildLoginForm);
 
 var lang = {};
 function buildLoginForm() {

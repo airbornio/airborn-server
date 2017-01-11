@@ -63,9 +63,6 @@ fs.writeFileSync('content.html', Mustache.render(fs.readFileSync('content.html',
 }));
 
 app.get('/', function(req, res) {
-	if(req.session.username) {
-		res.set('Link', '</user/' + req.session.username + '/salt>; rel=prefetch');
-	}
 	res.sendfile('bootstrap.html');
 });
 app.get(/^\/(?:pako\.min|sjcl|login)\.js$/, function(req, res) {
@@ -124,6 +121,10 @@ app.get('/user/:username/salt', function(req, res) {
 });
 
 app.get(/^\/object\/(.+)$/, function(req, res) {
+	var username = req.get('X-Username');
+	if(username) {
+		req.session.username = username;
+	}
 	var authkey = req.get('X-Authentication');
 	if(authkey) {
 		brute.prevent(req, res, function() {

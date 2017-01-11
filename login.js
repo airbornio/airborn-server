@@ -1,4 +1,4 @@
-function GET(url, callback, err, authkey) {
+function GET(url, callback, err, authkey, username) {
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
 		if(req.readyState === 4) {
@@ -11,6 +11,7 @@ function GET(url, callback, err, authkey) {
 	};
 	req.open('GET', url);
 	if(authkey) req.setRequestHeader('X-Authentication', authkey);
+	if(username) req.setRequestHeader('X-Username', username);
 	req.send(null);
 }
 
@@ -32,20 +33,24 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 	var key = creds.key;
 	var files_key = creds.files_key;
 	var hmac_bits = creds.hmac_bits;
+	var salt = creds.salt;
+	var needToSendUsername = !!salt;
+	var needToAuth = true;
 	var authkey;
 	var storage = {};
 	if(username && (key || password)) {
-		new Promise(function(resolve, reject) {
-			GET('user/' + username + '/salt', function(salt) {
-				creds.salt = salt = sjcl.codec.hex.toBits(salt);
-				resolve(salt);
+		(salt ? Promise.resolve(salt) : new Promise(function(resolve, reject) {
+			GET('user/' + username + '/salt', function(response) {
+				salt = sjcl.codec.hex.toBits(response);
+				resolve();
 			}, reject);
-		}).then(function(salt) {
+		})).then(function() {
+			storage.salt = salt;
 			storage.username = window.username = username;
 			if(!key) {
 				key = sjcl.misc.pbkdf2(password, salt, 1000);
-				storage.key = key;
 			}
+			storage.key = key;
 			window.private_key = key.slice(128/32); // Second half
 			var shared_key = key.slice(0, 128/32); // First half
 			window.private_hmac = new sjcl.misc.hmac(window.private_key);
@@ -59,9 +64,10 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 						} catch(e) {
 							files_key = decryptAndMaybeUngzip(password, response);
 						}
-						storage.files_key = files_key = sjcl.codec.hex.toBits(files_key);
+						files_key = sjcl.codec.hex.toBits(files_key);
+						needToAuth = needToSendUsername = false;
 						resolve();
-					}, reject, authkey);
+					}, reject, authkey, needToSendUsername && username);
 				}),
 				hmac_bits || new Promise(function(resolve, reject) {
 					GET('object/' + sjcl.codec.hex.fromBits(window.private_hmac.mac('/hmac')), function(response) {
@@ -70,20 +76,22 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 						} catch(e) {
 							hmac_bits = decryptAndMaybeUngzip(password, response);
 						}
-						storage.hmac_bits = hmac_bits = sjcl.codec.hex.toBits(hmac_bits);
+						hmac_bits = sjcl.codec.hex.toBits(hmac_bits);
+						needToAuth = needToSendUsername = false;
 						resolve();
-					}, reject, authkey);
+					}, reject, authkey, needToSendUsername && username);
 				})
 			]);
 		}).then(function() {
-			window.files_key = files_key;
+			window.files_key = storage.files_key = files_key;
+			storage.hmac_bits = hmac_bits
 			window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			
 			if(firstfile) {
 				return new Promise(function(resolve, reject) {
 					GET('object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(firstfile)), function(response) {
 						resolve(decryptAndMaybeUngzip(files_key, response))
-					}, reject, authkey);
+					}, reject, needToAuth && authkey, needToSendUsername && username);
 				});
 			}
 		}).then(function(firstfilecontents) {
