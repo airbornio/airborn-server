@@ -88,6 +88,22 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 			window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			
 			if(firstfile) {
+				[
+					'/Core/core.js',
+					'/Core/startup.js',
+					'/Core/loader.js',
+					'/Core/js-yaml.js',
+					'/Core/3rdparty/jszip/jszip.min.js',
+					'/Core/3rdparty/esprima.js',
+					'/Core/3rdparty/estraverse.js',
+					'/Core/merge.js',
+				].forEach(function(url) {
+					var link = document.createElement('link');
+					link.rel = 'prefetch';
+					link.href = 'object/' + sjcl.codec.hex.fromBits(files_hmac.mac(url));
+					document.body.appendChild(link);
+				});
+				
 				return new Promise(function(resolve, reject) {
 					GET('object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(firstfile)), function(response) {
 						resolve(decryptAndMaybeUngzip(files_key, response))
