@@ -1,0 +1,30 @@
+body {
+	background-color: #607B8B;
+	background-image: url(images/background.png);
+	font-family: sans-serif;
+	margin: 0;
+}
+@media (max-device-width: 640px) and (max-device-height: 640px) {
+	body {
+		background-image: url(images/background-small.png)
+	}
+}
+@supports (
+	(image-rendering: pixelated) or
+	(image-rendering: moz-crisp-edges) or
+	(-ms-interpolation-mode: nearest-neighbor)
+) {
+	body {
+		background-image: url(images/background-pixelated.png);
+		background-size: 1925px 1100px;
+		image-rendering: pixelated;
+		image-rendering: moz-crisp-edges;
+		-ms-interpolation-mode: nearest-neighbor;
+	}
+	@media (max-device-width: 640px) and (max-device-height: 640px) {
+		body {
+			background-image: url(images/background-pixelated-small.png);
+			background-size: 650px 650px;
+		}
+	}
+}

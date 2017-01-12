@@ -75,7 +75,7 @@ app.get('/lang.json', function(req, res) {
 app.get(/^\/(?:content|register|update|demo)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:bootstrap|content|register|update|demo|plans|docs\/docs|terms)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:bootstrap|content|register|update|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {

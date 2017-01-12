@@ -6,18 +6,7 @@ html, body {
 	margin: 0;
 }
 body {
-	background-color: #607B8B;
-	font-family: sans-serif;
 	padding: 100px calc((100% - 800px) / 2) 100px;
-}
-body:before {
-	content: '';
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: -1;
 }
 #logo {
 	margin: 0 auto;
