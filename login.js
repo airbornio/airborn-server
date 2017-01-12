@@ -93,7 +93,6 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 					'/Core/startup.js',
 					'/Core/loader.js',
 					'/Core/js-yaml.js',
-					'/Core/3rdparty/jszip/jszip.min.js',
 					'/Core/3rdparty/esprima.js',
 					'/Core/3rdparty/estraverse.js',
 					'/Core/merge.js',
