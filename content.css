@@ -46,6 +46,35 @@ body {
 	color: #E1E7EA;
 	font-weight: bold;
 	font-size: large;
+	line-height: 1;
+}
+.marquee {
+	position: relative;
+	display: inline-block;
+	height: 1.2em;
+	margin-bottom: -.2em;
+	overflow: hidden;
+	text-align: right;
+	vertical-align: bottom;
+	margin-left: -10px;
+	padding-right: .2em;
+	margin-right: -.2em;
+}
+.marquee-hidden {
+	display: none;
+}
+.marquee-el {
+	animation: marquee 10s infinite;
+	margin-bottom: .2em;
+}
+@keyframes marquee {
+	0% { transform: translateY(0); }
+	25% { transform: translateY(0); }
+	30% { transform: translateY(-1.2em); }
+	55% { transform: translateY(-1.2em); }
+	60% { transform: translateY(-2.4em); }
+	85% { transform: translateY(-2.4em); }
+	90% { transform: translateY(0); }
 }
 #tricolon {
 	color: #E1E7EA;
