@@ -42,13 +42,6 @@
 		XMLHttpRequest_open.apply(this, arguments);
 	};
 	
-	window.pako = {};
-	window.pako.deflate =
-	window.pako.inflate =
-	window.pako.gzip =
-	window.pako.ungzip =
-		function(contents) { return contents; };
-	
 	var req = new XMLHttpRequest();
 	req.open('GET', '/v2/live/Core/core.js');
 	req.addEventListener('readystatechange', function() {
