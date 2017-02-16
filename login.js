@@ -88,20 +88,7 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 			window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			
 			if(firstfile) {
-				[
-					'/Core/core.js',
-					'/Core/startup.js',
-					'/Core/loader.js',
-					'/Core/js-yaml.js',
-					'/Core/3rdparty/esprima.js',
-					'/Core/3rdparty/estraverse.js',
-					'/Core/merge.js',
-				].forEach(function(url) {
-					var link = document.createElement('link');
-					link.rel = 'prefetch';
-					link.href = 'object/' + sjcl.codec.hex.fromBits(files_hmac.mac(url));
-					document.body.appendChild(link);
-				});
+				if(!needToAuth) prefetchFiles();
 				
 				return new Promise(function(resolve, reject) {
 					GET('object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(firstfile)), function(response) {
@@ -117,6 +104,8 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 				storage.password = window.password = password;
 			}
 			if(firstfile) {
+				if(needToAuth) prefetchFiles();
+				
 				eval(firstfilecontents);
 			}
 			success(storage);
@@ -131,5 +120,22 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 		});
 	} else {
 		error({status: 0, statusText: '', id: 'missingcreds'});
+	}
+	
+	function prefetchFiles() {
+		[
+			'/Core/core.js',
+			'/Core/startup.js',
+			'/Core/loader.js',
+			'/Core/js-yaml.js',
+			'/Core/3rdparty/esprima.js',
+			'/Core/3rdparty/estraverse.js',
+			'/Core/merge.js',
+		].forEach(function(url) {
+			var link = document.createElement('link');
+			link.rel = 'prefetch';
+			link.href = 'object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(url));
+			document.body.appendChild(link);
+		});
 	}
 }
