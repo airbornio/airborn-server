@@ -600,6 +600,10 @@ app.get('/pub', function(req, res) {
 	res.redirect(process.env.USERCONTENT_URL + req.path);
 });
 
+app.get('/feedback', function(req, res) {
+	res.redirect(process.env.FEEDBACK_URL);
+});
+
 
 function login(req, res, authkey, cont) {
 	client.one('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username]).then(function(user) {
