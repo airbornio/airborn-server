@@ -58,9 +58,7 @@ var session = Session({
 });
 app.use(session);
 
-fs.writeFileSync('content.html', Mustache.render(fs.readFileSync('content.html', 'utf8'), {
-	FORKME_URL: process.env.FORKME_URL
-}));
+var menu_html = fs.readFileSync('menu.html', 'utf8');
 
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
@@ -73,16 +71,23 @@ app.get('/lang.json', function(req, res) {
 	res.sendfile('lang.json');
 });
 app.get(/^\/(?:content|register|update|demo)$/, function(req, res) {
-	res.sendfile(req.path.substr(1) + '.html');
+	res.type('html');
+	fs.readFile(req.path.substr(1) + '.html', 'utf8', function(err, contents) {
+		res.send(200, Mustache.render(contents, {
+			FORKME_URL: process.env.FORKME_URL,
+		}, {
+			menu: menu_html,
+		}));
+	});
 });
 app.get(/^\/(?:bootstrap|content|register|update|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
-	res.sendfile(req.path.substr(1));
+	res.sendfile(req.path.substr(1).replace(/\.\./g, ''));
 });
-app.get(/^\/images\/.+\.png$/, function(req, res) {
-	res.sendfile(req.path.substr(1));
+app.get(/^\/images\/.+\.(?:png|svg)$/, function(req, res) {
+	res.sendfile(req.path.substr(1).replace(/\.\./g, ''));
 });
 app.get('/favicon.ico', function(req, res) {
 	res.sendfile('favicon.ico');
@@ -466,13 +471,16 @@ app.get('/plans', function(req, res) {
 			});
 			fs.readFile('plans.html', 'utf8', function(err, contents) {
 				res.send(200, Mustache.render(contents, {
+					FORKME_URL: process.env.FORKME_URL,
 					FASTSPRING_URL: process.env.FASTSPRING_URL,
 					userId: req.session.userID,
 					username: req.session.username,
 					subscription: req.session.subscription,
 					knowledgeWorkerPrice: prices.product_1_unit_display,
 					mediaLoverPrice: prices.product_2_unit_display,
-					mediaWorkerPrice: prices.product_3_unit_display
+					mediaWorkerPrice: prices.product_3_unit_display,
+				}, {
+					menu: menu_html,
 				}));
 			});
 		});
@@ -568,8 +576,11 @@ app.get('/docs/:id', function(req, res) {
 		}
 		fs.readFile('docs/docs.html', 'utf8', function(err, docs) {
 			res.send(200, Mustache.render(docs, {
+				FORKME_URL: process.env.FORKME_URL,
 				title: contents.match(/^# (.*)$/m)[1],
-				contents: markdown.toHTML(contents, 'Maruku')
+				contents: markdown.toHTML(contents, 'Maruku'),
+			}, {
+				menu: menu_html,
 			}));
 		});
 	});
@@ -582,7 +593,10 @@ app.get('/terms', function(req, res) {
 	fs.readFile('terms.md', 'utf8', function(err, contents) {
 		fs.readFile('terms.html', 'utf8', function(err, terms) {
 			res.send(200, Mustache.render(terms, {
-				contents: markdown.toHTML(contents, 'Maruku')
+				FORKME_URL: process.env.FORKME_URL,
+				contents: markdown.toHTML(contents, 'Maruku'),
+			}, {
+				menu: menu_html,
 			}));
 		});
 	});

@@ -39,8 +39,6 @@ GET('lang.json', function(response) {
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('current-step').textContent = strings['current-step'];
 	document.getElementById('register').value = strings.register;
-	document.getElementById('plans').textContent = strings.plans;
-	document.getElementById('contact').textContent = strings.contact;
 });
 
 var captcha;

@@ -8,9 +8,8 @@ html, body {
 body {
 	padding: 100px calc((100% - 1000px) / 2) 100px;
 }
-#logo {
-	position: absolute;
-	left: calc(50% - 223px);
+.bar, .background {
+	left: 0;
 }
 #container {
 	width: calc(100% - 200px);
@@ -20,6 +19,8 @@ body {
 	border-radius: 10px;
 	margin: 53px 10px 100px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	color: #374A55;
+	text-shadow: none;
 }
 #container:after {
 	content: '';
@@ -36,19 +37,6 @@ body {
 }
 .img-container.security img {
 	margin: 10px;
-}
-#links-container {
-	position: absolute;
-	margin-top: 35px;
-	margin-left: -30px;
-	text-align: center;
-	width: 100%;
-	color: #E1E7EA;
-	font-size: small;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
-}
-#links-container a {
-	color: #E1E7EA;
 }
 @media (min-width: 769px) {
 	.img-container {
@@ -70,9 +58,6 @@ body {
 	}
 }
 @media (max-width: 768px) {
-	#logo {
-		left: calc(50% - 123px);
-	}
 	#container {
 		width: calc(100% - 20px);
 	}

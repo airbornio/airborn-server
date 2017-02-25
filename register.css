@@ -5,13 +5,6 @@ html, body {
 	height: 100%;
 	margin: 0;
 }
-#logo {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -123px;
-	margin-top: -179px;
-}
 table {
 	border-collapse: collapse;
 	width: 100%;
@@ -28,11 +21,13 @@ label {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: -120px 0 0 -205px;
+	margin: -200px 0 0 -205px;
 	padding: 20px 30px;
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	color: #374A55;
+	text-shadow: none;
 }
 #username, #password, #password-again, #email {
 	width: 100%;
@@ -67,19 +62,6 @@ label {
 	display: none;
 	position: absolute;
 	margin-left: -22px;
-}
-#links-container {
-	position: absolute;
-	margin-top: 35px;
-	margin-left: -30px;
-	text-align: center;
-	width: 100%;
-	color: #E1E7EA;
-	font-size: small;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
-}
-#links-container a {
-	color: #E1E7EA;
 }
 
 .visualCaptcha {

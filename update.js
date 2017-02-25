@@ -4,7 +4,6 @@ GET('lang.json', function(response) {
 	document.getElementById('username').placeholder = strings.username;
 	document.getElementById('password').placeholder = strings.password;
 	document.getElementById('update').value = strings.update;
-	document.getElementById('contact').textContent = strings.contact;
 	document.getElementById('explanation').textContent = strings.updateexplanation;
 });
 

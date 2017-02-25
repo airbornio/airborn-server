@@ -5,13 +5,6 @@ html, body {
 	height: 100%;
 	margin: 0;
 }
-#logo {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -94px;
-	margin-top: -150px;
-}
 #container {
 	width: 260px;
 	position: absolute;
@@ -22,6 +15,8 @@ html, body {
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	color: #374A55;
+	text-shadow: none;
 }
 #explanation {
 	font-size: smaller;
@@ -29,18 +24,6 @@ html, body {
 #username, #password, #update {
 	width: 100%;
 	margin: 5px 0;
-}
-#links-container {
-	position: absolute;
-	margin-top: 35px;
-	margin-left: -30px;
-	text-align: center;
-	width: 100%;
-	color: #E1E7EA;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
-}
-#links-container a {
-	color: #E1E7EA;
 }
 .window {
 	width: 100%;

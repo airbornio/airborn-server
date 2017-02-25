@@ -8,7 +8,8 @@
 	<link rel="stylesheet" href="register.css">
 </head>
 <body>
-	<a href="/"><img id="logo" src="images/logo.png"></a>
+	<div class="background"></div>
+	{{> menu}}
 	<form id="container">
 		<table>
 			<tr><td><label id="username-label" for="username"></label></td><td><input type="text" id="username"></td></tr>
@@ -22,10 +23,6 @@
 			<tr><td colspan="2" id="captcha-td"><div id="captcha"></div></td></tr>
 			<tr><td colspan="2"><span id="ready"></span><span id="error"></span><input type="submit" id="register" disabled><br></td></tr>
 		</table>
-		<div id="links-container">
-			<a href="plans" id="plans"></a> |
-			<a href="mailto:info@airbornos.com" id="contact"></a>
-		</div>
 	</form>
 	<span id="current-step"></span>
 	<script src="register.js"></script>

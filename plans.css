@@ -1,13 +1,6 @@
 * {
 	box-sizing: border-box;
 }
-#logo {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -123px;
-	margin-top: -179px;
-}
 #plans {
 	width: 100%;
 	position: absolute;
@@ -15,6 +8,8 @@
 	margin-top: -120px;
 	text-align: center;
 	padding: 0 calc((100% - 730px) / 2);
+	color: #374A55;
+	text-shadow: none;
 }
 .plan {
 	width: 340px;
@@ -39,7 +34,7 @@
 	font-size: small;
 }
 .plan a {
-	color: black;
+	color: #374A55;
 	text-decoration: none;
 	border-radius: inherit;
 }
@@ -57,17 +52,4 @@
 	font-weight: bold;
 	position: absolute;
 	right: 12px;
-}
-#links-container {
-	position: absolute;
-	margin-top: 10px;
-	left: 0;
-	text-align: center;
-	width: 100%;
-	color: #E1E7EA;
-	font-size: small;
-	text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
-}
-#links-container a {
-	color: #E1E7EA;
 }

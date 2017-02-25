@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="width=320,height=550,initial-scale=1,user-scalable=no">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 	<link rel="stylesheet" href="bootstrap.css">
 </head>
 <body>
-	<form id="container">
-		<input type="text" id="username"><br>
-		<input type="password" id="password"><br>
-		<input type="submit" id="login" value=""><br>
-		<input type="checkbox" id="save" checked> <label id="label" for="save"></label>
-	</form>
+	<div id="container">
+		<a href="#" id="login-button" class="toggle-button"><span class="icon-lock">🔒</span> Login <span class="icon-play" style="display: inline-block; width: 18px; text-align: left;">▾</span></a>
+		<form id="login-form">
+			<input type="text" id="username"><br>
+			<input type="password" id="password"><br>
+			<input type="submit" id="login-submit" value=""><br>
+			<input type="checkbox" id="save" checked> <label id="label" for="save"></label>
+		</form>
+	</div>
 	<script src="sjcl.js"></script>
 	<script src="pako.min.js"></script>
 	<script src="login.js"></script>

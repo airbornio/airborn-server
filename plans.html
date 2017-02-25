@@ -7,7 +7,8 @@
 	<link rel="stylesheet" href="plans.css">
 </head>
 <body>
-	<a href="/"><img id="logo" src="images/logo.png"></a>
+	<div class="background"></div>
+	{{> menu}}
 	<div id="plans">
 		<div class="plan">
 			<div class="header">Starter</div>
@@ -72,9 +73,6 @@
 			<div class="purchase">{{mediaWorkerPrice}} / month</div></a>
 		</div>
 		{{/FASTSPRING_URL}}
-		<div id="links-container">
-			<a href="mailto:info@airbornos.com" id="contact">Contact</a>
-		</div>
 	</div>
 </body>
 </html>

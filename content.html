@@ -1,51 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="content.css">
 </head>
 <body>
-	<a target="_top" href="/"><img id="logo" alt="Airborn OS" src="images/logo-small.png"></a>
-	<div id="container">
-		<input type="text" id="username"><br>
-		<input type="password" id="password"><br>
-		<input type="submit" id="login"><br>
-		<input type="checkbox" id="save"> <label id="label" for="save"></label>
-		<div id="whatisit"><div class="marquee"><div class="marquee-el">Documents</div><div class="marquee-hidden">,</div> <div class="marquee-el">Presentations</div> <div class="marquee-hidden">and</div> <div class="marquee-el">Notes</div><span></div> in the Cloud, Securely</div>
-		<div id="tricolon">
-			<div class="colon">
-				<a target="_top" href="images/files-anywhere.png"><div class="image phone"><img src="images/files-anywhere-small.png"></div></a>
-				<span class="header">Create files and edit them anywhere</span>
-				<span class="body">Log into Airborn OS in any browser from any computer or from your mobile browser.</span>
-			</div>
-			<div class="colon">
-				<a target="_top" href="images/apps-anywhere.png"><div class="image laptop"><img src="images/apps-anywhere-small.png"></div></a>
-				<span class="header">Install apps and use them anywhere</span>
-				<span class="body">The apps you install inside Airborn OS are still there when you open Airborn OS on another computer.</span>
-			</div>
-			<div class="colon">
-				<a target="_top" href="/docs/security"><img class="image" src="images/client-side-encryption.png"></a>
-				<span class="header">Files and apps client-side encrypted</span>
-				<span class="body">All your files are encrypted with your password before they leave your computer. <a target="_top" href="/docs/security">Read more&hellip;</a></span>
-			</div>
+	<div class="background"></div>
+	<div class="background" id="gradient"></div>
+	{{> menu}}
+	<div id="wrap" class="needsfocus" onclick="">
+		<div id="whatisit"><div class="marquee"><div class="marquee-el">Documents</div><div class="marquee-hidden">,</div> <div class="marquee-el">Presentations</div> <div class="marquee-hidden">and</div> <div class="marquee-el">Notes</div></div> in the Cloud, Securely</div>
+		<a id="noanim"></a>
+		<a href="#noanim" id="fastforward">⏩</a>
+		<div class="annotation" id="annotation-1">You want to open your files anywhere.</div>
+		<div class="arrow" id="arrow-1"><img src="images/arrow.svg"></div>
+		<div class="annotation" id="annotation-2">That's why you keep them in the cloud.</div>
+		<div class="annotation" id="annotation-3">But the cloud can be a little scary.</div>
+		<div class="annotation" id="annotation-4">Its owners can read your documents.</div>
+		<div class="arrow" id="arrow-2"><img src="images/arrow.svg"></div>
+		<div class="annotation" id="annotation-5">Not so on Airborn OS.</div>
+		<div class="annotation" id="annotation-6">All your documents are <a href="#documents-encrypted">encrypted</a></div>
+		<div class="annotation" id="annotation-7">before they leave your hands.</div>
+		<div class="arrow" id="arrow-3"><img src="images/arrow.svg"></div>
+		<div class="annotation" id="annotation-8">Give it a try!</div>
+		<div class="arrow" id="arrow-4"><img src="images/arrow.svg"></div>
+		<div id="demo-bar">
+			{{> menu}}
 		</div>
-		<div id="links-container">
-			<div id="table-container">
-				<table>
-					<tr id="emphasized">
-						<td><a target="_top" href="demo" id="demo">Demo<span id="live">live</span></a></td><td>|</td>
-						<td><a target="_top" href="register" id="register">Register</a></td>
-					</tr>
-					<tr>
-						<td><a target="_top" href="plans" id="plans">Plans</a></td><td>|</td>
-						<td><a target="_top" href="mailto:info@airbornos.com" id="contact">Contact</a></td>
-					</tr>
-				</table>
-				<div id="emphasized-background"></div>
+		<div id="contents">
+			<div class="row">
+				<div class="img" style="float: right; background-image: url(images/collaborate.png); --height: 343;"></div>
+				<p class="title">Collaborate in real-time</p>
+				<p>Work together on documents with your teammates or classmates. Even when you share a document, we (the makers of Airborn OS) <em>still</em> can't read your documents. You can even set a password on your document for extra protection.</p>
+				<p>Also, we made it so that only one person at a time can type in a paragraph. No longer can that annoying classmate delete what you just typed.</p>
+			</div>
+			<div class="row">
+				<div class="img" style="float: left; background-image: url(images/presentations.png); --height: 408;"></div>
+				<p class="title">Make fancy 3D presentations</p>
+				<p>Airborn OS is not just for text documents! You can make presentations as well.</p>
+				<p>You can add videos to your slides, and make awesome 3D transitions between slides. Or keep it simple, it's up to you.</p>
+				<p>Just as with text documents, we can't see your presentations. Now, you can keep the presentation on your company's finance forecasts in the cloud without fear of spying eyes.</p>
+			</div>
+			<div class="row" id="documents-encrypted">
+				<div class="img" style="float: right; background-image: url(images/documents-encrypted.png); --height: 357;"></div>
+				<p class="title">This is what your documents look like to us.</p>
+				<p>As you can see,</p>
+				<ul>
+					<li>They're encrypted with AES.</li>
+					<li>The contents (on the right) are gibberish. Even if we wanted to read them, we can't. And neither can someone who hacks us.</li>
+					<li>The names of the documents (on the left) are gibberish as well. So not only can't we read your documents, we also can't see what you name them.</li>
+				</ul>
+				<p><a target="_top" href="/docs/security">Read more…</a></p>
 			</div>
 		</div>
 	</div>
-	<img id="forkme" src="images/forkme.png">
-	<a id="forkmelink" target="_top" href="{{FORKME_URL}}"></a>
 </body>
 </html>
