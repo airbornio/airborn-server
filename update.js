@@ -65,6 +65,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			getFile('/Core/startup.js', function(contents) {
 				eval(contents);
 				//alert(lang.updatedone.replace('{email}', '<a href="mailto:support@airbornos.com">support@airbornos.com</a>'));
+				document.querySelector('.bar').remove();
+				document.querySelector('.background').remove();
+				document.getElementById('container').remove();
 			});
 			getFile('/Core/loader.js', function(contents) {
 				eval(contents);

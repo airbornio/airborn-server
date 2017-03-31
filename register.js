@@ -251,6 +251,9 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				getFile('/Core/startup.js', function(contents) {
 					eval(contents);
 					//alert(lang.done);
+					document.querySelector('.bar').remove();
+					document.querySelector('.background').remove();
+					document.getElementById('container').remove();
 				});
 				getFile('/Core/loader.js', function(contents) {
 					eval(contents);
