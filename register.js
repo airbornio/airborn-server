@@ -44,7 +44,6 @@ GET('lang.json', function(response) {
 var captcha;
 document.addEventListener('DOMContentLoaded', function() {
 	captcha = visualCaptcha('captcha', {
-		numberOfImages: 5,
 		imgPath: '/3rdparty/visualcaptcha/img/',
 		captcha: {
 			url: '/captcha'
