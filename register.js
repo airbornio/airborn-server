@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 				if(step === 'done') {
 					document.getElementById('ready').style.display = 'inline-block';
-				} else if(step !== 7) {
+				} else {
 					var td = document.getElementById('container').getElementsByTagName('tr')[step].firstChild
 					td.insertBefore(document.getElementById('current-step'), td.firstChild);
 					document.getElementById('current-step').style.display = 'block';
