@@ -3,8 +3,13 @@
 }
 html, body {
 	height: 100%;
-	font-family: sans-serif;
+}
+body {
+	font-family: Calibri, Lato, Ubuntu, sans-serif;
+	font-weight: 300;
 	margin: 0;
+	color: white;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .6);
 }
 .window {
 	width: 100%;

@@ -63,6 +63,7 @@
 			window.logout = function() {
 				window.location = '/';
 			};
+			window.showNotice('demo', 'In this demo version, your files are not saved.', true);
 		}
 	});
 	req.send(null);
