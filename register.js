@@ -239,7 +239,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				keys.forEach(function(path) {
 					var file = zip.files[path];
 					if(!file.options.dir) {
-						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer(), {from: 'origin', parentFrom: 'origin'});
+						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer());
 					}
 				});
 				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
