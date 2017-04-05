@@ -236,26 +236,29 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 
 				var keys = Object.keys(zip.files);
 				var target = '/';
-				keys.forEach(function(path) {
-					var file = zip.files[path];
-					if(!file.options.dir) {
-						putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer());
-					}
-				});
 				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
 				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
-				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}});
-				
-				history.pushState({}, '', '/');
-				getFile('/Core/startup.js', function(contents) {
-					eval(contents);
-					//alert(lang.done);
-					document.querySelector('.bar').remove();
-					document.querySelector('.background').remove();
-					document.getElementById('container').remove();
-				});
-				getFile('/Core/loader.js', function(contents) {
-					eval(contents);
+				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
+					
+					keys.forEach(function(path) {
+						var file = zip.files[path];
+						if(!file.options.dir) {
+							putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverinstall'});
+						}
+					});
+					
+					history.pushState({}, '', '/');
+					getFile('/Core/startup.js', function(contents) {
+						eval(contents);
+						//alert(lang.done);
+						document.querySelector('.bar').remove();
+						document.querySelector('.background').remove();
+						document.getElementById('container').remove();
+					});
+					getFile('/Core/loader.js', function(contents) {
+						eval(contents);
+					});
+					
 				});
 			});
 		}, function(req) {

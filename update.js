@@ -50,7 +50,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			keys.forEach(function(path) {
 				var file = zip.files[path];
 				if(!file.options.dir) {
-					putFile(target + path, {codec: 'arrayBuffer'}, file.asArrayBuffer());
+					putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverupdate'}, file.asArrayBuffer());
 				}
 			});
 			
