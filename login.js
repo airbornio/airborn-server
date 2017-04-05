@@ -130,7 +130,6 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 			'/Core/js-yaml.js',
 			'/Core/3rdparty/esprima.js',
 			'/Core/3rdparty/estraverse.js',
-			'/Core/merge.js',
 		].forEach(function(url) {
 			var link = document.createElement('link');
 			link.rel = 'prefetch';
