@@ -46,15 +46,22 @@ function queueTask(queue, type, metadata, buffer, callback) {
 	});
 }
 
-app.use(compression());
+//app.use(compression());
 
 app.use(bodyParser.json());
+
+app.use(function(req, res, next) {
+	if(req.method === 'GET') {
+		res.set('Cache-control', 's-maxage=86400');
+	}
+	next();
+});
 
 var session = Session({
 	secret: process.env.COOKIE_SESSION_SECRET,
 	store: new RedisStore({client: redis}),
-	resave: true,
-	saveUninitialized: true
+	resave: false,
+	saveUninitialized: false
 });
 app.use(session);
 
@@ -94,6 +101,7 @@ app.get('/favicon.ico', function(req, res) {
 });
 
 app.get('/user/:username/exists', function(req, res) {
+	res.set('Cache-control', 's-maxage=0');
 	var username = req.param('username');
 	req.session.username = username;
 	client.query('SELECT salt FROM users WHERE username = $1', [username]).then(function(rows) {
@@ -110,6 +118,7 @@ app.get('/user/:username/exists', function(req, res) {
 });
 
 app.get('/user/:username/salt', function(req, res) {
+	res.set('Cache-control', 's-maxage=0');
 	var username = req.param('username');
 	req.session.username = username;
 	client.query('SELECT salt FROM users WHERE username = $1', [username]).then(function(rows) {
@@ -144,19 +153,20 @@ app.get(/^\/object\/(.+)$/, function(req, res) {
 	function cont() {
 		res.set('Access-Control-Allow-Origin', process.env.USERCONTENT_URL);
 		res.set('Access-Control-Allow-Headers', 'X-S3Prefix');
-		res.set('Content-Type', 'application/json');
 		var S3Prefix = req.get('X-S3Prefix') || req.session.S3Prefix;
 		var authenticated = S3Prefix === req.session.S3Prefix;
 		var stream = s3[authenticated ? 'makeRequest' : 'makeUnauthenticatedRequest']('getObject', {
 			Bucket: process.env.S3_BUCKET_NAME,
 			Key: S3Prefix + '/' + req.params[0]
-		}).createReadStream();
-		stream.pipe(res);
-		stream.on('error', function(err) {
-			console.error(err);
-			res.removeHeader('Content-Type');
-			res.send(err.statusCode);
-		});
+		}).on('httpHeaders', function(statusCode, headers) {
+			if(statusCode !== 200) {
+				res.send(statusCode);
+				return;
+			}
+			res.set('Content-Length', headers['content-length']);
+			res.set('Content-Type', 'application/json');
+			this.response.httpResponse.createUnbufferedStream().pipe(res);
+		}).send();
 	}
 });
 
@@ -470,6 +480,7 @@ app.get('/plans', function(req, res) {
 				prices[pair[0]] = pair[1];
 			});
 			fs.readFile('plans.html', 'utf8', function(err, contents) {
+				res.set('Cache-control', 's-maxage=0');
 				res.send(200, Mustache.render(contents, {
 					FORKME_URL: process.env.FORKME_URL,
 					FASTSPRING_URL: process.env.FASTSPRING_URL,
@@ -622,6 +633,7 @@ app.get('/feedback', function(req, res) {
 function login(req, res, authkey, cont) {
 	client.one('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username]).then(function(user) {
 		if(user.authkey === authkey) {
+			res.set('Cache-control', 's-maxage=0');
 			req.session.userID = user.id;
 			req.session.S3Prefix = user.S3Prefix;
 			req.session.subscription = user.subscription;
@@ -698,6 +710,8 @@ ftio.on('connection', function(socket) {
 // Define routes functions
 // Fetches and streams an audio file
 function _getAudio( req, res, next ) {
+	res.set('Cache-control', 's-maxage=0');
+	
 	// Default file type is mp3, but we need to support ogg as well
 	if ( req.params.type !== 'ogg' ) {
 		req.params.type = 'mp3';
@@ -712,6 +726,8 @@ function _getAudio( req, res, next ) {
 
 // Fetches and streams an image file
 function _getImage( req, res, next ) {
+	res.set('Cache-control', 's-maxage=0');
+	
 	var isRetina = false;
 
 	// Default is non-retina
@@ -728,6 +744,7 @@ function _getImage( req, res, next ) {
 
 // Start and refresh captcha options
 function _startRoute( req, res, next ) {
+	res.set('Cache-control', 's-maxage=0');
 
 	// After initializing visualCaptcha, we only need to generate new options
 	if ( ! visualCaptcha ) {
@@ -742,6 +759,8 @@ function _startRoute( req, res, next ) {
 // Try to validate the captcha
 // We need to make sure we generate new options after trying to validate, to avoid abuse
 function _trySubmission( req, res, next ) {
+	res.set('Cache-control', 's-maxage=0');
+	
 	var namespace = req.query.namespace,
 		frontendData,
 		queryParams = [],

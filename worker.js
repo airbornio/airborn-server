@@ -66,32 +66,18 @@ function getMessage(channel, queue, callback, getanother) {
 						return client.query(`
 							INSERT INTO objects ("userId", name, size, "ACL", authkey) VALUES ((SELECT id FROM users WHERE "S3Prefix" = $1), $2, $3, $4, $5)
 							ON CONFLICT ("userId", name) DO UPDATE
-							SET (size, "ACL", authkey) = ($3, $4, $5)
-						`, [metadata.S3Prefix, metadata.name, metadata.size, metadata.ACL, metadata.objectAuthkey]);
+							SET (size, "ACL", authkey, "lastUpdated") = ($3, $4, $5, $6)
+						`, [metadata.S3Prefix, metadata.name, metadata.size, metadata.ACL, metadata.objectAuthkey, Date.now()]);
 					} else {
 						return client.query(`
 							INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)
 							ON CONFLICT ("userId", name) DO UPDATE
-							SET size = $3
-						`, [metadata.userID, metadata.name, metadata.size]);
+							SET (size, "lastUpdated") = ($3, $4)
+						`, [metadata.userID, metadata.name, metadata.size, Date.now()]);
 					}
 				}).then(function() {
 					channel.ack(message);
 					callback();
-					request.delete('https://api.keycdn.com/zones/purgeurl/' + process.env.KEYCDN_ZONE_ID + '.json', {
-						auth: {
-							user: process.env.KEYCDN_API_KEY
-						},
-						body: {
-							urls: [process.env.KEYCDN_ZONE_URL + '/object/' + metadata.name]
-						},
-						json: true,
-					}, function(err, response) {
-						if(err) {
-							console.error(err);
-						}
-						console.log(response);
-					});
 				}, function(err) {
 					console.log(metadata);
 					console.error(err);
@@ -110,3 +96,41 @@ function getMessage(channel, queue, callback, getanother) {
 		getanother();
 	});
 }
+
+var lastInvalidated = Date.now();
+
+setInterval(function() {
+	client.query(`
+		SELECT "userId", name, "lastUpdated" FROM objects WHERE
+		"lastUpdated" >= $1
+		ORDER BY "lastUpdated" ASC
+		LIMIT 101
+	`, [lastInvalidated]).then(function(rows) {
+		if(rows.length) {
+			var nextLastInvalidated =
+				rows.length === 101 ? rows.pop().lastUpdated :
+				rows[rows.length - 1].lastUpdated + 1;
+			request.delete('https://api.keycdn.com/zones/purgeurl/' + process.env.KEYCDN_ZONE_ID + '.json', {
+				auth: {
+					user: process.env.KEYCDN_API_KEY
+				},
+				body: {
+					urls: rows.map(function(row) {
+						return process.env.KEYCDN_ZONE_URL + '/object/' + row.name;
+					})
+				},
+				json: true,
+			}, function(err, response) {
+				if(err) {
+					console.error(err);
+					return;
+				}
+				if(response.body.status !== 'success') {
+					console.error(response.body);
+					return;
+				}
+				lastInvalidated = nextLastInvalidated;
+			});
+		}
+	});
+}, 1000 / 10); // 10 per second, to stay under the limit of 20 per second.
