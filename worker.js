@@ -4,6 +4,8 @@ var client = pg(process.env.DATABASE_URL);
 var AWS = require('aws-sdk-promise');
 var s3 = new AWS.S3();
 
+var request = require('request');
+
 require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
 	return conn.createChannel().then(function(channel) {
 		channel.assertQueue('transactions');
@@ -76,6 +78,20 @@ function getMessage(channel, queue, callback, getanother) {
 				}).then(function() {
 					channel.ack(message);
 					callback();
+					request.delete('https://api.keycdn.com/zones/purgeurl/' + process.env.KEYCDN_ZONE_ID + '.json', {
+						auth: {
+							user: process.env.KEYCDN_API_KEY
+						},
+						body: {
+							urls: [process.env.KEYCDN_ZONE_URL + '/object/' + metadata.name]
+						},
+						json: true,
+					}, function(err, response) {
+						if(err) {
+							console.error(err);
+						}
+						console.log(response);
+					});
 				}, function(err) {
 					console.log(metadata);
 					console.error(err);

@@ -20,6 +20,7 @@
 		"express-brute-redis": "0.0.1",
 		"markdown": "0.5.0",
 		"compression": "1.4.3",
-		"geoip2": "1.0.4"
+		"geoip2": "1.0.4",
+		"request": "2.81.0"
 	}
 }
