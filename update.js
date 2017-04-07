@@ -47,10 +47,15 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			var keys = Object.keys(zip.files);
 			var target = '/';
 			
-			keys.forEach(function(path) {
+			keys.forEach(function(path, i) {
 				var file = zip.files[path];
 				if(!file.options.dir) {
-					putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverupdate'}, file.asArrayBuffer());
+					putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverupdate'}, file.asArrayBuffer(), i === keys.length - 1 ? function() {
+						// Transaction finished; all files have been uploaded
+						setTimeout(function() { // Wait 30s to be sure
+							window.hideNotice('serverupdating');
+						}, 30000);
+					} : undefined);
 				}
 			});
 			
@@ -61,6 +66,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				document.querySelector('.bar').remove();
 				document.querySelector('.background').remove();
 				document.getElementById('container').remove();
+				window.showNotice('serverupdating', "Updating… Please don't close this tab.");
 			});
 			getFile('/Core/loader.js', function(contents) {
 				eval(contents);

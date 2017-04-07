@@ -240,10 +240,15 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
 				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
 					
-					keys.forEach(function(path) {
+					keys.forEach(function(path, i) {
 						var file = zip.files[path];
 						if(!file.options.dir) {
-							putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverinstall'});
+							putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverinstall'}, file.asArrayBuffer(), i === keys.length - 1 ? function() {
+								// Transaction finished; all files have been uploaded
+								setTimeout(function() { // Wait 30s to be sure
+									window.hideNotice('serverinstalling');
+								}, 30000);
+							} : undefined);
 						}
 					});
 					
@@ -254,6 +259,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						document.querySelector('.bar').remove();
 						document.querySelector('.background').remove();
 						document.getElementById('container').remove();
+						window.showNotice('serverinstalling', "Installing… Please don't close this tab.");
 					});
 					getFile('/Core/loader.js', function(contents) {
 						eval(contents);
