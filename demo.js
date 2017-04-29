@@ -43,7 +43,7 @@
 	};
 	
 	var req = new XMLHttpRequest();
-	req.open('GET', '/v2/live/Core/core.js');
+	req.open('GET', '/v2/live/Core/modules/core/core.js');
 	req.addEventListener('readystatechange', function() {
 		if(this.readyState === 4 && this.status === 200) {
 			eval(this.responseText.replace(/\b((?:this|req)\.)((?:readyState|status|response)(?:Text)?)\b/g, '$1airborn_$2')); // renameGlobalVariables light
@@ -57,7 +57,7 @@
 					}
 				});
 			};
-			getFile('/Core/startup.js', function(contents) {
+			getFile('/Core/modules/startup/startup.js', function(contents) {
 				eval(contents);
 			});
 			window.logout = function() {
