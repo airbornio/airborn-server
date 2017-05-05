@@ -188,93 +188,94 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			alert(lang.error);
 			throw e;
 		}
-		var key = sjcl.misc.pbkdf2(password, salt, 1000);
-		var private_key = window.private_key = key.slice(128/32); // Second half
-		var shared_key = key.slice(0, 128/32); // First half
-		var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
-		var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
-		var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
-		
-		POST('/register', {
-			username: username,
-			salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
-			authkey: authkey,
-			password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
-			email: email
-		}, function(response) {
-			window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
-			register.value = lang.uploading;
-			JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
-				if(err) {
-					register.disabled = false;
-					register.value = lang.register;
-					alert(lang.error);
-					return;
-				}
-				
-				var zip = new JSZip(data);
-
-				var getFile = function(file, options, callback) {
-					if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
-						if(typeof options === 'function' || options === undefined) {
-							callback = options;
-							options = {};
-						}
-						var zipfile = zip.files[file.substr(1)];
-						if(options.codec) {
-							if(callback) callback(codec[options.codec].fromAB(zipfile.asArrayBuffer()));
-							return;
-						}
-						if(callback) callback(zipfile.asText());
+		deriveKey(password, salt, 1000).then(function(key) {
+			var private_key = window.private_key = key.slice(128/32); // Second half
+			var shared_key = key.slice(0, 128/32); // First half
+			var private_hmac = window.private_hmac = new sjcl.misc.hmac(private_key);
+			var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
+			var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
+			
+			POST('/register', {
+				username: username,
+				salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
+				authkey: authkey,
+				password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
+				email: email
+			}, function(response) {
+				window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
+				register.value = lang.uploading;
+				JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
+					if(err) {
+						register.disabled = false;
+						register.value = lang.register;
+						alert(lang.error);
 						return;
 					}
-					return _getFile(file, options, callback);
-				};
-				eval(zip.files['Core/core.js'].asText());
-				var _getFile = window.getFile;
-				window.getFile = getFile;
+					
+					var zip = new JSZip(data);
 
-				var keys = Object.keys(zip.files);
-				var target = '/';
-				putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
-				putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
-				putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
-					
-					keys.forEach(function(path, i) {
-						var file = zip.files[path];
-						if(!file.options.dir) {
-							putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverinstall'}, file.asArrayBuffer(), i === keys.length - 1 ? function() {
-								// Transaction finished; all files have been uploaded
-								setTimeout(function() { // Wait 30s to be sure
-									window.hideNotice('serverinstalling');
-								}, 30000);
-							} : undefined);
+					var getFile = function(file, options, callback) {
+						if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
+							if(typeof options === 'function' || options === undefined) {
+								callback = options;
+								options = {};
+							}
+							var zipfile = zip.files[file.substr(1)];
+							if(options.codec) {
+								if(callback) callback(codec[options.codec].fromAB(zipfile.asArrayBuffer()));
+								return;
+							}
+							if(callback) callback(zipfile.asText());
+							return;
 						}
+						return _getFile(file, options, callback);
+					};
+					eval(zip.files['Core/core.js'].asText());
+					var _getFile = window.getFile;
+					window.getFile = getFile;
+
+					var keys = Object.keys(zip.files);
+					var target = '/';
+					putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
+					putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
+					putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
+						
+						keys.forEach(function(path, i) {
+							var file = zip.files[path];
+							if(!file.options.dir) {
+								putFile(target + path, {codec: 'arrayBuffer', transactionId: 'serverinstall'}, file.asArrayBuffer(), i === keys.length - 1 ? function() {
+									// Transaction finished; all files have been uploaded
+									setTimeout(function() { // Wait 30s to be sure
+										window.hideNotice('serverinstalling');
+									}, 30000);
+								} : undefined);
+							}
+						});
+						
+						history.pushState({}, '', '/');
+						getFile('/Core/startup.js', function(contents) {
+							eval(contents);
+							//alert(lang.done);
+							document.querySelector('.bar').remove();
+							document.querySelector('.background').remove();
+							document.getElementById('container').remove();
+							window.showNotice('serverinstalling', "Installing… Please don't close this tab.");
+						});
+						getFile('/Core/loader.js', function(contents) {
+							eval(contents);
+						});
+						
 					});
-					
-					history.pushState({}, '', '/');
-					getFile('/Core/startup.js', function(contents) {
-						eval(contents);
-						//alert(lang.done);
-						document.querySelector('.bar').remove();
-						document.querySelector('.background').remove();
-						document.getElementById('container').remove();
-						window.showNotice('serverinstalling', "Installing… Please don't close this tab.");
-					});
-					getFile('/Core/loader.js', function(contents) {
-						eval(contents);
-					});
-					
 				});
+			}, function(req) {
+				register.disabled = false;
+				register.value = lang.register;
+				if(req.status === 409) {
+					alert(lang.taken);
+				} else {
+					alert(lang.error);
+				}
 			});
-		}, function(req) {
-			register.disabled = false;
-			register.value = lang.register;
-			if(req.status === 409) {
-				alert(lang.taken);
-			} else {
-				alert(lang.error);
-			}
 		});
 	}, function(req) {
 		register.disabled = false;

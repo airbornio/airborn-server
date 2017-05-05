@@ -47,9 +47,8 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 		})).then(function() {
 			storage.salt = salt;
 			storage.username = window.username = username;
-			if(!key) {
-				key = sjcl.misc.pbkdf2(password, salt, 1000);
-			}
+			return key ? Promise.resolve(key) : deriveKey(password, salt, 1000);
+		}).then(function(key) {
 			storage.key = key;
 			window.private_key = key.slice(128/32); // Second half
 			var shared_key = key.slice(0, 128/32); // First half
