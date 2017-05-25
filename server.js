@@ -70,7 +70,7 @@ var menu_html = fs.readFileSync('menu.html', 'utf8');
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
 });
-app.get(/^\/(?:pako\.min|sjcl|login|crypto)\.js$/, function(req, res) {
+app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics)\.js$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get('/lang.json', function(req, res) {
@@ -427,7 +427,8 @@ app.post('/register', function(req, res) {
 	var S3Prefix = crypto.createHmac('sha256', new Buffer(authkey, 'hex')).update(username).digest('hex').substr(0, 16);
 	var password_backup_key = req.body.password_backup_key;
 	var email = req.body.email;
-	client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email, created) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9, $10)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email, Math.floor(Date.now() / 1000)]).then(function() {
+	var referrer = req.body.referrer;
+	client.query('INSERT INTO users (id, username, salt, authkey, "S3Prefix", account_version, tier, quota, password_backup_key, email, created, referrer) VALUES ($1, $2, $3, $4, $5, 3, $6, $7, $8, $9, $10, $11)', [id, username, salt, authkey, S3Prefix, process.env.DEFAULT_TIER, process.env.DEFAULT_QUOTA, password_backup_key, email, Math.floor(Date.now() / 1000), referrer]).then(function() {
 		req.session.username = username;
 		login(req, res, authkey, function() {
 			res.send(200);

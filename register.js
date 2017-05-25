@@ -200,7 +200,8 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
 				authkey: authkey,
 				password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
-				email: email
+				email: email,
+				referrer: window.sessionStorage.referrer,
 			}, function(response) {
 				window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
 				register.value = lang.uploading;
