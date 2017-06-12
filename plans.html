@@ -14,63 +14,32 @@
 			<div class="header">Starter</div>
 			<div class="features">
 				<ul>
-					<li>2GB</li>
+					<li>All your documents fully secure</li>
 				</ul>
 			</div>
+			<div class="price"><em>Free</em></div>
 			{{#userId}}
-				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Starter plan. My subscription id is {{subscription}}." title="Email us to switch"><div class="purchase">Free</div></a>{{/subscription}}
-				{{^subscription}}<div class="purchase">Free</div>{{/subscription}}
+				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Starter plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/subscription}}
+				{{^subscription}}<div class="purchase">You're currently on this plan</div>{{/subscription}}
 			{{/userId}}
-			{{^userId}}<a href="register" title="Login or Register to choose this plan"><div class="purchase">Free</div></a>{{/userId}}
+			{{^userId}}<a href="register" title=""><div class="purchase">Register now!</div></a>{{/userId}}
 		</div>
 		{{#FASTSPRING_URL}}
-		<div class="plan">
-			<div class="header">Media Lover</div>
-			<div class="features">
-				<ul>
-					<li>100GB</li>
-				</ul>
-			</div>
-			{{#userId}}
-				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Media Lover plan. My subscription id is {{subscription}}." title="Email us to switch">{{/subscription}}
-				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/medialover?referrer={{userId}}" title="You're logged in as {{username}}">{{/subscription}}
-			{{/userId}}
-			{{^userId}}<a href="register" title="Login or Register to choose this plan">{{/userId}}
-			<div class="purchase">{{mediaLoverPrice}} / month</div></a>
-		</div>
 		<div class="plan">
 			<div class="header">Knowledge Worker</div>
 			<div class="features">
 				<ul>
-					<li>2GB</li>
-					<li>File history* + 10GB Free</li>
-					<li>Collaboration</li>
+					<li>All your documents fully secure</li>
+					<li>Get old versions of your documents back</li>
+					<li>Collaborate with others on your documents</li>
 				</ul>
 			</div>
-			<div class="footnote">* Takes up space.</div>
+			<div class="price"><em>{{knowledgeWorkerPrice}}</em> per <em>3 months</em></div>
 			{{#userId}}
-				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Knowledge Worker plan. My subscription id is {{subscription}}." title="Email us to switch">{{/subscription}}
-				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}" title="You're logged in as {{username}}">{{/subscription}}
+				{{#subscription}}<div class="purchase">You're currently on this plan</div>{{/subscription}}
+				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Start your free 3 month trial!</div></a>{{/subscription}}
 			{{/userId}}
-			{{^userId}}<a href="register" title="Login or Register to choose this plan">{{/userId}}
-			<div class="purchase">{{knowledgeWorkerPrice}} / month — <b>6 months free!</b></div></a>
-		</div>
-		<div class="plan">
-			<div class="header">Media Worker</div>
-			<div class="features">
-				<ul>
-					<li>100GB</li>
-					<li>File history* + 200GB Free</li>
-					<li>Collaboration</li>
-				</ul>
-			</div>
-			<div class="footnote">* Takes up space.</div>
-			{{#userId}}
-				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Media Worker plan. My subscription id is {{subscription}}." title="Email us to switch">{{/subscription}}
-				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/mediaworker?referrer={{userId}}" title="You're logged in as {{username}}">{{/subscription}}
-			{{/userId}}
-			{{^userId}}<a href="register" title="Login or Register to choose this plan">{{/userId}}
-			<div class="purchase">{{mediaWorkerPrice}} / month</div></a>
+			{{^userId}}<a href="register" title="Login or Register to choose this plan"><div class="purchase">Start your free 3 month trial!</div></a>{{/userId}}
 		</div>
 		{{/FASTSPRING_URL}}
 	</div>

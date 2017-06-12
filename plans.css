@@ -2,36 +2,45 @@
 	box-sizing: border-box;
 }
 #plans {
+	display: flex;
+	justify-content: center;
 	width: 100%;
 	position: absolute;
 	top: 50%;
 	margin-top: -120px;
-	text-align: center;
-	padding: 0 calc((100% - 730px) / 2);
 	color: #374A55;
 	text-shadow: none;
 }
 .plan {
+	display: flex;
+	flex-direction: column;
 	width: 340px;
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
-	display: inline-block;
 	vertical-align: top;
 	margin: 10px;
-	text-align: left;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	font-weight: bold;
 }
 .plan div {
 	padding: 0 30px;
 }
 .plan .header {
 	font-size: large;
-	font-weight: bold;
 	margin-top: 20px;
 }
-.plan .footnote {
+.plan .features {
+	flex-grow: 1;
+}
+.plan .features ul {
+	list-style-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTIiIHdpZHRoPSIxMi40NiI+PHBhdGggZD0iTTQuNSAxMmMtLjMgMC0uNiAwLS43NS0uM0wuMyA4LjI1IDAgNy41bC4zLS42LjYtLjMuNzUuM0w0LjUgOS40NWw2LTkgLjktLjQ1aC42Yy40NS40NS42IDEuMDUuMyAxLjVMNS4yNSAxMS41NWMwIC4zLS40NS40NS0uNzUuNDV6IiBmaWxsPSIjMjZhOTY0Ii8+PC9zdmc+);
+	padding-left: 2em;
+}
+.plan .features ul li:not(:last-child) {
+	padding-bottom: .5em;
+}
+.plan .price {
 	margin-bottom: 1rem;
-	font-size: small;
 }
 .plan a {
 	color: #374A55;
@@ -49,7 +58,12 @@
 }
 .plan a .purchase:after {
 	content: '⇨';
-	font-weight: bold;
 	position: absolute;
 	right: 12px;
+}
+@media (max-width: 730px) {
+	#plans {
+		flex-direction: column;
+		align-items: center;
+	}
 }
