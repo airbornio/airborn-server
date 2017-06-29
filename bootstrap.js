@@ -48,10 +48,6 @@ function buildLoginForm() {
 			}, 100);
 		});
 		document.body.appendChild(iframe);
-
-		var script = document.createElement('script');
-		script.src = 'analytics.js';
-		document.body.appendChild(script);
 	}
 	
 	// Login area

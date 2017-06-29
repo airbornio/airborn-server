@@ -289,3 +289,14 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		captcha.refresh();
 	});
 });
+
+document.getElementById('notify-of-updates').addEventListener('click', function() {
+	// Request permission for the service worker to notify of updates to the
+	// service worker. This is a slightly illogical place to request
+	// permission for that, since this checkbox doesn't currently have any
+	// effect on that. Furthermore, this permission is also needed on
+	// computers where you haven't signed up for Airborn OS. However, it makes
+	// sense from a UX point of view since this way, users who want to be
+	// notified of updates will be… notified of updates.
+	Notification.requestPermission();
+});

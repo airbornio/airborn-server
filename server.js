@@ -52,7 +52,8 @@ app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
 	if(req.method === 'GET') {
-		res.set('Cache-control', 's-maxage=86400');
+		res.set('Cache-control', 's-maxage=86400, max-age=0');
+		res.set('X-GitHub-Commit', process.env.HEROKU_SLUG_COMMIT);
 	}
 	next();
 });
@@ -65,21 +66,24 @@ var session = Session({
 });
 app.use(session);
 
-var menu_html = fs.readFileSync('menu.html', 'utf8');
+var menu_html = fs.readFileSync('menu.mustache', 'utf8');
 
 app.get('/', function(req, res) {
 	res.sendfile('bootstrap.html');
 });
-app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics)\.js$/, function(req, res) {
+app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics|serviceworker)\.js$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
 	res.sendfile('lang.json');
 });
+app.get(/^\/(?:demo)$/, function(req, res) {
+	res.sendfile(req.path.substr(1) + '.html');
+});
 app.get(/^\/(?:content|register|update|demo)$/, function(req, res) {
 	res.type('html');
-	fs.readFile(req.path.substr(1) + '.html', 'utf8', function(err, contents) {
+	fs.readFile(req.path.substr(1) + '.mustache', 'utf8', function(err, contents) {
 		res.send(200, Mustache.render(contents, {
 			FORKME_URL: process.env.FORKME_URL,
 		}, {
@@ -480,7 +484,7 @@ app.get('/plans', function(req, res) {
 				var pair = line.split('=');
 				prices[pair[0]] = pair[1];
 			});
-			fs.readFile('plans.html', 'utf8', function(err, contents) {
+			fs.readFile('plans.mustache', 'utf8', function(err, contents) {
 				res.set('Cache-control', 's-maxage=0');
 				res.send(200, Mustache.render(contents, {
 					FORKME_URL: process.env.FORKME_URL,
@@ -586,7 +590,7 @@ app.get('/docs/:id', function(req, res) {
 			res.send(500);
 			return;
 		}
-		fs.readFile('docs/docs.html', 'utf8', function(err, docs) {
+		fs.readFile('docs/docs.mustache', 'utf8', function(err, docs) {
 			res.send(200, Mustache.render(docs, {
 				FORKME_URL: process.env.FORKME_URL,
 				title: contents.match(/^# (.*)$/m)[1],
@@ -603,7 +607,7 @@ app.get('/docs/images/:image', function(req, res) {
 
 app.get('/terms', function(req, res) {
 	fs.readFile('terms.md', 'utf8', function(err, contents) {
-		fs.readFile('terms.html', 'utf8', function(err, terms) {
+		fs.readFile('terms.mustache', 'utf8', function(err, terms) {
 			res.send(200, Mustache.render(terms, {
 				FORKME_URL: process.env.FORKME_URL,
 				contents: markdown.toHTML(contents, 'Maruku'),
