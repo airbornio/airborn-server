@@ -1,7 +1,7 @@
 const GITHUB_API_URL = 'https://api.github.com/repos/airbornos/airborn-server/contents/?ref=';
 
 function getGitHubPath(path) {
-	if(path === '') return 'bootstrap.html';
+	if(path === '') return 'index.html';
 	if(!path.includes('.')) return path + '.html';
 	return path;
 }

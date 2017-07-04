@@ -1,6 +1,3 @@
-* {
-	box-sizing: border-box;
-}
 #plans {
 	display: flex;
 	justify-content: center;

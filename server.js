@@ -69,7 +69,7 @@ app.use(session);
 var menu_html = fs.readFileSync('menu.mustache', 'utf8');
 
 app.get('/', function(req, res) {
-	res.sendfile('bootstrap.html');
+	res.sendfile('index.html');
 });
 app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics|serviceworker)\.js$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
@@ -78,10 +78,10 @@ app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
 	res.sendfile('lang.json');
 });
-app.get(/^\/(?:demo)$/, function(req, res) {
+app.get(/^\/(?:app|demo)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:content|register|update|demo)$/, function(req, res) {
+app.get(/^\/(?:content|content-app|register|update|demo)$/, function(req, res) {
 	res.type('html');
 	fs.readFile(req.path.substr(1) + '.mustache', 'utf8', function(err, contents) {
 		res.send(200, Mustache.render(contents, {
@@ -91,7 +91,7 @@ app.get(/^\/(?:content|register|update|demo)$/, function(req, res) {
 		}));
 	});
 });
-app.get(/^\/(?:bootstrap|content|register|update|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:index|app|content|register|update|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {

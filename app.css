@@ -1,4 +1,5 @@
 #container {
+	visibility: hidden;
 	width: 260px;
 	position: absolute;
 	top: 50%;
@@ -8,19 +9,34 @@
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	z-index: 1;
 	text-shadow: none;
 }
-#explanation {
-	font-size: smaller;
+.show {
+	visibility: visible !important;
 }
-#username, #password, #update {
+#username, #password, #login-submit {
 	width: 100%;
 	margin: 5px 0;
+}
+#save {
+	vertical-align: middle;
+}
+#label {
+	font-family: sans-serif;
+	font-size: small;
+}
+iframe#content {
+	position: absolute;
+	top: 0;
+	width: 1px;
+	min-width: 100%;
+	height: 100%;
+	border: 0;
 }
 .window {
 	width: 100%;
 	height: 100%;
-	position: absolute;
 }
 .window iframe {
 	width: 100%;

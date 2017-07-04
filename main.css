@@ -1,3 +1,9 @@
+* {
+	box-sizing: border-box;
+}
+html, body {
+	height: 100%;
+}
 body {
 	font-family: Calibri, Lato, Ubuntu, sans-serif;
 	font-weight: 300;
@@ -72,8 +78,7 @@ body {
 	padding: 0 20px;
 	cursor: pointer;
 }
-.menu-button .icon-play:before,
-.toggle-button .icon-play:before {
+.menu-button .icon-play:before {
 	transform: translateY(1px) rotate(90deg) scale(.8);
 }
 .menu {
@@ -114,6 +119,7 @@ body {
 @media (max-width: 900px) {
 	.menu-button {
 		display: inline-block;
+		padding: 0 10px;
 	}
 	.menu {
 		visibility: hidden;
