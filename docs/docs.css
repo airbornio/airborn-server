@@ -19,7 +19,6 @@ body {
 	border-radius: 10px;
 	margin: 53px 10px 100px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
-	color: #374A55;
 	text-shadow: none;
 }
 #container:after {

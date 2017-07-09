@@ -23,6 +23,10 @@ a {
 		mask: url(images/gradient-mask.svg#m);
 	}
 }
+#wrap {
+	color: white;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .6);
+}
 @supports (-webkit-overflow-scrolling: touch) { /* iOS (http://stackoverflow.com/questions/23083462#23123845) */
 	#wrap {
 		position: fixed;
@@ -239,7 +243,6 @@ body.noanim #fastforward,
 	background: white;
 	background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .6) 10px, rgba(255, 255, 255, .8) 10px, rgba(255, 255, 255, .8) 20px);
 	border-radius: 7px;
-	color: #385f75;
 	padding: 0 16px;
 	margin-right: -16px;
 	display: inline-block;
@@ -314,7 +317,7 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 		background-size: cover;
 		width: 20px;
 		height: 20px;
-		opacity: .5;
+		opacity: .7;
 		position: absolute;
 		top: 0;
 		left: 100%;

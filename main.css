@@ -2,8 +2,7 @@ body {
 	font-family: Calibri, Lato, Ubuntu, sans-serif;
 	font-weight: 300;
 	margin: 0;
-	color: white;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, .6);
+	color: #10677A;
 	overflow-x: hidden;
 }
 .background {
@@ -48,13 +47,13 @@ body {
 	width: 100vw;
 	height: 38px;
 	line-height: 38px;
-	background: rgba(255, 255, 255, .5);
+	background: rgba(255, 255, 255, .7);
 	padding: 0 calc((100vw - 900px) / 2);
 	z-index: 2;
 }
 .hanger {
 	height: 25px;
-	opacity: .5;
+	opacity: .7;
 	position: absolute;
 	top: 38px;
 	margin-left: -100px;
@@ -67,7 +66,7 @@ body {
 .menu-button {
 	display: none;
 	float: right;
-	color: white;
+	color: #10677A;
 	text-decoration: none;
 	font-size: large;
 	padding: 0 20px;
@@ -75,7 +74,6 @@ body {
 }
 .menu-button .icon-play:before {
 	transform: translateY(1px) rotate(90deg) scale(.8);
-	text-shadow: 1px 0 1px rgba(0, 0, 0, .6);
 }
 .menu {
 	list-style: none;
@@ -89,7 +87,7 @@ body {
 	margin: 0 10px;
 }
 .menu a {
-	color: white;
+	color: #10677A;
 	text-decoration: none;
 }
 .live {
@@ -122,7 +120,7 @@ body {
 		position: absolute;
 		right: 0;
 		top: 38px;
-		background: rgba(255, 255, 255, .5);
+		background: rgba(255, 255, 255, .7);
 		padding: 8px 10px 8px;
 		border-radius: 0 0 20px 20px;
 	}
