@@ -216,6 +216,14 @@ body.noanim #fastforward,
 #noanim:target ~ #fastforward {
 	display: none;
 }
+#fastforward :first-child:before {
+	width: 8px;
+	overflow: hidden;
+}
+#fastforward :last-child:before {
+	margin-left: -5px;
+	overflow: hidden;
+}
 @keyframes hide {
 	to { opacity: 0; visibility: hidden; }
 }
