@@ -3,6 +3,18 @@ a {
 	z-index: 1;
 	position: relative;
 }
+.login-cutout {
+	position: relative;
+	float: right; /* Fix rounding error in Chrome. */
+}
+.login-cutout:before {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 38px; /* Not 100%, to fix rounding error in Firefox. */
+	left: 0;
+	background-attachment: fixed;
+}
 .login {
 	visibility: hidden;
 }
@@ -306,8 +318,11 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 	.logo, .hanger {
 		display: none;
 	}
-	.login {
-		visibility: inherit;
+	.login-cutout {
+		visibility: visible;
+		position: fixed;
+		left: 0;
+		top: 0;
 	}
 	.menu:after {
 		content: '';

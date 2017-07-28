@@ -90,7 +90,8 @@ body {
 }
 .menu li {
 	display: inline-block;
-	margin: 0 10px;
+	padding: 0 12px;
+	float: left;
 }
 .menu a {
 	color: #10677A;
@@ -140,6 +141,7 @@ body {
 	}*/
 	.menu li {
 		display: block;
+		float: none;
 	}
 	.menu:before {
 	    content: '';

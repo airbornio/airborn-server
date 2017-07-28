@@ -6,6 +6,7 @@
 	height: 38px;
 	padding: 0 calc((100vw - 900px) / 2);
 	z-index: 2;
+	overflow: hidden; /* Fix rounding error. */
 }
 #container > * {
 	pointer-events: all;
@@ -15,11 +16,11 @@
 	color: #10677A;
 	text-decoration: none;
 	font-size: large;
-	width: 120px;
 	margin-left: -120px;
 	text-align: right;
 	line-height: 38px;
-	padding: 0 10px;
+	padding: 0 12px;
+	background: rgba(255, 255, 255, .7);
 }
 #login-form {
 	visibility: hidden;
@@ -81,7 +82,7 @@ iframe#content {
 }
 @media (max-width: 900px) {
 	#login-button {
-		float: none;
+		float: left;
 		margin-left: 0;
 	}
 }
