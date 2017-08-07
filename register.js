@@ -231,7 +231,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						}
 						return _getFile(file, options, callback);
 					};
-					eval(zip.files['Core/core.js'].asText());
+					eval(zip.files['Core/modules/core/core.js'].asText());
 					var _getFile = window.getFile;
 					window.getFile = getFile;
 
@@ -254,7 +254,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						});
 						
 						history.pushState({}, '', '/');
-						getFile('/Core/startup.js', function(contents) {
+						getFile('/Core/modules/startup/startup.js', function(contents) {
 							eval(contents);
 							//alert(lang.done);
 							document.querySelector('.bar').remove();
@@ -262,7 +262,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 							document.getElementById('container').remove();
 							window.showNotice('serverinstalling', "Installing… Please don't close this tab.");
 						});
-						getFile('/Core/loader.js', function(contents) {
+						getFile('/Core/modules/startup/loader.js', function(contents) {
 							eval(contents);
 						});
 						

@@ -123,12 +123,12 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 	
 	function prefetchFiles() {
 		[
-			'/Core/core.js',
-			'/Core/startup.js',
-			'/Core/loader.js',
-			'/Core/js-yaml.js',
-			'/Core/3rdparty/esprima.js',
-			'/Core/3rdparty/estraverse.js',
+			'/Core/modules/core/core.js',
+			'/Core/modules/startup/startup.js',
+			'/Core/modules/startup/loader.js',
+			'/Core/lib/yaml/js-yaml.js',
+			'/Core/lib/esprima/esprima.js',
+			'/Core/lib/estraverse/estraverse.js',
 		].forEach(function(url) {
 			var link = document.createElement('link');
 			link.rel = 'prefetch';
