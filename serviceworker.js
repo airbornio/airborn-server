@@ -7,7 +7,7 @@ function getGitHubPath(path) {
 }
 
 function shouldCheckGitHub(path) {
-	if(['content', 'demo', 'register', 'terms', 'plans'].some(page => path.startsWith(page))) {
+	if(['content', 'demo', 'register', 'terms', 'plans', 'messages'].some(page => path.startsWith(page))) {
 		return false;
 	}
 	return !path.includes('/');
