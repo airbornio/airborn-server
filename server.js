@@ -52,7 +52,7 @@ app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
 	if(req.method === 'GET') {
-		res.set('Cache-control', 's-maxage=86400, max-age=0');
+		res.set('Cache-control', 's-maxage=86400, max-age=300');
 		res.set('X-GitHub-Commit', process.env.HEROKU_SLUG_COMMIT);
 	}
 	next();
