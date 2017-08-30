@@ -139,6 +139,7 @@ app.get('/user/:username/salt', function(req, res) {
 });
 
 app.get(/^\/object\/(.+)$/, function(req, res) {
+	res.set('Cache-control', 's-maxage=86400, max-age=0');
 	var username = req.get('X-Username');
 	if(username) {
 		req.session.username = username;
