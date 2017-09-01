@@ -63,7 +63,7 @@
 			window.logout = function() {
 				window.location = '/';
 			};
-			window.showNotice('demo', 'In this demo version, your files are not saved.', true);
+			window.showNotice('demo', 'In this demo version, your files are not saved. <a href="' + location.origin + '/register" target="_blank">Register now!</a>', true);
 		}
 	});
 	req.send(null);
