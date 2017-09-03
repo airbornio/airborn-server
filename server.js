@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 var http = require('http');
+var https = require('https');
 
 var express = require('express');
 var app = express();
@@ -474,7 +475,7 @@ app.put('/push/:id/', function(req, res) {
 });
 
 app.get('/plans', function(req, res) {
-	return http.get('http://sites.fastspring.com/airbornos/api/price?product_1_path=/knowledgeworker&product_2_path=/medialover&product_3_path=/mediaworker&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For').split(',')[0]) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
+	return https.get('https://sites.fastspring.com/airbornos/api/price?product_1_path=/knowledgeworker&product_2_path=/medialover&product_3_path=/mediaworker&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For').split(',')[0]) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
 		var body = '';
 		response.on('data', function(data) {
 			body += data;
