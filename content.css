@@ -59,15 +59,32 @@ a {
 		display: none;
 	}
 }
-#whatisit {
-	margin-top: calc(50vh - 100px);
-	left: 0;
-	text-align: center;
-	width: 100%;
+.header.header { /* Increase specificity above .annotation */
+	top: auto;
+	left: calc(50vw - 21.7ch);
 	color: #E1E7EA;
 	font-size: xx-large;
-	line-height: 1;
-	margin-bottom: 50px;
+	position: relative;
+}
+#header-1 {
+	margin-top: calc(50vh - 100px);
+	animation-delay: .1s; /* Hide first character when animation hasn't started yet (on page load). */
+}
+#header-2 {
+	margin-bottom: 37px;
+	transform: translateY(-100%);
+	animation-delay: .3s; /* Slight delay after the comma. */
+	pointer-events: none;
+}
+#header-2 * {
+	pointer-events: all;
+}
+.header-hidden {
+	visibility: hidden;
+}
+.marquee-placeholder {
+	animation: hide 0s 5.5s;
+	animation-fill-mode: forwards;
 }
 .marquee {
 	position: relative;
@@ -75,18 +92,30 @@ a {
 	height: 1.2em;
 	margin-bottom: -.2em;
 	overflow: hidden;
-	text-align: right;
-	vertical-align: bottom;
-	margin-left: -10px;
-	padding-right: .2em;
-	margin-right: -.2em;
+	vertical-align: top;
+	animation: show 0s 5.5s;
+	animation-fill-mode: both;
 }
 .marquee-hidden {
 	display: none;
 }
 .marquee-el {
-	animation: marquee 10s infinite;
-	margin-bottom: .2em;
+	animation: marquee 7s 6s infinite;
+	margin-bottom: .24em;
+}
+#marquee-1 {
+	text-align: left;
+	margin-right: -35px;
+}
+#marquee-2 {
+	text-align: right;
+}
+@keyframes show {
+	from { visibility: hidden; }
+	to { visibility: visible; }
+}
+@keyframes hide {
+	to { font-size: 0; }
 }
 @keyframes marquee {
 	0% { transform: translateY(0); }
@@ -98,7 +127,7 @@ a {
 	89% { transform: translateY(0); }
 }
 .annotation {
-	animation: type 2.3s linear forwards;
+	animation: type 3.5s linear forwards;
 	overflow: hidden;
 	width: 0;
 	height: 1.2em;
@@ -107,50 +136,21 @@ a {
 	position: absolute;
 	top: 50%;
 	left: 50%;
+	line-height: 1.2;
 }
 #annotation-1 {
-	margin-top: calc(-200px + 2.6em);
-	margin-left: -350px;
-	animation-delay: .1s; /* Hide first character when animation hasn't started yet (on page load). */
+	margin-top: -38px;
+	margin-left: -125px;
+	animation-delay: 4s;
 }
 #annotation-2 {
-	margin-top: -200px;
-	margin-left: 30px;
-	animation-delay: 3.2s;
-}
-#annotation-3 {
-	margin-top: calc(-200px + 1.3em);
-	margin-left: 30px;
-	animation-delay: 6s;
-}
-#annotation-4 {
-	margin-top: calc(-200px + 2.6em);
-	margin-left: 30px;
-	animation-delay: 8.5s;
-}
-#annotation-5 {
-	margin-top: -30px;
-	margin-left: 100px;
-	animation-delay: 11s;
-}
-#annotation-6 {
-	margin-top: calc(-30px + 1.3em);
-	margin-left: 100px;
-	animation-delay: 13s;
-}
-#annotation-7 {
-	margin-top: calc(-30px + 2.6em);
-	margin-left: 100px;
-	animation-delay: 14.7s;
-}
-#annotation-8 {
-	margin-top: 57px;
-	margin-left: -48px;
-	animation-delay: 17s;
+	margin-top: 90px;
+	margin-left: -54px;
+	animation-delay: 6.5s;
 }
 @keyframes type {
 	from { width: 1ch; }
-	to { width: 40ch; }
+	to { width: 50ch; }
 }
 .arrow {
 	animation: reveal 1.5s linear;
@@ -166,31 +166,11 @@ a {
 	height: 24px;
 }
 #arrow-1 {
-	margin-top: -128px;
-	margin-left: -127px;
-	animation-delay: 2s;
+	margin-top: 60px;
+	margin-left: -20px;
+	animation-delay: 6.5s;
 }
-#arrow-2 {
-	margin-top: -128px;
-	margin-left: 48px;
-	animation-delay: 5s;
-	transform: scaleX(-1);
-}
-#arrow-3 {
-	margin-top: -62px;
-	margin-left: 138px;
-	animation-delay: 12s;
-}
-#arrow-3 img {
-	transform: scale(-1);
-	filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, .6));
-}
-#arrow-4 {
-	margin-top: 28px;
-	margin-left: -18px;
-	animation-delay: 17s;
-}
-#arrow-4 img {
+#arrow-1 img {
 	transform: scaleY(-1);
 	filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, .6));
 }
@@ -215,7 +195,7 @@ body.inactive .marquee-el {
 	text-decoration: none;
 	margin-left: 300px;
 	margin-top: 57px;
-	animation: hide .5s 17s forwards;
+	animation: fadeout .5s 7s forwards;
 }
 #noanim:target ~ .annotation,
 #noanim:target ~ .arrow,
@@ -236,7 +216,7 @@ body.noanim #fastforward,
 	margin-left: -5px;
 	overflow: hidden;
 }
-@keyframes hide {
+@keyframes fadeout {
 	to { opacity: 0; visibility: hidden; }
 }
 #demo-bar {
@@ -273,7 +253,7 @@ body.noanim #fastforward,
 	margin-top: calc(50vh - 150px);
 }
 .row {
-	padding: 16px calc((100vw - 900px) / 2);
+	padding: 16px calc((100vw - 865px) / 2);
 	margin-top: 100px;
 	margin-bottom: 100px;
 }
@@ -338,56 +318,38 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 	#gradient {
 		height: 100px;
 	}
-	#whatisit {
-		margin-bottom: 140px;
+	.header.header {
 		font-size: x-large;
-		transform: translateY(40px);
-		width: 339px;
-		margin-left: calc(50vw - 169px);
-		margin-right: calc(50vw - 169px);
+	}
+	.header-hidden {
+		display: none;
+	}
+	#header-1 {
+		top: -5px;
+		left: calc(50vw - 8.7ch);
+	}
+	#header-2 {
+		left: calc(50vw - 13ch);
+		transform: none;
+		margin-bottom: 122px;
+		animation-delay: 1.5s;
 	}
 	.annotation {
 		font-size: medium;
 		opacity: 0.99; /* Fix overflow: hidden on iOS. */
 	}
 	#annotation-1 {
-		margin-top: -206px;
-		margin-left: -146px;
+		margin-top: 10px;
 	}
-	#annotation-2, #annotation-3, #annotation-4 {
-		transform: translate(-149px, 33px);
-	}
-	#annotation-5, #annotation-6, #annotation-7 {
-		transform: translate(-245px, 44px);
-	}
-	#annotation-8 {
+	#annotation-2 {
 		margin-top: 161px;
 		margin-left: -43px;
 	}
 	#arrow-1 {
-		margin-top: -150px;
-		margin-left: -161px;
-		animation-duration: .5s;
-	}
-	#arrow-1 img {
-		transform: scale(-1, 2);
-		margin-top: 12px;
-	}
-	#arrow-2 {
-		margin-top: -96px;
-		margin-left: 80px;
-		transform: none;
-	}
-	#arrow-3 {
-		margin-top: -12px;
-		margin-left: -26px;
-		transform: scaleX(-1);
-	}
-	#arrow-4 {
 		margin-top: 132px;
 		margin-left: -26px;
 	}
-	#arrow-4 img {
+	#arrow-1 img {
 		transform: scale(-1);
 	}
 	#fastforward {
@@ -409,7 +371,7 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 	}
 }
 @media (max-height: 600px) {
-	#whatisit {
+	#header-1 {
 		margin-top: 200px;
 	}
 	.annotation, .arrow {
