@@ -50,11 +50,12 @@ body {
 .bar {
 	position: fixed;
 	top: 0;
-	width: 100vw;
+	width: 100%;
 	height: 38px;
 	line-height: 38px;
 	background: rgba(255, 255, 255, .7);
-	padding: 0 calc((100vw - 900px) / 2);
+	padding-left: calc((100vw - 865px) / 2);
+	padding-right: calc((100vw - 865px) / 2 - (100vw - 100%)); /* Same as padding-left, minus the scrollbar width. */
 	z-index: 2;
 }
 .hanger {
