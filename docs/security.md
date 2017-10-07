@@ -1,40 +1,25 @@
-![Client-Side Encryption](images/client-side-encryption.png)
-{: .img-container .security #sidebar}
-
 # Security
 
-## What we did, or What we can't see
+We've gone to really great lengths to make sure that even if our server
+gets hacked, the hackers still can't read your documents. We can't read
+them either, nor can our hosting provider, our CDN, our storage
+provider, or the intern we wish we had.
 
-All your files are encrypted with your password before they are uploaded
-to us. This means we can't see what's inside or what the files are
-called.
+We've done two things to accomplish this:
 
-Most of the code of Airborn OS is also encrypted and stored with your
-files. This means we can't change what your Airborn OS does and shares with
-us without your permission (by clicking Update, or by having autoupdating enabled). We say most code
-because there also needs to be some unencrypted code which decrypts the
-rest of the code. To protect that code as well, you need to install
-[this addon][].
+1. All documents are encrypted before they leave your computer. This
+   means we can't see what's inside or what the documents are called.
 
+2. Normally, when hackers get access to your server, they can change the
+   code that gets sent to customers. For example, they could make the
+   code say "send your password to us". Then, even though they can't
+   read documents immediately, passwords start coming in and they can
+   soon read them.
 
-## What we didn't do, or What we can see
+   To solve this, we're using a relatively new web technology (Service
+   Workers) to install some code which can't be changed without setting
+   off a warning to you. That code then keeps taps on all other code,
+   and checks that it matches the publicly available version on GitHub.
 
-We can see how large your files are and how many they are. If you store
-something with a distinctive filesize or distinctive filesizes, we could
-see it.
-
-We don't protect your anonymity. Unless you protect it yourself, we can
-see where in the world you're accessing Airborn OS from.
-
-
-## What you can do
-
-1. Don't use Airborn OS on computers you don't trust
-2. Always log out of Airborn OS when you leave your computer, even if for a
-   little while
-3. Choose a long password, or choose a short sentence as your password,
-   or use a password manager
-4. Use Airborn OS with Firefox with [this addon][] installed
-
-
-[this addon]: https://addons.mozilla.org/firefox/addon/hcs-checker/
+![Client-Side Encryption](images/client-side-encryption.png)
+{: .img-container .security #sidebar}

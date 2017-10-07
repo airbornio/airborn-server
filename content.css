@@ -71,19 +71,29 @@ a {
 	animation-delay: .1s; /* Hide first character when animation hasn't started yet (on page load). */
 }
 #header-2 {
-	margin-bottom: 37px;
 	transform: translateY(-100%);
 	animation-delay: .3s; /* Slight delay after the comma. */
 	pointer-events: none;
 }
-#header-2 * {
+#header-3 {
+	transform: translateY(-200%);
+	animation-delay: .5s; /* Slight delay after the whitespace. */
+	pointer-events: none;
+}
+#header-2 *, #header-3 * {
 	pointer-events: all;
 }
 .header-hidden {
 	visibility: hidden;
 }
+.header-hidden .marquee {
+	animation: none;
+}
+.header-smaller {
+	font-size: smaller;
+}
 .marquee-placeholder {
-	animation: hide 0s 5.5s;
+	animation: hide 0s 6s;
 	animation-fill-mode: forwards;
 }
 .marquee {
@@ -93,22 +103,15 @@ a {
 	margin-bottom: -.2em;
 	overflow: hidden;
 	vertical-align: top;
-	animation: show 0s 5.5s;
+	animation: show 0s 6s;
 	animation-fill-mode: both;
 }
 .marquee-hidden {
 	display: none;
 }
 .marquee-el {
-	animation: marquee 7s 6s infinite;
+	animation: marquee 7s 6.7s infinite;
 	margin-bottom: .24em;
-}
-#marquee-1 {
-	text-align: left;
-	margin-right: -35px;
-}
-#marquee-2 {
-	text-align: right;
 }
 @keyframes show {
 	from { visibility: hidden; }
@@ -141,16 +144,16 @@ a {
 #annotation-1 {
 	margin-top: -38px;
 	margin-left: -125px;
-	animation-delay: 4s;
+	animation-delay: 4.5s;
 }
 #annotation-2 {
 	margin-top: 90px;
 	margin-left: -54px;
-	animation-delay: 6.5s;
+	animation-delay: 7.5s;
 }
 @keyframes type {
 	from { width: 1ch; }
-	to { width: 50ch; }
+	to { width: 54ch; }
 }
 .arrow {
 	animation: reveal 1.5s linear;
@@ -168,7 +171,7 @@ a {
 #arrow-1 {
 	margin-top: 60px;
 	margin-left: -20px;
-	animation-delay: 6.5s;
+	animation-delay: 7s;
 }
 #arrow-1 img {
 	transform: scaleY(-1);
@@ -195,7 +198,7 @@ body.inactive .marquee-el {
 	text-decoration: none;
 	margin-left: 300px;
 	margin-top: 57px;
-	animation: fadeout .5s 7s forwards;
+	animation: fadeout .5s 7.5s forwards;
 }
 #noanim:target ~ .annotation,
 #noanim:target ~ .arrow,
@@ -331,15 +334,21 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 	#header-2 {
 		left: calc(50vw - 13ch);
 		transform: none;
-		margin-bottom: 122px;
 		animation-delay: 1.5s;
+	}
+	#header-3 {
+		top: 5px;
+		left: calc(50vw - 2.5ch);
+		transform: none;
+		animation-delay: 3.5s;
+		margin-bottom: 94px;
 	}
 	.annotation {
 		font-size: medium;
 		opacity: 0.99; /* Fix overflow: hidden on iOS. */
 	}
 	#annotation-1 {
-		margin-top: 10px;
+		margin-top: 30px;
 	}
 	#annotation-2 {
 		margin-top: 161px;
