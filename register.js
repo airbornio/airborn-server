@@ -204,6 +204,8 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 				referrer: window.sessionStorage.referrer,
 			}, function(response) {
 				window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
+				window.S3Prefix = window.account_info.S3Prefix;
+				window.account_version = window.account_info.account_version;
 				register.value = lang.uploading;
 				JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
 					if(err) {
