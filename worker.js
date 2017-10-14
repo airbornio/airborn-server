@@ -64,16 +64,16 @@ function getMessage(channel, queue, callback, getanother) {
 				}).promise().then(function() {
 					if(metadata.authenticated) {
 						return client.query(`
-							INSERT INTO objects ("userId", name, size, "ACL", authkey) VALUES ((SELECT id FROM users WHERE "S3Prefix" = $1), $2, $3, $4, $5)
+							INSERT INTO objects ("userId", name, size, "ACL", authkey) VALUES ($1, $2, $3, $4, $5)
 							ON CONFLICT ("userId", name) DO UPDATE
 							SET (size, "ACL", authkey, "lastUpdated") = ($3, $4, $5, $6)
-						`, [metadata.S3Prefix, metadata.name, metadata.size, metadata.ACL, metadata.objectAuthkey, Date.now()]);
+						`, [metadata.userID, metadata.name, metadata.size, metadata.ACL, metadata.objectAuthkey, Date.now()]);
 					} else {
 						return client.query(`
-							INSERT INTO objects ("userId", name, size) VALUES ($1, $2, $3)
+							INSERT INTO objects ("userId", name, size) VALUES ((SELECT id FROM users WHERE "S3Prefix" = $1), $2, $3)
 							ON CONFLICT ("userId", name) DO UPDATE
 							SET (size, "lastUpdated") = ($3, $4)
-						`, [metadata.userID, metadata.name, metadata.size, Date.now()]);
+						`, [metadata.S3Prefix, metadata.name, metadata.size, Date.now()]);
 					}
 				}).then(function() {
 					channel.ack(message);
