@@ -220,7 +220,7 @@ app.put(/^\/object\/(.+)$/, function(req, res) {
 		var name = req.params[0];
 		var size = req.get('Content-Length');
 		var transactionId = req.get('X-Transaction-Id');
-		var queue = req.session.userID + ':' + (transactionId || '');
+		var queue = req.session.userID + ':' + (transactionId || 'oneoff:' + Math.round(Math.random() * Date.now()).toString(16));
 		var ACL = req.get('X-ACL');
 		var objectAuthkey = req.get('X-Object-Authentication');
 		if(!transactionId) {
