@@ -622,7 +622,7 @@ app.get('/terms', function(req, res) {
 
 app.get('/run', function(req, res) {
 	if(userLoggedIn(req)) {
-		res.redirect('/');
+		res.redirect('/app');
 	} else {
 		res.redirect('/demo');
 	}
