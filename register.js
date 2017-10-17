@@ -255,7 +255,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 							}
 						});
 						
-						history.pushState({}, '', '/');
+						history.pushState({}, '', '/app');
 						getFile('/Core/modules/startup/startup.js', function(contents) {
 							eval(contents);
 							//alert(lang.done);

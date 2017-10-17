@@ -19,7 +19,6 @@ function buildLoginForm() {
 
 	// Page content
 	var iframe = document.createElement('iframe');
-	var interval;
 	if('sandbox' in iframe) {
 		iframe.sandbox = 'allow-top-navigation allow-same-origin';
 		iframe.src = 'content-app';

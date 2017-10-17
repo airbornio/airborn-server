@@ -93,6 +93,14 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 					GET('object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(firstfile)), function(response) {
 						resolve(decryptAndMaybeUngzip(files_key, response))
 					}, reject, needToAuth && authkey, needToSendUsername && username);
+				}).catch(function(req) {
+					if(req.status === 404) {
+						setTimeout(function() {
+							window.location = '/update';
+						});
+					} else {
+						throw req;
+					}
 				});
 			}
 		}).then(function(firstfilecontents) {

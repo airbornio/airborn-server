@@ -79,10 +79,10 @@ app.get('/lang.json', function(req, res) {
 	res.set('Access-Control-Allow-Origin', '*');
 	res.sendfile('lang.json');
 });
-app.get(/^\/(?:app|demo)$/, function(req, res) {
+app.get(/^\/(?:app|demo|update)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:content|content-app|register|update|demo)$/, function(req, res) {
+app.get(/^\/(?:content|content-app|register|demo)$/, function(req, res) {
 	res.type('html');
 	fs.readFile(req.path.substr(1) + '.mustache', 'utf8', function(err, contents) {
 		res.send(200, Mustache.render(contents, {

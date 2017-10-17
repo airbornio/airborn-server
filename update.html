@@ -7,8 +7,6 @@
 	<link rel="stylesheet" href="update.css">
 </head>
 <body>
-	<div class="background"></div>
-	{{> menu}}
 	<form id="container">
 		<div id="explanation"></div><br>
 		<input type="text" id="username"><br>
@@ -16,17 +14,17 @@
 		<input type="submit" id="update">
 	</form>
 	<script src="login.js"></script>
-	<script src="update.js"></script>
 	<script src="sjcl.js"></script>
 	<script src="crypto.js"></script>
 	<script src="pako.min.js"></script>
-	<script src="3rdparty/jszip/jszip.min.js"></script>
-	<script type="text/javascript" src="3rdparty/jszip/jszip-utils.js"></script>
+	<script src="3rdparty/jszip/jszip.min.js" integrity="sha256-jszrAWzwnYwrwh6lsETSmX3L2fydd9XGkAuHHdnHmL0="></script>
+	<script type="text/javascript" src="3rdparty/jszip/jszip-utils.js" integrity="sha256-V2b45dvEeGuW5o94fsAJnLprv6Od3g3qJrpq/96Ufno="></script>
 	<!--
 	Mandatory in IE 6, 7, 8 and 9.
 	-->
 	<!--[if IE]>
-	<script type="text/javascript" src="3rdparty/jszip/jszip-utils-ie.js"></script>
+	<script type="text/javascript" src="3rdparty/jszip/jszip-utils-ie.js" integrity="sha256-8q3ipGtEWzVuIeTunq7kUEcPJqmcITMFH4GobXc0BPw="></script>
 	<![endif]-->
+	<script src="update.js"></script>
 </body>
 </html>
