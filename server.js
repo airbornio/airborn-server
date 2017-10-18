@@ -568,6 +568,7 @@ app.get(/^\/(?:v2\/)?current(?:-id)?$/, function(req, res) {
 	update[req.path].then(function(response) {
 		res.set('Content-Type', response.headers['content-type']);
 		res.set('Content-Length', response.headers['content-length']);
+		res.set('X-GitHub-Commit', response.headers['x-github-commit']);
 		res.send(200, response.body);
 	});
 });
