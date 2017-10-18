@@ -5,6 +5,8 @@ var path = require('path');
 var crypto = require('crypto');
 var http = require('http');
 var https = require('https');
+var request = require('request-promise');
+var JSZip = require('jszip');
 
 var express = require('express');
 var app = express();
@@ -529,6 +531,12 @@ app.post('/notify/deactivated/', function(req, res) {
 	});
 });
 
+app.get('/v2/live/Apps/', function(req, res) {
+	res.send(`strut/: {}
+firetext/: {}
+marketplace/: {}
+`);
+});
 app.get('/v2/live/Documents/', function(req, res) {
 	res.send('Documents/: {}');
 });
@@ -542,16 +550,37 @@ app.get('/v2/live/AppData/firetext/localStorage', function(req, res) {
 	res.send('{"firetext.recents":"[[\\"/sdcard/Documents/\\",\\"Welcome\\",\\".html\\",\\"\\",\\"internal\\"]]"}');
 });
 
-app.get(/^\/(?:v2\/)?(?:current(?:-id)?|live(?:\/.*))$/, function(req, res) {
-	console.log(process.env.UPDATE_URL + req.path);
-	http.get(process.env.UPDATE_URL + req.path, function(update) {
-		res.statusCode = update.statusCode;
-		res.set('Content-Type', update.headers['content-type']);
-		res.set('Content-Length', update.headers['content-length']);
-		update.pipe(res);
-	}).on('error', function(err) {
-		console.error(err);
-		res.send(500);
+var update = {};
+['/current-id', '/current', '/v2/current-id', '/v2/current'].forEach(function(path) {
+	update[path] = request({
+		uri: process.env.UPDATE_URL + path,
+		resolveWithFullResponse: true,
+		encoding: null, // Buffer
+	});
+});
+var live = {};
+['/current', '/v2/current'].forEach(function(path) {
+	live[path.replace('current', 'live')] = update[path].then(function(response) {
+		return JSZip.loadAsync(response.body);
+	});
+});
+app.get(/^\/(?:v2\/)?current(?:-id)?$/, function(req, res) {
+	update[req.path].then(function(response) {
+		res.set('Content-Type', response.headers['content-type']);
+		res.set('Content-Length', response.headers['content-length']);
+		res.send(200, response.body);
+	});
+});
+app.get(/^(\/(?:v2\/)?live)\/(.*)$/, function(req, res) {
+	var path = req.params[1];
+	live[req.params[0]].then(function(zip) {
+		var file = zip.file(path);
+		if(file) {
+			res.contentType(path.split('.').pop());
+			file.nodeStream().pipe(res);
+		} else {
+			res.send(404);
+		}
 	});
 });
 
