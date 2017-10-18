@@ -98,8 +98,9 @@ function getMessage(channel, queue, callback, getanother) {
 }
 
 var lastInvalidated = Date.now();
+var prevRows;
 
-setInterval(function() {
+(function invalidateCDN() {
 	client.query(`
 		SELECT "userId", name, "lastUpdated" FROM objects WHERE
 		"lastUpdated" >= $1
@@ -107,9 +108,22 @@ setInterval(function() {
 		LIMIT 101
 	`, [lastInvalidated]).then(function(rows) {
 		if(rows.length) {
+			var origRows = rows.slice();
+			var origRowCount = origRows.length;
 			var nextLastInvalidated =
-				rows.length === 101 ? rows.pop().lastUpdated :
-				rows[rows.length - 1].lastUpdated + 1;
+				origRowCount === 101 ? +rows.pop().lastUpdated :
+				+rows[rows.length - 1].lastUpdated;
+			while(prevRows && prevRows.some(function(row) {
+				return rows[0].name === row.name && rows[0].lastUpdated === row.lastUpdated;
+			})) {
+				rows.shift();
+				if(!rows.length) {
+					setTimeout(invalidateCDN, 1000 / 10);
+					return;
+				}
+			}
+			prevRows = origRows;
+			console.log(rows.length, lastInvalidated, nextLastInvalidated);
 			request.delete('https://api.keycdn.com/zones/purgeurl/' + process.env.KEYCDN_ZONE_ID + '.json', {
 				auth: {
 					user: process.env.KEYCDN_API_KEY
@@ -121,8 +135,13 @@ setInterval(function() {
 				},
 				json: true,
 			}, function(err, response) {
+				setTimeout(invalidateCDN, 1000 / 10); // 10 per second, to stay under the limit of 20 per second.
 				if(err) {
 					console.error(err);
+					return;
+				}
+				if(!response.body) {
+					console.error(response);
 					return;
 				}
 				if(response.body.status !== 'success') {
@@ -131,6 +150,8 @@ setInterval(function() {
 				}
 				lastInvalidated = nextLastInvalidated;
 			});
+		} else {
+			setTimeout(invalidateCDN, 1000 / 10);
 		}
 	});
-}, 1000 / 10); // 10 per second, to stay under the limit of 20 per second.
+})();
