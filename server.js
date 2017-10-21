@@ -666,6 +666,10 @@ app.get('/feedback', function(req, res) {
 	res.redirect(process.env.FEEDBACK_URL);
 });
 
+app.get('/google-drive-import', function(req, res) {
+	res.redirect(process.env.GOOGLE_DRIVE_IMPORT_URL);
+});
+
 
 function login(req, res, authkey, cont) {
 	client.one('SELECT id, authkey, "S3Prefix", account_version, tier, subscription FROM users WHERE username = $1', [req.session.username]).then(function(user) {
