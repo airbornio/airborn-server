@@ -35,7 +35,7 @@ GET('lang.json', function(response) {
 	document.getElementById('email-label').textContent = strings.email;
 	document.getElementById('double-check-email').innerHTML = strings['double-check-email'].replace('\n', '<br>');
 	document.getElementById('notify-of-updates-label').textContent = strings['notify-of-updates'];
-	document.getElementById('agree-terms-label').innerHTML = strings['agree-terms'].replace('{terms}', '<a target="_blank" href="terms">' + strings.terms + '</a>');
+	document.getElementById('agree-terms-label').innerHTML = strings['agree-terms'].replace('{terms}', '<a target="_blank" href="docs/terms">' + strings.terms + '</a>').replace('{privacypolicy}', '<a target="_blank" href="docs/privacypolicy">' + strings.privacypolicy + '</a>');
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('current-step').textContent = strings['current-step'];
 	document.getElementById('register').value = strings.register;

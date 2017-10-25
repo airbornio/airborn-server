@@ -92,8 +92,8 @@ SERVICE.
 
 ## Personal information
 
-We may use the data you give us as described in the Privacy Policy (see
-below).
+We may use the data you give us as described in our
+[Privacy Policy](./privacypolicy).
 
 
 ## Agreement
@@ -103,16 +103,3 @@ We may change these terms if we have posted a public advance notice.
 Your use of the service implies your agreement to these terms or the
 modified terms (described above). If you don't agree with the latest
 terms, don't use the service.
-
-
-## Privacy Policy
-
-We may collect your email address and use it to notify or warn you about
-the service, or send you news or information, in which case we will give
-you the option to sign off from those updates. We will not give your
-email address to third parties.
-
-Payments are handled by FastSpring. Be sure to read their Privacy
-Policy.
-
-Be sure to read the Privacy Policy of any apps you install.

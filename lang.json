@@ -30,7 +30,8 @@
 	"current-step": "→",
 	"email": "Email address",
 	"double-check-email": "Please double check your email address.\nYou need it to use your key (above)",
-	"agree-terms": "I agree to the {terms}.",
+	"agree-terms": "I agree to the {terms} and {privacypolicy}.",
 	"terms": "Terms of Service",
-	"noterms": "Please agree to the Terms of Service"
+	"privacypolicy": "Privacy Policy",
+	"noterms": "Please agree to the Terms of Service and Privacy Policy"
 }
