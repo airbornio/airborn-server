@@ -21,6 +21,7 @@
 		"markdown": "0.5.0",
 		"compression": "1.4.3",
 		"geoip2": "1.0.4",
+		"request": "2.83.0",
 		"request-promise": "4.2.2",
 		"jszip": "3.1.4",
 		"js-yaml": "3.0.2"
