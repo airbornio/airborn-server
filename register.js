@@ -195,28 +195,29 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 			var files_hmac = window.files_hmac = new sjcl.misc.hmac(hmac_bits);
 			var authkey = sjcl.codec.hex.fromBits(shared_key).toUpperCase();
 			
-			POST('/register', {
-				username: username,
-				salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
-				authkey: authkey,
-				password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
-				email: email,
-				referrer: window.sessionStorage.referrer,
-			}, function(response) {
-				window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
-				window.S3Prefix = window.account_info.S3Prefix;
-				window.account_version = window.account_info.account_version;
-				register.value = lang.uploading;
-				JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
-					if(err) {
-						register.disabled = false;
-						register.value = lang.register;
-						alert(lang.error);
-						return;
-					}
+			JSZipUtils.getBinaryContent('/v2/current', function(err, data) {
+				if(err) {
+					register.disabled = false;
+					register.value = lang.register;
+					alert(lang.error);
+					return;
+				}
+				
+				var zip = new JSZip(data);
+				
+				POST('/register', {
+					username: username,
+					salt: sjcl.codec.hex.fromBits(salt).toUpperCase(),
+					authkey: authkey,
+					password_backup_key: sjcl.codec.hex.fromBits(window.password_backup_key).toUpperCase(),
+					email: email,
+					referrer: window.sessionStorage.referrer,
+				}, function(response) {
+					window.account_info = JSON.parse(decodeURIComponent(document.cookie.match(/account_info=(.*)(?:;|$)/)[1]).match(/{.*}/)[0]);
+					window.S3Prefix = window.account_info.S3Prefix;
+					window.account_version = window.account_info.account_version;
+					register.value = lang.uploading;
 					
-					var zip = new JSZip(data);
-
 					var getFile = function(file, options, callback) {
 						if(!window.getFileCache[file] && file.substr(-1) !== '/' && zip.files[file.substr(1)]) {
 							if(typeof options === 'function' || options === undefined) {
@@ -269,15 +270,15 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 						});
 						
 					});
+				}, function(req) {
+					register.disabled = false;
+					register.value = lang.register;
+					if(req.status === 409) {
+						alert(lang.taken);
+					} else {
+						alert(lang.error);
+					}
 				});
-			}, function(req) {
-				register.disabled = false;
-				register.value = lang.register;
-				if(req.status === 409) {
-					alert(lang.taken);
-				} else {
-					alert(lang.error);
-				}
 			});
 		});
 	}, function(req) {
