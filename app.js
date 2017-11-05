@@ -14,6 +14,7 @@ function buildLoginForm() {
 		document.getElementById('password').placeholder = strings.password;
 		document.getElementById('login-submit').value = strings.login;
 		document.getElementById('label').textContent = strings.save;
+		document.getElementById('forgot').textContent = strings.forgot;
 		document.title = strings.sitename;
 	});
 

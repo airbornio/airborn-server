@@ -4,6 +4,7 @@
 	"login": "Login",
 	"loggingIn": "Logging in…",
 	"save": "Remain logged in",
+	"forgot": "Forgot",
 	"wronguser": "Sorry, that username doesn't exist.",
 	"wrongpass": "Sorry, that password is not correct.",
 	"register": "Register",

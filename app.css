@@ -22,9 +22,14 @@
 #save {
 	vertical-align: middle;
 }
-#label {
+#label, #forgot {
 	font-family: sans-serif;
 	font-size: small;
+}
+#forgot {
+	color: inherit;
+	margin-top: 10px;
+	display: inline-block;
 }
 iframe#content {
 	position: absolute;
