@@ -34,7 +34,6 @@ GET('lang.json', function(response) {
 	document.getElementById('download-creds').value = strings['download-creds'];
 	document.getElementById('email-label').textContent = strings.email;
 	document.getElementById('double-check-email').innerHTML = strings['double-check-email'].replace('\n', '<br>');
-	document.getElementById('notify-of-updates-label').textContent = strings['notify-of-updates'];
 	document.getElementById('agree-terms-label').innerHTML = strings['agree-terms'].replace('{terms}', '<a target="_blank" href="docs/terms">' + strings.terms + '</a>').replace('{privacypolicy}', '<a target="_blank" href="docs/privacypolicy">' + strings.privacypolicy + '</a>');
 	document.getElementById('ready').textContent = strings.ready;
 	document.getElementById('current-step').textContent = strings['current-step'];
@@ -151,10 +150,10 @@ function currentStep() {
 		return [4, lang.nofield];
 	}
 	if(!document.getElementById('agree-terms').checked) {
-		return [7, lang.noterms];
+		return [6, lang.noterms];
 	}
 	if(!captcha.getCaptchaData().valid) {
-		return [8, lang.nocaptcha];
+		return [7, lang.nocaptcha];
 	}
 	return ['done'];
 }
@@ -177,7 +176,6 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 	var username = window.username = document.getElementById('username').value;
 	var password = window.password = document.getElementById('password').value;
 	var email = document.getElementById('email').value;
-	var notifyOfUpdates = document.getElementById('notify-of-updates').checked;
 	POST('/captcha/try', data, function() {
 		register.value = lang.registering;
 		try {
@@ -242,7 +240,7 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 					var target = '/';
 					putFile('/key', sjcl.codec.hex.fromBits(files_key).toUpperCase());
 					putFile('/hmac', sjcl.codec.hex.fromBits(hmac_bits).toUpperCase());
-					putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: notifyOfUpdates}}, function() {
+					putFile('/settings', {codec: 'prettyjson'}, {core: {notifyOfUpdates: false}}, function() {
 						
 						keys.forEach(function(path, i) {
 							var file = zip.files[path];
@@ -291,15 +289,4 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 		}
 		captcha.refresh();
 	});
-});
-
-document.getElementById('notify-of-updates').addEventListener('click', function() {
-	// Request permission for the service worker to notify of updates to the
-	// service worker. This is a slightly illogical place to request
-	// permission for that, since this checkbox doesn't currently have any
-	// effect on that. Furthermore, this permission is also needed on
-	// computers where you haven't signed up for Airborn OS. However, it makes
-	// sense from a UX point of view since this way, users who want to be
-	// notified of updates will be… notified of updates.
-	Notification.requestPermission();
 });
