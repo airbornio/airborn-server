@@ -19,34 +19,17 @@ body {
 	clear: both;
 	display: block;
 }
-.img-container {
-	float: right;
-	position: relative;
-}
 #container img {
 	float: right;
 	position: relative;
-}
-.img-container.security img {
-	margin: 10px;
+	padding: 10px;
 }
 @media (min-width: 769px) {
-	.img-container {
+	#container img {
 		margin: 0 -200px 0 20px;
 	}
-	.img-container:before {
-		content: '';
-		background-attachment: fixed;
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		border-radius: 10px;
-	}
-	.img-container.file-hist:before {
-		box-shadow: inset 0 0 5px rgba(0, 0, 0, .5);
-	}
-	.img-container.security {
-		margin-top: calc(-100% + 389px);
+	#container img.security {
+		margin-top: calc(-100% + 300px);
 		margin-bottom: 50px;
 	}
 }
@@ -54,7 +37,7 @@ body {
 	#container {
 		width: calc(100% - 20px);
 	}
-	.img-container, #container img {
+	#container img {
 		max-width: 100%;
 	}
 }

@@ -11,7 +11,7 @@ var JSZip = require('jszip');
 var express = require('express');
 var app = express();
 var Mustache = require('mustache');
-var markdown = require('markdown').markdown;
+var marked = require('marked');
 var compression = require('compression');
 
 var pg = require('pg-promise')();
@@ -627,7 +627,7 @@ app.get('/docs/:id', function(req, res) {
 			res.send(200, Mustache.render(docs, {
 				FORKME_URL: process.env.FORKME_URL,
 				title: contents.match(/^# (.*)$/m)[1],
-				contents: markdown.toHTML(contents, 'Maruku'),
+				contents: marked(contents),
 			}, {
 				menu: menu_html,
 			}));
@@ -643,7 +643,7 @@ app.get('/terms', function(req, res) {
 		fs.readFile('terms.mustache', 'utf8', function(err, terms) {
 			res.send(200, Mustache.render(terms, {
 				FORKME_URL: process.env.FORKME_URL,
-				contents: markdown.toHTML(contents, 'Maruku'),
+				contents: marked(contents),
 			}, {
 				menu: menu_html,
 			}));
