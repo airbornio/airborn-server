@@ -14,7 +14,7 @@
 			<div class="header">Starter</div>
 			<div class="features">
 				<ul>
-					<li>All your documents fully secure</li>
+					<a href="docs/security"><li><i class="icon icon-lock"></i>All your documents fully secure</li></a>
 				</ul>
 			</div>
 			<div class="price"><em>Free</em></div>
@@ -29,17 +29,40 @@
 			<div class="header">Knowledge Worker</div>
 			<div class="features">
 				<ul>
-					<li>All your documents fully secure</li>
-					<li>Get old versions of your documents back</li>
-					<li>Collaborate with others on your documents</li>
+					<a href="docs/security"><li><i class="icon icon-lock"></i>All your documents fully secure</li></a>
+					<li><i class="icon icon-history"></i>Get old versions of your documents back</li>
+					<li><i class="icon icon-users"></i>Collaborate with others on your documents</li>
 				</ul>
 			</div>
-			<div class="price"><em>{{knowledgeWorkerPrice}}</em> per month</div>
+			<div class="price"><em>{{knowledgeWorkerPrice}}</em> per month <span class="live">(billed per 3 months)</span></div>
 			{{#userId}}
-				{{#subscription}}<div class="purchase">You're currently on this plan</div>{{/subscription}}
-				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Start your free 3 month trial!</div></a>{{/subscription}}
+				{{#subscription}}
+					{{#knowledgeWorker}}<div class="purchase">You're currently on this plan</div>{{/knowledgeWorker}}
+					{{^knowledgeWorker}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Knowledge Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/knowledgeWorker}}
+				{{/subscription}}
+				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Claim your free month!</div></a>{{/subscription}}
 			{{/userId}}
-			{{^userId}}<a href="register" title="Login or Register to choose this plan"><div class="purchase">Register now and claim your free 3 month trial in the app!</div></a>{{/userId}}
+			{{^userId}}<a href="register" title="Login or Register to choose this plan"><div class="purchase">Claim your free month in the app!</div></a>{{/userId}}
+		</div>
+		<div class="plan">
+			<div class="header">Business Worker</div>
+			<div class="features">
+				<ul>
+					<a href="docs/security"><li><i class="icon icon-lock"></i>All your documents fully secure</li></a>
+					<li><i class="icon icon-history"></i>Get old versions of your documents back</li>
+					<li><i class="icon icon-users"></i>Collaborate with others on your documents</li>
+					<li><i class="icon icon-wristwatch"></i>Choose when and whether to update Airborn OS</li>
+				</ul>
+			</div>
+			<div class="price"><em>{{businessWorkerPrice}}</em> per month</div>
+			{{#userId}}
+				{{#subscription}}
+					{{#businessWorker}}<div class="purchase">You're currently on this plan</div>{{/businessWorker}}
+					{{^businessWorker}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Business Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/businessWorker}}
+				{{/subscription}}
+				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/businessworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Claim your free month!</div></a>{{/subscription}}
+			{{/userId}}
+			{{^userId}}<a href="register" title="Login or Register to choose this plan"><div class="purchase">Claim your free month in the app!</div></a>{{/userId}}
 		</div>
 		{{/FASTSPRING_URL}}
 	</div>

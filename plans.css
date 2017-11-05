@@ -14,7 +14,7 @@
 	background-color: rgba(255, 255, 255, .6);
 	border-radius: 10px;
 	vertical-align: top;
-	margin: 10px;
+	margin: 30px;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
 	font-weight: bold;
 }
@@ -29,11 +29,22 @@
 	flex-grow: 1;
 }
 .plan .features ul {
-	list-style-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTIiIHdpZHRoPSIxMi40NiI+PHBhdGggZD0iTTQuNSAxMmMtLjMgMC0uNiAwLS43NS0uM0wuMyA4LjI1IDAgNy41bC4zLS42LjYtLjMuNzUuM0w0LjUgOS40NWw2LTkgLjktLjQ1aC42Yy40NS40NS42IDEuMDUuMyAxLjVMNS4yNSAxMS41NWMwIC4zLS40NS40NS0uNzUuNDV6IiBmaWxsPSIjMjZhOTY0Ii8+PC9zdmc+);
+	list-style: none;
 	padding-left: 2em;
 }
-.plan .features ul li:not(:last-child) {
+.plan .features ul li {
 	padding-bottom: .5em;
+	min-height: 2em;
+	vertical-align: middle;
+}
+.plan .features ul li .icon {
+	position: absolute;
+	margin-left: -30px;
+	color: green;
+}
+.plan .features ul li .icon:before {
+	width: 1.2em;
+	font-size: large;
 }
 .plan .price {
 	margin-bottom: 1rem;
@@ -53,11 +64,13 @@
     border-bottom-right-radius: inherit;
 }
 .plan a .purchase:after {
-	content: '⇨';
+	content: '➡';
 	position: absolute;
 	right: 12px;
+	color: green;
+	opacity: .8;
 }
-@media (max-width: 730px) {
+@media (max-width: 900px) {
 	#plans {
 		flex-direction: column;
 		align-items: center;

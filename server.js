@@ -477,7 +477,7 @@ app.put('/push/:id/', function(req, res) {
 });
 
 app.get('/plans', function(req, res) {
-	return https.get('https://sites.fastspring.com/airbornos/api/price?product_1_path=/knowledgeworker&product_2_path=/medialover&product_3_path=/mediaworker&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For').split(',')[0]) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
+	return https.get('https://sites.fastspring.com/airbornos/api/price?product_1_path=/knowledgeworker&product_2_path=/businessworker&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For').split(',')[0]) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
 		var body = '';
 		response.on('data', function(data) {
 			body += data;
@@ -496,9 +496,10 @@ app.get('/plans', function(req, res) {
 					userId: req.session.userID,
 					username: req.session.username,
 					subscription: req.session.subscription,
-					knowledgeWorkerPrice: prices.product_1_unit_display,
-					mediaLoverPrice: prices.product_2_unit_display,
-					mediaWorkerPrice: prices.product_3_unit_display,
+					knowledgeWorker: req.session.tier === 5,
+					businessWorker: req.session.tier === 10,
+					knowledgeWorkerPrice: (prices.product_1_unit_value / 3).toLocaleString(prices.user_language, {style: 'currency', currency: prices.user_currency}),
+					businessWorkerPrice: parseFloat(prices.product_2_unit_value).toLocaleString(prices.user_language, {style: 'currency', currency: prices.user_currency}),
 				}, {
 					menu: menu_html,
 				}));
@@ -677,6 +678,7 @@ function login(req, res, authkey, cont) {
 			res.set('Cache-control', 's-maxage=0');
 			req.session.userID = user.id;
 			req.session.S3Prefix = user.S3Prefix;
+			req.session.tier = user.tier;
 			req.session.subscription = user.subscription;
 			res.cookie('account_info', {
 				S3Prefix: user.S3Prefix,
