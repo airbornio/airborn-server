@@ -57,6 +57,22 @@
 					}
 				});
 			};
+			[
+				'/',
+				'/Documents/',
+				'/Documents/.history/',
+				'/Documents/Documents/.history/',
+				'/AppData/',
+				'/AppData/firetext/',
+				'/AppData/firetext/localStorage',
+				'/CoreData/',
+				'/CoreData/localStorage',
+				'/settings',
+			].forEach(function(path) {
+				// We write directly to cache instead of using putFile to avoid the
+				// cyclic dependency between /Documents/ and /Documents/.history/.
+				window.getFileCache[path] = {codec: 'utf8String', contents: '', ts: Date.now()};
+			});
 			if(!location.hash.includes('firetext:s=')) {
 				putFile('/Documents/Documents/', 'Welcome.html: {type: text/html}');
 				putFile('/AppData/firetext/localStorage', '{"firetext.recents":"[[\\"/sdcard/Documents/\\",\\"Welcome\\",\\".html\\",\\"\\",\\"internal\\"]]"}');
