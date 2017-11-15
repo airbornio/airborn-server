@@ -57,6 +57,10 @@
 					}
 				});
 			};
+			if(!location.hash.includes('firetext:s=')) {
+				putFile('/Documents/Documents/', 'Welcome.html: {type: text/html}');
+				putFile('/AppData/firetext/localStorage', '{"firetext.recents":"[[\\"/sdcard/Documents/\\",\\"Welcome\\",\\".html\\",\\"\\",\\"internal\\"]]"}');
+			}
 			getFile('/Core/modules/startup/startup.js', function(contents) {
 				eval(contents);
 			});

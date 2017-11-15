@@ -538,17 +538,8 @@ firetext/: {}
 marketplace/: {}
 `);
 });
-app.get('/v2/live/Documents/', function(req, res) {
-	res.send('Documents/: {}');
-});
-app.get('/v2/live/Documents/Documents/', function(req, res) {
-	res.send('Welcome.html: {type: text/html}');
-});
 app.get('/v2/live/Documents/Documents/Welcome.html', function(req, res) {
 	res.sendFile('Welcome.html', {root: __dirname});
-});
-app.get('/v2/live/AppData/firetext/localStorage', function(req, res) {
-	res.send('{"firetext.recents":"[[\\"/sdcard/Documents/\\",\\"Welcome\\",\\".html\\",\\"\\",\\"internal\\"]]"}');
 });
 
 var update = {};
