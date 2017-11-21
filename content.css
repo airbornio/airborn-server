@@ -244,7 +244,7 @@ body.noanim #fastforward,
 	background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .6) 10px, rgba(255, 255, 255, .8) 10px, rgba(255, 255, 255, .8) 20px);
 	border-radius: 7px;
 	padding: 0 16px;
-	margin-right: -16px;
+	margin-right: -4px;
 	display: inline-block;
 	text-shadow: none;
 	height: 38px;
