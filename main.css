@@ -21,6 +21,7 @@ body {
 .background, .background-before:before {
 	background-color: #607B8B;
 	background-image: url(images/background.png);
+	background-attachment: fixed;
 }
 @media (max-device-width: 640px) and (max-device-height: 640px) {
 	.background, .background-before:before {
@@ -44,6 +45,11 @@ body {
 			background-image: url(images/background-pixelated-small.png);
 			background-size: 650px 650px;
 		}
+	}
+}
+@media (min-width: 1926px), (min-height: 1101px) {
+	.background, .background-before:before {
+		background-size: cover;
 	}
 }
 
