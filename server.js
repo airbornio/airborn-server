@@ -535,7 +535,6 @@ app.post('/notify/deactivated/', function(req, res) {
 app.get('/v2/live/Apps/', function(req, res) {
 	res.send(`strut/: {}
 firetext/: {}
-marketplace/: {}
 `);
 });
 app.get('/v2/live/Documents/Documents/Welcome.html', function(req, res) {
