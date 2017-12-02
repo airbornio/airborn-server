@@ -5,7 +5,7 @@
 
 ## Why are those little history icons missing for all files?
 
-Airborn OS only records file history when you're on a paid plan. If you recently changed to a paid plan, Airborn OS will start recording file history as soon as you start modifying files.
+Airborn only records file history when you're on a paid plan. If you recently changed to a paid plan, Airborn will start recording file history as soon as you start modifying files.
 
 ## Why are those little history icons missing for some files?
 

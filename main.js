@@ -42,22 +42,22 @@ var msg_console = ['info', 'info', 'info', 'warn', 'error'];
 var msg_icons = ['check', 'check', 'info', 'warning', 'error'];
 var msg_colors = ['green', 'green', 'blue', 'yellow', 'red'];
 var msg_strings = {
-	updatefound_sw: ['warning', "Airborn OS has been updated. We can't be sure that it's an update that's publicly available on GitHub. Please check that you trust this update or stop using this version of Airborn OS."],
+	updatefound_sw: ['warning', "Airborn has been updated. We can't be sure that it's an update that's publicly available on GitHub. Please check that you trust this update or stop using this version of Airborn."],
 	
-	response_unchanged: ['unchanged', "Airborn OS is still the same version as last time you opened it."],
-	response_matches: ['changed', "Airborn OS was updated. The new version matches the publicly available version."],
-	response_matches_sw: ['warning', "Airborn OS was updated. It seems the new version matches the publicly available version, but we can't be sure. Please check that you trust this update or stop using this version of Airborn OS."],
-	response_does_not_match: ['info', "Someone attempted to update your version of Airborn OS to a version that's not publicly available, and shouldn't be trusted. We rejected the update. If you want to continue using the version of Airborn OS you currently have, don't clear your browser storage and don't force-refresh this page."],
-	response_does_not_match_sw: ['error', "Airborn OS has been updated to a version that's not publicly available, and shouldn't be trusted! We recommended that you stop using this version of Airborn OS."],
-	could_not_reach_github: ['info', "There's an update available for Airborn OS, but we couldn't check that it's an update that's publicly available on GitHub. You can continue using the old version. If you trust and want to use the new version (not recommended), clear your browser storage for this website and force-refresh this page."],
-	could_not_reach_github_sw: ['error', "Airborn OS has been updated, but we couldn't check that it's an update that's publicly available on GitHub. Please check that you trust this update or stop using this version of Airborn OS."],
+	response_unchanged: ['unchanged', "Airborn is still the same version as last time you opened it."],
+	response_matches: ['changed', "Airborn was updated. The new version matches the publicly available version."],
+	response_matches_sw: ['warning', "Airborn was updated. It seems the new version matches the publicly available version, but we can't be sure. Please check that you trust this update or stop using this version of Airborn."],
+	response_does_not_match: ['info', "Someone attempted to update your version of Airborn to a version that's not publicly available, and shouldn't be trusted. We rejected the update. If you want to continue using the version of Airborn you currently have, don't clear your browser storage and don't force-refresh this page."],
+	response_does_not_match_sw: ['error', "Airborn has been updated to a version that's not publicly available, and shouldn't be trusted! We recommended that you stop using this version of Airborn."],
+	could_not_reach_github: ['info', "There's an update available for Airborn, but we couldn't check that it's an update that's publicly available on GitHub. You can continue using the old version. If you trust and want to use the new version (not recommended), clear your browser storage for this website and force-refresh this page."],
+	could_not_reach_github_sw: ['error', "Airborn has been updated, but we couldn't check that it's an update that's publicly available on GitHub. Please check that you trust this update or stop using this version of Airborn."],
 	
-	new_response_matches: ['info', "This version of Airborn OS seems to be the publicly available version. However, since this is the first time you open Airborn OS here, you should check that you trust this computer and this version of Airborn OS."],
-	new_response_does_not_match: ['error', "This version of Airborn OS is not the publicly available version. It's recommended that you don't enter your username and password."],
-	new_could_not_reach_github: ['error', "We could not check whether this version of Airborn OS is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
+	new_response_matches: ['info', "This version of Airborn seems to be the publicly available version. However, since this is the first time you open Airborn here, you should check that you trust this computer and this version of Airborn."],
+	new_response_does_not_match: ['error', "This version of Airborn is not the publicly available version. It's recommended that you don't enter your username and password."],
+	new_could_not_reach_github: ['error', "We could not check whether this version of Airborn is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
 	
-	sw_not_supported: ['warning', "Please switch to a recent version of Chrome or Firefox to increase the security of Airborn OS. (Service Workers are not supported in your browser.) We could not check whether this version of Airborn OS is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
-	sw_failed: ['error', "We could not check whether this version of Airborn OS is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
+	sw_not_supported: ['warning', "Please switch to a recent version of Chrome or Firefox to increase the security of Airborn. (Service Workers are not supported in your browser.) We could not check whether this version of Airborn is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
+	sw_failed: ['error', "We could not check whether this version of Airborn is the publicly available version. Please check that you trust this version, otherwise, don't enter your username and password."],
 };
 
 const GITHUB_URL = 'https://github.com/airbornos/airborn-server/tree/';

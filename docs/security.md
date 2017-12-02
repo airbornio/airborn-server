@@ -21,12 +21,12 @@ We've done two things to accomplish this:
    off a warning to you. That code then keeps taps on all other code,
    and checks that it matches the publicly available version on GitHub.
    
-   In some cases, such as when Airborn OS is opened in the background,
-   we might be unable to show you a warning when Airborn OS updates. For
+   In some cases, such as when Airborn is opened in the background,
+   we might be unable to show you a warning when Airborn updates. For
    those cases, you should
    <button onclick="Notification.requestPermission()">enable Web
    Notifications</button> so that we can always show you a notification
-   when Airborn OS updates. We won't show you notifications for anything
+   when Airborn updates. We won't show you notifications for anything
    other than that.
 
 <img alt="Client-Side Encryption" src="images/client-side-encryption.png" class="img-container security" id="sidebar">

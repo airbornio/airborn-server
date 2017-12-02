@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Plans - Airborn OS</title>
+	<title>Plans - Airborn</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="plans.css">
@@ -19,7 +19,7 @@
 			</div>
 			<div class="price"><em>Free</em></div>
 			{{#userId}}
-				{{#subscription}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Starter plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/subscription}}
+				{{#subscription}}<a href="mailto:support@airborn.io?subject=Switch plans&amp;body=Hi, I would like to switch to the Starter plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/subscription}}
 				{{^subscription}}<div class="purchase">You're currently on this plan</div>{{/subscription}}
 			{{/userId}}
 			{{^userId}}<a href="register" title=""><div class="purchase">Register now!</div></a>{{/userId}}
@@ -38,7 +38,7 @@
 			{{#userId}}
 				{{#subscription}}
 					{{#knowledgeWorker}}<div class="purchase">You're currently on this plan</div>{{/knowledgeWorker}}
-					{{^knowledgeWorker}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Knowledge Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/knowledgeWorker}}
+					{{^knowledgeWorker}}<a href="mailto:support@airborn.io?subject=Switch plans&amp;body=Hi, I would like to switch to the Knowledge Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/knowledgeWorker}}
 				{{/subscription}}
 				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/knowledgeworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Claim your free month!</div></a>{{/subscription}}
 			{{/userId}}
@@ -51,14 +51,14 @@
 					<a href="docs/security"><li><i class="icon icon-lock"></i>All your documents fully secure</li></a>
 					<li><i class="icon icon-history"></i>Get old versions of your documents back</li>
 					<li><i class="icon icon-users"></i>Collaborate with others on your documents</li>
-					<li><i class="icon icon-wristwatch"></i>Choose when and whether to update Airborn OS</li>
+					<li><i class="icon icon-wristwatch"></i>Choose when and whether to update Airborn</li>
 				</ul>
 			</div>
 			<div class="price"><em>{{businessWorkerPrice}}</em> per month</div>
 			{{#userId}}
 				{{#subscription}}
 					{{#businessWorker}}<div class="purchase">You're currently on this plan</div>{{/businessWorker}}
-					{{^businessWorker}}<a href="mailto:support@airbornos.com?subject=Switch plans&amp;body=Hi, I would like to switch to the Business Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/businessWorker}}
+					{{^businessWorker}}<a href="mailto:support@airborn.io?subject=Switch plans&amp;body=Hi, I would like to switch to the Business Worker plan. My subscription id is {{subscription}}."><div class="purchase">Email us to switch</div></a>{{/businessWorker}}
 				{{/subscription}}
 				{{^subscription}}<a href="{{FASTSPRING_URL}}/instant/businessworker?referrer={{userId}}" title="You're logged in as {{username}}"><div class="purchase">Claim your free month!</div></a>{{/subscription}}
 			{{/userId}}

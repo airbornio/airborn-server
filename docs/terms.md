@@ -4,7 +4,7 @@ Date: January 30, 2015
 
 These Terms of Use govern Airborn ("we"), the user of the account to be
 created ("you"), said account ("your account") and your use of Airborn
-OS at airbornos.com ("the service").
+at airborn.io ("the service").
 
 
 ## Limiting of use

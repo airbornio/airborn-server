@@ -1,7 +1,7 @@
 # Contact
 
-Contact: [info@airbornos.com](mailto:info@airbornos.com)
+Contact: [info@airborn.io](mailto:info@airborn.io)
 
-Support: [support@airbornos.com](mailto:support@airbornos.com)
+Support: [support@airborn.io](mailto:support@airborn.io)
 
 [Feedback](https://www.supersimplesurvey.com/survey/17354/airborn-os-feedback/)
