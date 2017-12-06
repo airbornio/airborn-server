@@ -61,6 +61,14 @@ app.use(function(req, res, next) {
 	next();
 });
 
+app.use(/^\/(?:docs\/)?[a-z-]*$/, function(req, res, next) {
+	if(req.method === 'GET' && req.get('Host') !== process.env.HOSTNAME && req.get('Host') !== process.env.HOSTNAME_ALT) {
+		res.redirect(301, '//' + process.env.HOSTNAME + req.originalUrl);
+		return;
+	}
+	next();
+});
+
 var session = Session({
 	secret: process.env.COOKIE_SESSION_SECRET,
 	store: new RedisStore({client: redis}),
