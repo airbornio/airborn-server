@@ -259,7 +259,6 @@ document.getElementById('container').addEventListener('submit', function(evt) {
 							eval(contents);
 							//alert(lang.done);
 							document.querySelector('.bar').remove();
-							document.querySelector('.background').remove();
 							document.getElementById('container').remove();
 							window.showNotice('serverinstalling', "Installing… Please don't close this tab.");
 						});
