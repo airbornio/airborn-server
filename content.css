@@ -148,7 +148,7 @@ a {
 }
 #annotation-2 {
 	margin-top: 90px;
-	margin-left: -54px;
+	margin-left: -34px;
 	animation-delay: 7.5s;
 }
 @keyframes type {
@@ -170,7 +170,6 @@ a {
 }
 #arrow-1 {
 	margin-top: 60px;
-	margin-left: -20px;
 	animation-delay: 7s;
 }
 #arrow-1 img {
@@ -243,8 +242,8 @@ body.noanim #fastforward,
 	background: white;
 	background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .6) 10px, rgba(255, 255, 255, .8) 10px, rgba(255, 255, 255, .8) 20px);
 	border-radius: 7px;
-	padding: 0 16px;
-	margin-right: -4px;
+	padding: 0 12px;
+	margin-right: -3px;
 	display: inline-block;
 	text-shadow: none;
 	height: 38px;
@@ -365,7 +364,7 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 		margin-left: 100px;
 		margin-top: 157px;
 	}
-	#demo-bar .menu-button {
+	#demo-bar .menu-button, #demo-bar .menu > :first-child li {
 		display: none;
 	}
 	#demo-bar .menu {
