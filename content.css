@@ -72,12 +72,12 @@ a {
 }
 #header-2 {
 	transform: translateY(-100%);
-	animation-delay: .3s; /* Slight delay after the comma. */
+	animation-delay: .2s; /* Slight delay after the comma. */
 	pointer-events: none;
 }
 #header-3 {
 	transform: translateY(-200%);
-	animation-delay: .5s; /* Slight delay after the whitespace. */
+	animation-delay: .4s; /* Slight delay after the whitespace. */
 	pointer-events: none;
 }
 #header-2 *, #header-3 * {
@@ -93,7 +93,7 @@ a {
 	font-size: smaller;
 }
 .marquee-placeholder {
-	animation: hide 0s 6s;
+	animation: hide 0s 3.8s;
 	animation-fill-mode: forwards;
 }
 .marquee {
@@ -103,14 +103,14 @@ a {
 	margin-bottom: -.2em;
 	overflow: hidden;
 	vertical-align: top;
-	animation: show 0s 6s;
+	animation: show 0s 3.8s;
 	animation-fill-mode: both;
 }
 .marquee-hidden {
 	display: none;
 }
 .marquee-el {
-	animation: marquee 7s 6.7s infinite;
+	animation: marquee 4s 4.1s infinite;
 	margin-bottom: .24em;
 }
 @keyframes show {
@@ -130,7 +130,7 @@ a {
 	89% { transform: translateY(0); }
 }
 .annotation {
-	animation: type 3.5s linear forwards;
+	animation: type 2s linear forwards;
 	overflow: hidden;
 	width: 0;
 	height: 1.2em;
@@ -144,19 +144,19 @@ a {
 #annotation-1 {
 	margin-top: -38px;
 	margin-left: -125px;
-	animation-delay: 4.5s;
+	animation-delay: 2.8s;
 }
 #annotation-2 {
 	margin-top: 90px;
 	margin-left: -34px;
-	animation-delay: 7.5s;
+	animation-delay: 4.6s;
 }
 @keyframes type {
 	from { width: 1ch; }
 	to { width: 54ch; }
 }
 .arrow {
-	animation: reveal 1.5s linear;
+	animation: reveal 1s linear;
 	animation-fill-mode: both;
 	overflow: hidden;
 	position: absolute;
@@ -170,7 +170,7 @@ a {
 }
 #arrow-1 {
 	margin-top: 60px;
-	animation-delay: 7s;
+	animation-delay: 4.3s;
 }
 #arrow-1 img {
 	transform: scaleY(-1);
@@ -197,7 +197,7 @@ body.inactive .marquee-el {
 	text-decoration: none;
 	margin-left: 300px;
 	margin-top: 57px;
-	animation: fadeout .5s 7.5s forwards;
+	animation: fadeout .5s 4.6s forwards;
 }
 #noanim:target ~ .annotation,
 #noanim:target ~ .arrow,
@@ -333,13 +333,13 @@ body:not(.scrolled) .row:not(:first-child):not(:target) .img {
 	#header-2 {
 		left: calc(50vw - 13ch);
 		transform: none;
-		animation-delay: 1.5s;
+		animation-delay: 1s;
 	}
 	#header-3 {
 		top: 5px;
 		left: calc(50vw - 2.5ch);
 		transform: none;
-		animation-delay: 3.5s;
+		animation-delay: 2.3s;
 		margin-bottom: 94px;
 	}
 	.annotation {
