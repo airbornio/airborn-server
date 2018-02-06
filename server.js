@@ -595,7 +595,7 @@ app.get('/firetext/location', function(req, res) {
 		}
 		res.set('Access-Control-Allow-Origin', '*');
 		res.send(200, {
-			country: result.country,
+			country: result && result.country,
 		});
 	});
 });
