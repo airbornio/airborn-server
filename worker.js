@@ -135,7 +135,7 @@ var prevRows;
 				},
 				json: true,
 			}, function(err, response) {
-				setTimeout(invalidateCDN, 1000 / 10); // 10 per second, to stay under the limit of 20 per second.
+				setTimeout(invalidateCDN, 60000 / 20); // The rate limit is 20 requests per minute.
 				if(err) {
 					console.error(err);
 					return;
