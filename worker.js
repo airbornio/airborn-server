@@ -7,9 +7,9 @@ var s3 = new AWS.S3();
 var request = require('request');
 
 require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
-	return conn.createChannel().then(function(channel) {
-		channel.assertQueue('transactions');
-		channel.consume('transactions', function(message) {
+	return conn.createChannel().then(async function(channel) {
+		await channel.assertQueue('transactions');
+		channel.consume('transactions', async function(message) {
 			if(message === null) {
 				console.error('Consumer was canceled');
 				process.exit(1);
@@ -19,12 +19,12 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(fun
 			var metadata = message.properties.headers;
 			switch(action) {
 				case 'commit':
-					channel.assertQueue(metadata.queue);
+					await channel.assertQueue(metadata.queue);
 					(function _getMessage() {
-						getMessage(channel, metadata.queue, function(done) {
+						getMessage(channel, metadata.queue, async function(done) {
 							if(done) {
-								channel.ack(message);
-								channel.deleteQueue(metadata.queue, {ifEmpty: true}); // To be safe, but it should always be empty.
+								await channel.ack(message);
+								await channel.deleteQueue(metadata.queue, {ifEmpty: true}); // To be safe, but it should always be empty.
 								return;
 							}
 							_getMessage();
@@ -45,7 +45,7 @@ require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(fun
 });
 
 function getMessage(channel, queue, callback, getanother) {
-	channel.get(queue).then(function(message) {
+	channel.get(queue).then(async function(message) {
 		if(message === false) {
 			callback(true);
 			return;
@@ -75,8 +75,8 @@ function getMessage(channel, queue, callback, getanother) {
 							SET (size, "lastUpdated") = ($3, $4)
 						`, [metadata.S3Prefix, metadata.name, metadata.size, Date.now()]);
 					}
-				}).then(function() {
-					channel.ack(message);
+				}).then(async function() {
+					await channel.ack(message);
 					callback();
 				}, function(err) {
 					console.log(metadata);
@@ -89,7 +89,7 @@ function getMessage(channel, queue, callback, getanother) {
 				break;
 			default:
 				console.error('Unknown message type: ' + action);
-				channel.nack(message);
+				await channel.nack(message);
 				callback();
 				break;
 		}

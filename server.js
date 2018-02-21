@@ -41,9 +41,9 @@ var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat
 	return conn.createChannel();
 });
 function queueTask(queue, type, metadata, buffer, callback) {
-	channel.then(function(channel) {
-		channel.assertQueue(queue);
-		channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
+	channel.then(async function(channel) {
+		await channel.assertQueue(queue);
+		await channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
 	}).then(callback, function(err) {
 		callback(null, err);
 	});
