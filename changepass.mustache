@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Change Password - Airborn</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="changepass.css">
+</head>
+<body>
+	<div class="background"></div>
+	{{> menu}}
+	<form id="container">
+		<table>
+			<tr><td><label id="username-label" for="username"></label></td><td><input type="text" id="username"></td></tr>
+			<tr><td><label id="current-password-label" for="current-password"></label></td><td><input type="password" id="current-password"></td></tr>
+			<tr><td><label id="new-password-label" for="new-password"></label></td><td><input type="password" id="new-password"></td></tr>
+			<tr><td><label id="new-password-again-label" for="new-password-again"></label></td><td><input type="password" id="new-password-again"></td></tr>
+			<tr><td colspan="2"><input type="submit" id="changepass"><br></td></tr>
+		</table>
+	</form>
+	<script src="changepass.js"></script>
+	<script src="sjcl.js"></script>
+	<script src="crypto.js"></script>
+	<script src="pako.min.js"></script>
+	<script src="login.js"></script>
+	<script src="3rdparty/FileSaver.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

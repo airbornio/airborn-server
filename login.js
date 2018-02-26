@@ -113,7 +113,7 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 			if(firstfile) {
 				if(needToAuth) prefetchFiles();
 				
-				eval(firstfilecontents);
+				window.eval(firstfilecontents);
 			}
 			success(storage);
 		}).catch(function(req) {

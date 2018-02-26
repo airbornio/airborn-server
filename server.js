@@ -94,7 +94,7 @@ app.get('/lang.json', function(req, res) {
 app.get(/^\/(?:app|demo|update)$/, function(req, res) {
 	res.sendfile(req.path.substr(1) + '.html');
 });
-app.get(/^\/(?:content|content-app|register|demo)$/, function(req, res) {
+app.get(/^\/(?:content|content-app|register|changepass|demo)$/, function(req, res) {
 	res.type('html');
 	fs.readFile(req.path.substr(1) + '.mustache', 'utf8', function(err, contents) {
 		res.send(200, Mustache.render(contents, {
@@ -104,7 +104,7 @@ app.get(/^\/(?:content|content-app|register|demo)$/, function(req, res) {
 		}));
 	});
 });
-app.get(/^\/(?:index|app|content|register|update|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
+app.get(/^\/(?:index|app|content|register|update|changepass|demo|plans|docs\/docs|terms|main)\.(?:js|css)$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get(/^\/3rdparty\/.+\.(?:js|css|png)$/, function(req, res) {
@@ -459,6 +459,23 @@ app.post('/register', function(req, res) {
 			res.send(500);
 		}
 	});
+});
+
+app.post('/changepass', function(req, res) {
+	if(userLoggedIn(req)) {
+		var salt = req.body.salt;
+		var authkey = req.body.authkey;
+		var password_backup_key = req.body.password_backup_key;
+		client.query('UPDATE users SET (salt, authkey, password_backup_key) = ($2, $3, $4) WHERE username = $1', [req.session.username, salt, authkey, password_backup_key]).then(function() {
+			res.send(200);
+		}, function(err) {
+			console.error(err);
+			res.send(500);
+		});
+	} else {
+		res.send(403);
+		return;
+	}
 });
 
 app.get('/messages', function(req, res) {

@@ -1,0 +1,38 @@
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+td {
+	padding: 5px 0;
+}
+label {
+	font-size: small;
+	margin-right: 8px;
+}
+#container {
+	width: 410px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -200px 0 0 -205px;
+	padding: 20px 30px;
+	background-color: rgba(255, 255, 255, .6);
+	border-radius: 10px;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+	text-shadow: none;
+}
+#username, #current-password, #new-password, #new-password-again {
+	width: 100%;
+}
+#ready, #error {
+	display: none;
+	font-size: small;
+	padding-top: 8px;
+}
+#error {
+	color: red;
+}
+#changepass {
+	float: right;
+	padding: 1px 20px;
+}
