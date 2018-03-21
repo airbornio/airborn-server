@@ -18,7 +18,7 @@ We've done two things to accomplish this:
 
    To solve this, we're using a relatively new web technology (Service
    Workers) to install some code which can't be changed without setting
-   off a warning to you. That code then keeps taps on all other code,
+   off a warning to you. That code then keeps tabs on all other code,
    and checks that it matches the publicly available version on GitHub.
    
    In some cases, such as when Airborn is opened in the background,
