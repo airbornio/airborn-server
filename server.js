@@ -84,7 +84,7 @@ var menu_html = fs.readFileSync('menu.mustache', 'utf8');
 app.get('/', function(req, res) {
 	res.sendfile('index.html');
 });
-app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics|serviceworker)\.js$/, function(req, res) {
+app.get(/^\/(?:pako\.min|sjcl|login|crypto|analytics|serviceworker|donate)\.js$/, function(req, res) {
 	res.sendfile(req.path.substr(1));
 });
 app.get('/lang.json', function(req, res) {
@@ -556,6 +556,35 @@ app.post('/notify/deactivated/', function(req, res) {
 	}).then(null, function(err) {
 		console.error(err);
 		res.send(500);
+	});
+});
+app.get('/donate', function(req, res) {
+	return https.get('https://sites.fastspring.com/airbornos/api/price?product_1_path=/exchangerate&user_x_forwarded_for=' + encodeURIComponent(req.get('X-Forwarded-For').split(',')[0]) + '&user_accept_language=' + encodeURIComponent(req.get('Accept-Language')), function(response) { // &user_remote_addr=' + encodeURIComponent(req.connection.remoteAddress) + '
+		var body = '';
+		response.on('data', function(data) {
+			body += data;
+		});
+		response.on('end', function() {
+			var prices = {};
+			body.split('\n').forEach(function(line) {
+				var pair = line.split('=');
+				prices[pair[0]] = pair[1];
+			});
+			fs.readFile('donate.mustache', 'utf8', function(err, contents) {
+				res.set('Cache-control', 's-maxage=0');
+				const input = '<input id="donation" type="number" value="5" step="any" min="1">';
+				res.send(200, Mustache.render(contents, {
+					FORKME_URL: process.env.FORKME_URL,
+					FASTSPRING_URL: process.env.FASTSPRING_URL,
+					user_language: JSON.stringify(prices.user_language.replace(/<>/g, '')),
+					user_currency: JSON.stringify(prices.user_currency.replace(/<>/g, '')),
+					exchangerate: prices.product_1_unit_value / 100,
+					input: Infinity.toLocaleString(prices.user_language, {style: 'currency', currency: prices.user_currency}).replace(Infinity.toLocaleString(), input)
+				}, {
+					menu: menu_html,
+				}));
+			});
+		});
 	});
 });
 

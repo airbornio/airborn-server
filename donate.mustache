@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Donate - Airborn</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="register.css">
+</head>
+<body>
+	<div class="background"></div>
+	{{> menu}}
+	{{#FASTSPRING_URL}}
+	<form id="container" method="GET" action="{{FASTSPRING_URL}}/instant/donate">
+		<input type="hidden" id="donationtags" name="tags" value="donation=100">
+		<table>
+			<tr><td><label id="donate-label" for="username"></label></td><td>{{{input}}}</td></tr>
+			<tr><td colspan="2"><input type="checkbox" id="include-fee"> <label id="include-fee-label" for="include-fee"></label></td></tr>
+			<tr><td><label id="donate-total-label"></label></td><td id="donate-total"></td></tr>
+		</table>
+		<input type="submit">
+	</form>
+	{{/FASTSPRING_URL}}
+	<script src="main.js"></script>
+	<script>
+	const exchangerate = {{exchangerate}};
+	const user_language = {{{user_language}}};
+	const user_currency = {{{user_currency}}};
+	</script>
+	<script src="donate.js"></script>
+</body>
+</html>

@@ -38,5 +38,8 @@
 	"agree-terms": "I agree to the {terms} and {privacypolicy}.",
 	"terms": "Terms of Service",
 	"privacypolicy": "Privacy Policy",
-	"noterms": "Please agree to the Terms of Service and Privacy Policy"
+	"noterms": "Please agree to the Terms of Service and Privacy Policy",
+	"donate": "Donate",
+	"include-fee": "Include fees in donation",
+	"donate-total": "Donation Total"
 }
