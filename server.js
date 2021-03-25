@@ -15,7 +15,7 @@ var marked = require('marked');
 var compression = require('compression');
 
 var pg = require('pg-promise')();
-var client = pg(process.env.DATABASE_URL);
+var client = pg(process.env.DATABASE_URL + '?ssl=true');
 
 var AWS = require('aws-sdk-promise');
 var s3 = new AWS.S3();
