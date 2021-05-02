@@ -899,6 +899,7 @@ function _trySubmission( req, res, next ) {
 
 	if(responseStatus === 403) {
 		newrelic.setIgnoreTransaction(true);
+		// newrelic.getTransaction().ignore();
 		setTimeout(function() {
 			res.send( responseStatus );
 		}, 2000);
