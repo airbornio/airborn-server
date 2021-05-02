@@ -40,13 +40,12 @@ var visualCaptcha;
 var channel = require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
 	return conn.createChannel();
 });
+channel.catch(console.error);
 function queueTask(queue, type, metadata, buffer, callback) {
 	channel.then(async function(channel) {
 		await channel.assertQueue(queue);
 		await channel.sendToQueue(queue, buffer, {type: type, headers: metadata});
-	}).then(callback, function(err) {
-		callback(null, err);
-	});
+	}).then(callback, callback);
 }
 
 //app.use(compression());
