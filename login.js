@@ -90,8 +90,8 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 				if(!needToAuth) prefetchFiles();
 				
 				return new Promise(function(resolve, reject) {
-					GET('object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(firstfile)), function(response) {
-						resolve(decryptAndMaybeUngzip(files_key, response))
+					GET('/v2/live' + firstfile, function(response) {
+						resolve(response)
 					}, reject, needToAuth && authkey, needToSendUsername && username);
 				}).catch(function(req) {
 					if(req.status === 404) {
@@ -140,7 +140,7 @@ function login(creds, firstfile, requestmorecreds, success, error) {
 		].forEach(function(url) {
 			var link = document.createElement('link');
 			link.rel = 'prefetch';
-			link.href = 'object/' + sjcl.codec.hex.fromBits(window.files_hmac.mac(url));
+			link.href = '/v2/live' + url;
 			document.body.appendChild(link);
 		});
 	}
