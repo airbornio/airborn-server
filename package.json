@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"dependencies": {
 		"express": "4.12.3",
-		"pg-promise": "5.0.3",
+		"pg-promise": "10.11.1",
 		"aws-sdk": "2.1.5",
 		"aws-sdk-promise": "0.0.2",
 		"newrelic": "4.0.0",
@@ -29,5 +29,10 @@
 	},
 	"engines": {
 		"node": "~8.9.4"
+	},
+	"scripts": {
+		"predeploy": "sed -i \"s/\\$GIT_COMMIT/$(git rev-parse origin)/\" fly.toml",
+		"deploy": "fly deploy",
+		"postdeploy": "sed -i \"s/$(git rev-parse origin)/\\$GIT_COMMIT/\" fly.toml"
 	}
 }

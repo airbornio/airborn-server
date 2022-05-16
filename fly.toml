@@ -1,0 +1,62 @@
+# fly.toml file generated for airborn-server on 2022-05-15T23:03:58+02:00
+
+app = "airborn-server"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  AWS_REGION = "eu-west-1"
+  DEVELOPMENT = 1
+  DEFAULT_QUOTA = 2
+  DEFAULT_TIER = 1
+  FASTSPRING_URL = "https://sites.fastspring.com/airbornos"
+  FEEDBACK_URL = "https://www.supersimplesurvey.com/survey/17354/airborn-os-feedback/"
+  FIRETEXT_SERVER_HOSTNAME = "firetext.herokuapp.com"
+  FORKME_URL = "https://github.com/airbornio"
+  HOSTNAME = "www.airborn.io"
+  HOSTNAME_ALT = "airborn-server.fly.dev"
+  GOOGLE_DRIVE_IMPORT_URL = "https://google-drive-import.airbornos.com/google-drive-import.html"
+  MIN_CORE_VERSION = 3
+  NEW_RELIC_APP_NAME = "Airborn"
+  NEW_RELIC_LOG = "stdout"
+  PORT = "8080"
+  S3_BUCKET_NAME = "airborn-prod"
+  UPDATE_URL = "http://airborn-update.herokuapp.com"
+  USERCONTENT_URL = "https://airborn-usercontent.herokuapp.com"
+  GIT_COMMIT = "$GIT_COMMIT"
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  http_checks = []
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
