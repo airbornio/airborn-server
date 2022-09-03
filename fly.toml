@@ -4,7 +4,10 @@ app = "airborn-server"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
-processes = []
+
+[processes]
+  web = "node --icu-data-dir=node_modules/full-icu server.js"
+  worker = "node worker.js"
 
 [build]
   builder = "heroku/buildpacks:20"
@@ -37,7 +40,7 @@ processes = []
 [[services]]
   http_checks = []
   internal_port = 8080
-  processes = ["app"]
+  processes = ["web"]
   protocol = "tcp"
   script_checks = []
 
