@@ -32,8 +32,8 @@ redis.auth(redisParams.password);
 var bruteStore = new (require('express-brute-redis'))({client: redis});
 var brute = new (require('express-brute'))(bruteStore);
 
-var geoip2 = require('geoip2');
-geoip2.init();
+var maxmind = require('maxmind');
+const geoip = maxmind.open('./geoip/GeoLite2-Country.mmdb');
 
 var visualCaptcha;
 
@@ -631,18 +631,19 @@ app.get(/^(\/(?:v2\/)?live)\/(.*)$/, function(req, res) {
 	});
 });
 
-app.get('/firetext/location', function(req, res) {
-	geoip2.lookupSimple(req.get('X-Forwarded-For').split(',')[0], function(err, result) {
-		if(err) {
-			console.error(err);
-			res.send(500);
-			return;
-		}
+app.get('/firetext/location', async function(req, res) {
+	try {
+		const lookup = await geoip;
+		const result = await lookup.get(req.get('X-Forwarded-For').split(',')[0]);
 		res.set('Access-Control-Allow-Origin', '*');
 		res.send(200, {
 			country: result && result.country,
 		});
-	});
+	} catch(e) {
+		console.error(err);
+		res.send(500);
+		return;
+	}
 });
 
 app.use('/firetext', function(req, res) {

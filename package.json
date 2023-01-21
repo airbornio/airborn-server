@@ -20,7 +20,7 @@
 		"express-brute-redis": "0.0.1",
 		"marked": "0.3.6",
 		"compression": "1.4.3",
-		"geoip2": "1.0.4",
+		"maxmind": "4.3.8",
 		"request": "2.83.0",
 		"request-promise": "4.2.2",
 		"jszip": "3.1.4",
