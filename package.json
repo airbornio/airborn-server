@@ -24,8 +24,7 @@
 		"request": "2.83.0",
 		"request-promise": "4.2.2",
 		"jszip": "3.1.4",
-		"js-yaml": "3.0.2",
-		"full-icu": "1.2.0"
+		"js-yaml": "3.0.2"
 	},
 	"engines": {
 		"node": "~18.13.0"
