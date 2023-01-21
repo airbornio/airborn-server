@@ -8,7 +8,7 @@
 		"aws-sdk-promise": "0.0.2",
 		"newrelic": "4.0.0",
 		"visualcaptcha": "0.1.2",
-		"amqplib": "0.5.2",
+		"amqplib": "0.10.3",
 		"express-session": "1.9.1",
 		"connect-redis": "2.1.0",
 		"body-parser": "1.9.1",
