@@ -28,7 +28,7 @@
 		"full-icu": "1.2.0"
 	},
 	"engines": {
-		"node": "~8.9.4"
+		"node": "~18.13.0"
 	},
 	"scripts": {
 		"predeploy": "sed -i \"s/\\$GIT_COMMIT/$(git rev-parse origin)/\" fly.toml",
