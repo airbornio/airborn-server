@@ -29,7 +29,7 @@ kill_timeout = 5
   NEW_RELIC_LOG = "stdout"
   PORT = "8080"
   S3_BUCKET_NAME = "airborn-prod"
-  UPDATE_URL = "http://airborn-update.herokuapp.com"
+  UPDATE_URL = "https://airborn-update.fly.dev"
   USERCONTENT_URL = "https://airborn-usercontent.herokuapp.com"
   GIT_COMMIT = "$GIT_COMMIT"
 
