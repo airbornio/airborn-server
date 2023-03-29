@@ -4,45 +4,61 @@ var client = pg(process.env.DATABASE_URL);
 var AWS = require('aws-sdk-promise');
 var s3 = new AWS.S3();
 
-var request = require('request');
+var amqplib = require('amqplib');
 
-require('amqplib').connect(process.env.CLOUDAMQP_URL + '?heartbeat=10').then(function(conn) {
-	return conn.createChannel().then(async function(channel) {
-		await channel.assertQueue('transactions');
-		channel.consume('transactions', async function(message) {
-			if(message === null) {
-				console.error('Consumer was canceled');
-				process.exit(1);
-				return;
-			}
-			var action = message.properties.type;
-			var metadata = message.properties.headers;
-			switch(action) {
-				case 'commit':
-					await channel.assertQueue(metadata.queue);
-					(function _getMessage() {
-						getMessage(channel, metadata.queue, async function(done) {
-							if(done) {
-								await channel.ack(message);
-								await channel.deleteQueue(metadata.queue, {ifEmpty: true}); // To be safe, but it should always be empty.
-								return;
-							}
-							_getMessage();
-						}, function getanother() {
-							getMessage(channel, metadata.queue, function() {}, getanother);
-						});
-					})();
-					break;
-				default:
-					console.error('Unknown message type: ' + action);
-					channel.nack(message);
-					break;
-			}
-		});
+async function createConnection() {
+	const connection = await amqplib.connect(process.env.CLOUDAMQP_URL + '?heartbeat=10');
+	connection.on('error', function(err) {
+		console.error('Connection was closed!')
+		console.error(err);
+		// The connection was closed by the server, open a new one.
+		createConnection();
 	});
-}).then(null, function(err) {
-	throw err;
-});
+	createChannel(connection);
+}
+
+async function createChannel(connection) {
+	const channel = await connection.createChannel();
+	channel.on('error', function(err) {
+		console.error('Channel was closed!')
+		console.error(err);
+		// The channel was closed by the server, open a new one.
+		createChannel();
+	});
+	await channel.assertQueue('transactions');
+	channel.consume('transactions', async function(message) {
+		if(message === null) {
+			console.error('Consumer was canceled');
+			process.exit(1);
+			return;
+		}
+		var action = message.properties.type;
+		var metadata = message.properties.headers;
+		switch(action) {
+			case 'commit':
+				await channel.assertQueue(metadata.queue);
+				(function _getMessage() {
+					getMessage(channel, metadata.queue, async function(done) {
+						if(done) {
+							await channel.ack(message);
+							await channel.deleteQueue(metadata.queue, {ifEmpty: true}); // To be safe, but it should always be empty.
+							return;
+						}
+						_getMessage();
+					}, function getanother() {
+						getMessage(channel, metadata.queue, function() {}, getanother);
+					});
+				})();
+				break;
+			default:
+				console.error('Unknown message type: ' + action);
+				channel.nack(message);
+				break;
+		}
+	});
+}
+
+createConnection();
 
 function getMessage(channel, queue, callback, getanother) {
 	channel.get(queue).then(async function(message) {
