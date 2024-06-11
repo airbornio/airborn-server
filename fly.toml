@@ -10,7 +10,7 @@ kill_timeout = 5
   worker = "node worker.js"
 
 [build]
-  builder = "heroku/buildpacks:20"
+  builder = "heroku/builder:20"
 
 [env]
   AWS_REGION = "eu-west-1"
