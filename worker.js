@@ -23,7 +23,7 @@ async function createChannel(connection) {
 		console.error('Channel was closed!')
 		console.error(err);
 		// The channel was closed by the server, open a new one.
-		createChannel();
+		createChannel(connection);
 	});
 	await channel.assertQueue('transactions');
 	channel.consume('transactions', async function(message) {
@@ -110,5 +110,8 @@ function getMessage(channel, queue, callback, getanother) {
 				break;
 		}
 		getanother();
+	}).catch(function(error) {
+		console.error('channel.get error', error);
+		throw error;
 	});
 }
