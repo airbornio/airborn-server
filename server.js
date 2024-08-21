@@ -26,7 +26,9 @@ var RedisStore = require('connect-redis')(Session);
 var bodyParser = require('body-parser');
 
 var redisParams = require('parse-redis-url')().parse(process.env.REDISCLOUD_URL);
-var redis = require('redis').createClient(redisParams.port, redisParams.host);
+var redis = require('redis').createClient(redisParams.port, redisParams.host, {
+	family: 'IPv6'
+});
 redis.auth(redisParams.password);
 
 var bruteStore = new (require('express-brute-redis'))({client: redis});
